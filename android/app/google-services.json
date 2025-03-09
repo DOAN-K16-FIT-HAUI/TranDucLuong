@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "850798256535",
+    "project_id": "financial-management-afd79",
+    "storage_bucket": "financial-management-afd79.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850798256535:android:da18adec1b1e59659164d2",
+        "android_client_info": {
+          "package_name": "io.ziblox.datn_haui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApoRazqgtLLSHgPq4znvrenDZSkJ4nqis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
