@@ -11,6 +11,7 @@ class AppRoutes {
   static const String loginRoute = 'login';
   static const String registerRoute = 'register';
   static const String dashboardRoute = 'dashboard';
+  static const String forgotPasswordRoute = 'forgot-password';
 
   static final router = GoRouter(
     initialLocation: AppPaths.loginPath, // Bắt đầu từ login
@@ -33,7 +34,8 @@ class AppRoutes {
         builder: (context, state) => const Placeholder(), // Thay bằng DashboardScreen của bạn
       ),
       GoRoute(
-        path: '/forgot-password',
+        name: forgotPasswordRoute,
+        path: AppPaths.forgotPasswordPath,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
     ],
@@ -42,19 +44,22 @@ class AppRoutes {
       final isAuthenticated = authState is AuthAuthenticated;
       final isOnLogin = state.matchedLocation == AppPaths.loginPath;
       final isOnRegister = state.matchedLocation == AppPaths.registerPath;
+      final isOnForgotPassword = state.matchedLocation == AppPaths.forgotPasswordPath;
 
-      if (!isAuthenticated && !isOnLogin && !isOnRegister) {
+      if (!isAuthenticated && !isOnLogin && !isOnRegister && !isOnForgotPassword) {
         return AppPaths.loginPath; // Chuyển hướng về login nếu chưa xác thực
       }
-      if (isAuthenticated && (isOnLogin || isOnRegister)) {
+      if (isAuthenticated && (isOnLogin || isOnRegister || isOnForgotPassword)) {
         return AppPaths.dashboardPath; // Chuyển hướng về dashboard nếu đã xác thực
       }
       return null; // Không chuyển hướng
     },
+
   );
 
   static void navigateToLogin(BuildContext context) => context.goNamed(loginRoute);
   static void navigateToRegister(BuildContext context) => context.goNamed(registerRoute);
+  static void navigateToForgotPassword(BuildContext context) => context.goNamed(forgotPasswordRoute);
   static void navigateToDashboard(BuildContext context) => context.goNamed(dashboardRoute);
 }
 
@@ -67,6 +72,7 @@ class AppPaths {
   static const String settingsPath = '/settings';
   static const String reportsPath = '/reports';
   static const String loginPath = '/login';
-  static const String registerPath = '/register'; // Thêm register path
+  static const String registerPath = '/register';
+  static const String forgotPasswordPath = '/forgot-password';
   static const String transactionListPath = '/transaction-list';
 }

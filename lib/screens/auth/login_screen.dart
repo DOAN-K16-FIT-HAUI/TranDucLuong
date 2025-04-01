@@ -1,10 +1,9 @@
+import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
-import 'package:finance_app/core/AppRoutes.dart';
-import 'package:finance_app/screens/auth/forgot_password_screen.dart';
+import 'package:finance_app/core/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:finance_app/blocs/auth/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,10 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Trong LoginScreen
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
-                  );
+                  AppRoutes.navigateToForgotPassword(context);
                 },
                 child: const Text('Quên mật khẩu?'),
               ),
