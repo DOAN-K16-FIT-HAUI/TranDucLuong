@@ -1,3 +1,3 @@
 # finance_app
 
-A personal finance management app build with Flutter
+A personal finance management app built with Flutter
