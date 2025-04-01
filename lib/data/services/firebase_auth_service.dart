@@ -1,9 +1,16 @@
 import 'package:finance_app/data/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthService {
-  // FirebaseAuth instance
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
+
+  FirebaseAuthService({
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn();
 
   // Sign in with email and password
   Future<UserModel> signInWithEmailAndPassword({
@@ -41,6 +48,29 @@ class FirebaseAuthService {
       );
     } catch (e) {
       throw Exception('Sign up failed: $e');
+    }
+  }
+
+  // Sign in with Google
+  Future<UserModel> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception('Google sign-in canceled');
+      }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      return UserModel(
+        id: userCredential.user!.uid,
+        email: userCredential.user!.email ?? '',
+        displayName: userCredential.user!.displayName,
+      );
+    } catch (e) {
+      throw Exception('Google sign-in failed: $e');
     }
   }
 
