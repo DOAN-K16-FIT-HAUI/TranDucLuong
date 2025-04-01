@@ -1,7 +1,5 @@
 import 'package:finance_app/data/repositories/auth_repository.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import 'auth_event.dart';
 import 'auth_state.dart';

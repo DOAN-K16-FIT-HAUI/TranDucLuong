@@ -50,11 +50,9 @@ class AppTheme {
       secondary: _secondaryLight,
       tertiary: _accentLight,
       error: _errorLight,
-      background: _backgroundLight,
       surface: _surfaceLight,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onBackground: _textPrimaryLight,
       onSurface: _textPrimaryLight,
       onError: Colors.white,
     ),
@@ -145,11 +143,11 @@ class AppTheme {
       contentPadding: const EdgeInsets.all(16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryLight.withOpacity(0.5)),
+        borderSide: BorderSide(color: _textSecondaryLight.withValues(alpha: 0.5)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryLight.withOpacity(0.5)),
+        borderSide: BorderSide(color: _textSecondaryLight.withValues(alpha: 0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -164,7 +162,7 @@ class AppTheme {
         fontSize: 14,
       ),
       hintStyle: GoogleFonts.poppins(
-        color: _textSecondaryLight.withOpacity(0.7),
+        color: _textSecondaryLight.withValues(alpha: 0.7),
         fontSize: 14,
       ),
     ),
@@ -193,11 +191,9 @@ class AppTheme {
       secondary: _secondaryDark,
       tertiary: _accentDark,
       error: _errorDark,
-      background: _backgroundDark,
       surface: _surfaceDark,
       onPrimary: Colors.black,
       onSecondary: Colors.black,
-      onBackground: _textPrimaryDark,
       onSurface: _textPrimaryDark,
       onError: Colors.black,
     ),
@@ -288,11 +284,11 @@ class AppTheme {
       contentPadding: const EdgeInsets.all(16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryDark.withOpacity(0.5)),
+        borderSide: BorderSide(color: _textSecondaryDark.withValues(alpha: 0.5)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryDark.withOpacity(0.5)),
+        borderSide: BorderSide(color: _textSecondaryDark.withValues(alpha: 0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -307,7 +303,7 @@ class AppTheme {
         fontSize: 14,
       ),
       hintStyle: GoogleFonts.poppins(
-        color: _textSecondaryDark.withOpacity(0.7),
+        color: _textSecondaryDark.withValues(alpha: 0.7),
         fontSize: 14,
       ),
     ),

@@ -1,5 +1,5 @@
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
-import 'package:finance_app/core/AppRoutes.dart';
+import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/di/injection.dart';
 import 'package:finance_app/firebase_option.dart';
 import 'package:firebase_core/firebase_core.dart';
