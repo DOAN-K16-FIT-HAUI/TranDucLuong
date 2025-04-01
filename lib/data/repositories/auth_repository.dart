@@ -26,6 +26,10 @@ class AuthRepository {
     );
   }
 
+  Future<UserModel> signInWithGoogle() async {
+    return await _firebaseAuthService.signInWithGoogle();
+  }
+
   Future<void> sendPasswordResetEmail({required String email}) async {
     await _firebaseAuthService.sendPasswordResetEmail(email: email);
   }
