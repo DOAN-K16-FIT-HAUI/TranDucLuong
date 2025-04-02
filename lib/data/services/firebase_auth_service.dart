@@ -22,12 +22,23 @@ class FirebaseAuthService {
         email: email,
         password: password,
       );
+      if (userCredential.user == null) {
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'Không tìm thấy người dùng.',
+        );
+      }
       return UserModel(
         id: userCredential.user!.uid,
         email: userCredential.user!.email ?? '',
       );
+    } on FirebaseAuthException catch (e) {
+      throw e; // Propagate the FirebaseAuthException
     } catch (e) {
-      throw Exception('Sign in failed: $e');
+      throw FirebaseAuthException(
+        code: 'unknown-error',
+        message: 'Đã xảy ra lỗi không xác định khi đăng nhập: $e',
+      );
     }
   }
 
@@ -41,13 +52,24 @@ class FirebaseAuthService {
         email: email,
         password: password,
       );
+      if (credential.user == null) {
+        throw FirebaseAuthException(
+          code: 'user-not-created',
+          message: 'Không thể tạo người dùng.',
+        );
+      }
       return UserModel(
         id: credential.user!.uid,
         email: credential.user!.email ?? '',
         displayName: credential.user!.displayName,
       );
+    } on FirebaseAuthException catch (e) {
+      throw e; // Propagate the FirebaseAuthException
     } catch (e) {
-      throw Exception('Sign up failed: $e');
+      throw FirebaseAuthException(
+        code: 'unknown-error',
+        message: 'Đã xảy ra lỗi không xác định khi đăng ký: $e',
+      );
     }
   }
 
@@ -56,7 +78,10 @@ class FirebaseAuthService {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        throw Exception('Google sign-in canceled');
+        throw FirebaseAuthException(
+          code: 'google-sign-in-cancelled',
+          message: 'Đăng nhập bằng Google đã bị hủy.',
+        );
       }
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -64,22 +89,39 @@ class FirebaseAuthService {
         idToken: googleAuth.idToken,
       );
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      if (userCredential.user == null) {
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'Không tìm thấy người dùng sau khi đăng nhập bằng Google.',
+        );
+      }
       return UserModel(
         id: userCredential.user!.uid,
         email: userCredential.user!.email ?? '',
         displayName: userCredential.user!.displayName,
       );
+    } on FirebaseAuthException catch (e) {
+      throw e; // Propagate the FirebaseAuthException
     } catch (e) {
-      throw Exception('Google sign-in failed: $e');
+      throw FirebaseAuthException(
+        code: 'google-sign-in-failed',
+        message: 'Đăng nhập bằng Google thất bại: $e',
+      );
     }
   }
 
   // Sign out
   Future<void> signOut() async {
     try {
-      await _firebaseAuth.signOut();
+      await _googleSignIn.signOut(); // Sign out from Google if signed in
+      await _firebaseAuth.signOut(); // Sign out from Firebase
+    } on FirebaseAuthException catch (e) {
+      throw e; // Propagate the FirebaseAuthException
     } catch (e) {
-      throw Exception('Sign out failed: $e');
+      throw FirebaseAuthException(
+        code: 'sign-out-failed',
+        message: 'Đăng xuất thất bại: $e',
+      );
     }
   }
 
@@ -87,8 +129,13 @@ class FirebaseAuthService {
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw e; // Propagate the FirebaseAuthException
     } catch (e) {
-      throw Exception('Password reset failed: $e');
+      throw FirebaseAuthException(
+        code: 'password-reset-failed',
+        message: 'Gửi email đặt lại mật khẩu thất bại: $e',
+      );
     }
   }
 }
