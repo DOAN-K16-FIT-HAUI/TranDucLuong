@@ -15,12 +15,27 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Add a form key for validation
+  bool _isPasswordVisible = false;
+  bool _rememberPassword = false;
+
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthBloc>().add(
+        SignInRequested(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Đăng nhập'),
+        centerTitle: true,
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -34,65 +49,221 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthLoading) {
-                    return const CircularProgressIndicator();
-                  }
-                  return Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(
-                            SignInRequested(
-                              email: _emailController.text,
-                              password: _passwordController.text,
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey, // Wrap the form with a key
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  // Email Field
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      label: RichText(
+                        text: const TextSpan(
+                          text: 'Email ',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          children: [
+                            TextSpan(
+                              text: '*',
+                              style: TextStyle(color: Colors.red),
                             ),
-                          );
-                        },
-                        child: const Text('Login'),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
+                      hintText: 'Nhập email',
+                      border: const OutlineInputBorder(),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      errorStyle: const TextStyle(color: Colors.red),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập email';
+                      }
+                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                          .hasMatch(value)) {
+                        return 'Email không hợp lệ';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  // Password Field
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      label: RichText(
+                        text: const TextSpan(
+                          text: 'Mật khẩu ',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          children: [
+                            TextSpan(
+                              text: '*',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ),
+                      hintText: 'Nhập mật khẩu',
+                      border: const OutlineInputBorder(),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      errorStyle: const TextStyle(color: Colors.red),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
                         onPressed: () {
-                          context.read<AuthBloc>().add(const SignInWithGoogleRequested());
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
                         },
-                        child: const Text('Login with Google'),
+                      ),
+                    ),
+                    obscureText: !_isPasswordVisible,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập mật khẩu';
+                      }
+                      if (value.length < 6) {
+                        return 'Mật khẩu phải có ít nhất 6 ký tự';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _rememberPassword,
+                        onChanged: (value) {
+                          setState(() {
+                            _rememberPassword = value ?? false;
+                          });
+                        },
+                      ),
+                      const Text('Ghi nhớ mật khẩu?'),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      if (state is AuthLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _login, // Call the login method with validation
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Đăng nhập',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          AppRoutes.navigateToForgotPassword(context);
+                        },
+                        child: const Text('Quên mật khẩu?'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          AppRoutes.navigateToRegister(context);
+                        },
+                        child: const Text('Đăng ký'),
                       ),
                     ],
-                  );
-                },
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: const [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text('Hoặc'),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Add Facebook login logic here if needed
+                          },
+                          style: ElevatedButton.styleFrom(
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(10),
+                            backgroundColor: Colors.grey[200],
+                          ),
+                          child: const Text(
+                            'f',
+                            style: TextStyle(fontSize: 20, color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<AuthBloc>()
+                                .add(const SignInWithGoogleRequested());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(10),
+                            backgroundColor: Colors.grey[200],
+                          ),
+                          child: const Text(
+                            'G',
+                            style: TextStyle(fontSize: 20, color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  AppRoutes.navigateToRegister(context);
-                },
-                child: const Text('Don\'t have an account? Register here'),
-              ),
-              // Trong LoginScreen
-              TextButton(
-                onPressed: () {
-                  AppRoutes.navigateToForgotPassword(context);
-                },
-                child: const Text('Quên mật khẩu?'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
