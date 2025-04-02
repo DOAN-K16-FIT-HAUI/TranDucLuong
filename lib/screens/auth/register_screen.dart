@@ -1,6 +1,7 @@
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
@@ -47,9 +48,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error)));
           }
         },
         child: Padding(
@@ -92,8 +93,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Vui lòng nhập email';
                       }
-                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
+                      if (!RegExp(
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
                         return 'Email không hợp lệ';
                       }
                       return null;
@@ -158,7 +160,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _register, // Call the register method with validation
+                          onPressed: _register,
+                          // Call the register method with validation
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -177,7 +180,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () {
                         AppRoutes.navigateToLogin(context);
                       },
-                      child: const Text('Đã có tài khoản? Đăng nhập ngay'),
+                      child: const Text(
+                        'Đã có tài khoản? Đăng nhập ngay',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
