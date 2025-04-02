@@ -52,8 +52,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return 'Tài khoản đã tồn tại với thông tin đăng nhập khác.';
         case 'operation-not-allowed':
           return 'Đăng nhập bằng Facebook chưa được kích hoạt trong Firebase.';
-        case 'invalid-credential':
-          return 'Thông tin đăng nhập Facebook không hợp lệ.';
       // Network errors
         case 'network-request-failed':
           return 'Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
