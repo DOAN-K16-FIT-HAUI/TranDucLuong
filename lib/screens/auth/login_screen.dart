@@ -33,25 +33,23 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Đăng nhập'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Đăng nhập'), centerTitle: true),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error)));
           }
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Form(
-              key: _formKey, // Wrap the form with a key
+              key: _formKey,
+              // Wrap the form with a key
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -87,8 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Vui lòng nhập email';
                       }
-                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
+                      if (!RegExp(
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
                         return 'Email không hợp lệ';
                       }
                       return null;
@@ -167,7 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       return SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _login, // Call the login method with validation
+                          onPressed: _login,
+                          // Call the login method with validation
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -211,22 +211,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
                           onPressed: () {
-                            // Add Facebook login logic here if needed
+                            context.read<AuthBloc>().add(
+                              const SignInWithFacebookRequested(),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             shape: const CircleBorder(),
                             padding: const EdgeInsets.all(10),
-                            backgroundColor: Colors.grey[200],
+                            elevation: 0,
+                            backgroundColor: const Color(
+                              0xFF1877F2,
+                            ), // Màu xanh của Facebook
                           ),
                           child: const Text(
                             'f',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -234,18 +243,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<AuthBloc>()
-                                .add(const SignInWithGoogleRequested());
+                            context.read<AuthBloc>().add(
+                              const SignInWithGoogleRequested(),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             shape: const CircleBorder(),
                             padding: const EdgeInsets.all(10),
-                            backgroundColor: Colors.grey[200],
+                            elevation: 0,
                           ),
                           child: const Text(
                             'G',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
+                            style: TextStyle(fontSize: 24, color: Colors.black),
                           ),
                         ),
                       ),
