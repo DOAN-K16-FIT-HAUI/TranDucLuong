@@ -1,10 +1,9 @@
+import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:finance_app/blocs/auth/auth_bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

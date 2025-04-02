@@ -6,15 +6,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 class FirebaseAuthService {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
-  final FacebookAuth _facebookAuth;
+  // final FacebookAuth _facebookAuth;
 
   FirebaseAuthService({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FacebookAuth? facebookAuth,
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? GoogleSignIn(),
-       _facebookAuth = facebookAuth ?? FacebookAuth.instance;
+       _googleSignIn = googleSignIn ?? GoogleSignIn();
 
   // Sign in with email and password
   Future<UserModel> signInWithEmailAndPassword({
