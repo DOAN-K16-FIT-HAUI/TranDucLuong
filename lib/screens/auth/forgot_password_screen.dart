@@ -32,13 +32,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            AppRoutes.navigateToLogin(context);
+          },
+        ),
         title: const Text('Quên mật khẩu'),
-        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthLoading) {
-            // Hiển thị loading
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -47,8 +54,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             );
           } else if (state is AuthInitial) {
-            // Ẩn loading và thông báo thành công
-            Navigator.of(context, rootNavigator: true).pop(); // Chỉ đóng dialog loading
+            Navigator.of(context, rootNavigator: true).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!'),
@@ -57,8 +63,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             );
             AppRoutes.navigateToLogin(context);
           } else if (state is AuthFailure) {
-            // Ẩn loading và thông báo lỗi
-            Navigator.of(context, rootNavigator: true).pop(); // Chỉ đóng dialog loading
+            Navigator.of(context, rootNavigator: true).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Lỗi: ${state.error}'),
@@ -72,56 +77,67 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 20),
                 const Text(
-                  'Đặt lại mật khẩu',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Nhập email của bạn để nhận liên kết đặt lại mật khẩu.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                  textAlign: TextAlign.center,
+                  'Nhập email để khôi phục mật khẩu',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    label: RichText(
+                      text: const TextSpan(
+                        text: 'Email ',
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        children: [
+                          TextSpan(
+                            text: '*',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                    hintText: 'Nhập email',
+                    border: const OutlineInputBorder(),
+                    errorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    errorStyle: const TextStyle(color: Colors.red),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập email';
                     }
-                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Email không hợp lệ';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _resetPassword,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _resetPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Gửi yêu cầu',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    child: const Text(
+                      'Xác nhận',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
