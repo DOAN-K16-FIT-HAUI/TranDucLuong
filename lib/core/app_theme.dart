@@ -33,8 +33,8 @@ class AppTheme {
   static const Color _errorDark = Color(0xFFFF6B6B);
 
   // Success colors
-  static const Color _successLight = Color(0xFF198754);
-  static const Color _successDark = Color(0xFF2A9D8F);
+  // static const Color _successLight = Color(0xFF198754);
+  // static const Color _successDark = Color(0xFF2A9D8F);
 
   // Income and expense colors
   static const Color incomeColor = Color(0xFF198754);

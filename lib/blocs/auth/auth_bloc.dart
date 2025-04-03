@@ -108,7 +108,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await authRepository.signInWithFacebook();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      print('Facebook Sign-In Error: $e'); // In lỗi ra console
       emit(AuthFailure(error: _mapFirebaseAuthExceptionToMessage(e)));
     }
   }
