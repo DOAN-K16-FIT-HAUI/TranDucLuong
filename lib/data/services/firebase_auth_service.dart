@@ -35,8 +35,8 @@ class FirebaseAuthService {
         id: userCredential.user!.uid,
         email: userCredential.user!.email ?? '',
       );
-    } on FirebaseAuthException catch (e) {
-      throw e; // Propagate the FirebaseAuthException
+    } on FirebaseAuthException {
+      rethrow; // Propagate the FirebaseAuthException
     } catch (e) {
       throw FirebaseAuthException(
         code: 'unknown-error',
@@ -66,8 +66,8 @@ class FirebaseAuthService {
         email: credential.user!.email ?? '',
         displayName: credential.user!.displayName,
       );
-    } on FirebaseAuthException catch (e) {
-      throw e; // Propagate the FirebaseAuthException
+    } on FirebaseAuthException {
+      rethrow; // Propagate the FirebaseAuthException
     } catch (e) {
       throw FirebaseAuthException(
         code: 'unknown-error',
@@ -106,8 +106,8 @@ class FirebaseAuthService {
         email: userCredential.user!.email ?? '',
         displayName: userCredential.user!.displayName,
       );
-    } on FirebaseAuthException catch (e) {
-      throw e; // Propagate the FirebaseAuthException
+    } on FirebaseAuthException {
+      rethrow; // Propagate the FirebaseAuthException
     } catch (e) {
       throw FirebaseAuthException(
         code: 'google-sign-in-failed',
@@ -158,7 +158,6 @@ class FirebaseAuthService {
         );
       }
     } catch (e) {
-      print('Facebook Login Error: $e');
       rethrow;
     }
   }
@@ -168,8 +167,8 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut(); // Sign out from Google if signed in
       await _firebaseAuth.signOut(); // Sign out from Firebase
-    } on FirebaseAuthException catch (e) {
-      throw e; // Propagate the FirebaseAuthException
+    } on FirebaseAuthException {
+      rethrow; // Propagate the FirebaseAuthException
     } catch (e) {
       throw FirebaseAuthException(
         code: 'sign-out-failed',
@@ -182,8 +181,8 @@ class FirebaseAuthService {
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      throw e; // Propagate the FirebaseAuthException
+    } on FirebaseAuthException {
+      rethrow; // Propagate the FirebaseAuthException
     } catch (e) {
       throw FirebaseAuthException(
         code: 'password-reset-failed',

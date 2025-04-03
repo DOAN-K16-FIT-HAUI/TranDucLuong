@@ -2,6 +2,7 @@ import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
+import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
 import 'package:finance_app/screens/splash/splash_screen.dart';
@@ -14,7 +15,7 @@ class AppRoutes {
   static const String splashRoute = 'splash';
   static const String loginRoute = 'login';
   static const String registerRoute = 'register';
-  static const String dashboardRoute = 'dashboard';
+  static const String dashboardRoute = 'top';
   static const String forgotPasswordRoute = 'forgot-password';
   static const String onBoardingRoute = 'on-boarding';
 
@@ -47,8 +48,7 @@ class AppRoutes {
       GoRoute(
         name: dashboardRoute,
         path: AppPaths.dashboardPath,
-        builder: (context, state) =>
-        const Placeholder(), // Replace with your DashboardScreen
+        builder: (context, state) => TopScreen(),
       ),
       GoRoute(
         name: forgotPasswordRoute,
@@ -72,7 +72,7 @@ class AppRoutes {
         if (!hasSeenOnboarding) {
           return AppPaths.onBoardingPath; // Show onboarding if not seen
         } else if (isAuthenticated) {
-          return AppPaths.dashboardPath; // Go to dashboard if authenticated
+          return AppPaths.dashboardPath; // Go to top if authenticated
         } else {
           return AppPaths.loginPath; // Go to login if not authenticated
         }

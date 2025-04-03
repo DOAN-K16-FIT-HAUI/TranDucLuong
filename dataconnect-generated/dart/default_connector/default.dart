@@ -1,7 +1,5 @@
-library default_connector;
+library;
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 
 class DefaultConnector {
@@ -32,7 +30,6 @@ class DefaultConnector {
       // Process the data as needed
     } catch (e) {
       // Handle any errors
-      print('Error fetching data: $e');
     }
   }
 
@@ -43,7 +40,6 @@ class DefaultConnector {
       // Handle successful data send
     } catch (e) {
       // Handle any errors
-      print('Error sending data: $e');
     }
   }
 }
