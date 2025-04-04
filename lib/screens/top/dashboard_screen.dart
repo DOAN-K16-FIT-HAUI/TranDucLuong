@@ -1,30 +1,57 @@
+import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatelessWidget {
   final List<Map<String, dynamic>> wallets = [
     {'name': 'Tiền mặt', 'balance': 1500000, 'icon': Icons.money_outlined},
     {'name': 'ATM', 'balance': 1200000, 'icon': Icons.credit_card_outlined},
-    {'name': 'Bitcoin', 'balance': 470000, 'icon': Icons.currency_bitcoin_outlined},
   ];
 
   final List<Map<String, dynamic>> recentTransactions = [
-    {'title': 'Ăn trưa', 'amount': -340000, 'count': 3, 'icon': Icons.local_cafe_outlined},
-    {'title': 'Mua sách', 'amount': -150000, 'count': 1, 'icon': Icons.book_outlined},
+    {
+      'title': 'Ăn trưa',
+      'amount': -340000,
+      'count': 3,
+      'icon': Icons.local_cafe_outlined,
+    },
+    {
+      'title': 'Mua sách',
+      'amount': -150000,
+      'count': 1,
+      'icon': Icons.book_outlined,
+    },
   ];
 
   final List<Map<String, dynamic>> loans = [
-    {'title': 'Chợ A vay', 'amount': -10000, 'note': 'Thời hạn còn lại 5 ngày', 'icon': Icons.account_balance_outlined},
+    {
+      'title': 'Chợ A vay',
+      'amount': -10000,
+      'note': 'Thời hạn còn lại 5 ngày',
+      'icon': Icons.account_balance_outlined,
+    },
   ];
 
   final List<Map<String, dynamic>> savings = [
-    {'title': 'Sổ tiết kiệm 6 tháng', 'amount': 5000000, 'interest': '5.5%/năm', 'icon': Icons.savings_outlined},
+    {
+      'title': 'Sổ tiết kiệm 6 tháng',
+      'amount': 5000000,
+      'interest': '5.5%/năm',
+      'icon': Icons.savings_outlined,
+    },
   ];
 
   final List<Map<String, dynamic>> spendingLimits = [
-    {'title': 'Hạn mức tháng 4', 'limit': 3000000, 'spent': 1200000, 'icon': Icons.speed_outlined},
+    {
+      'title': 'Hạn mức tháng 4',
+      'limit': 3000000,
+      'spent': 1200000,
+      'icon': Icons.speed_outlined,
+    },
   ];
 
   DashboardScreen({super.key});
@@ -32,79 +59,125 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 8),
-              _buildMainBalanceAndWallets(), // Gộp Tổng số dư và Danh sách ví
-              const SizedBox(height: 16),
-              _buildChart(),
-              const SizedBox(height: 16),
-              _buildSection(
-                title: 'Giao dịch gần đây',
-                children: recentTransactions.map((tx) => _buildTransactionRow(tx)).toList(),
+      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSafeArea(context),
+            _buildHeader(),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  _buildMainBalanceAndWallets(context),
+                  const SizedBox(height: 16),
+                  _buildChart(),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    title: 'Giao dịch gần đây',
+                    children:
+                        recentTransactions
+                            .map((tx) => _buildTransactionRow(tx))
+                            .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    title: 'Vay nợ',
+                    children:
+                        loans
+                            .map((loan) => _buildTransactionRow(loan))
+                            .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    title: 'Sổ tiết kiệm',
+                    children:
+                        savings
+                            .map(
+                              (saving) => _buildTransactionRow(
+                                saving,
+                                AppTheme.incomeColor,
+                              ),
+                            )
+                            .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    title: 'Hạn mức chi',
+                    children:
+                        spendingLimits
+                            .map((limit) => _buildSpendingLimitRow(limit))
+                            .toList(),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              _buildSection(
-                title: 'Vay nợ',
-                children: loans.map((loan) => _buildTransactionRow(loan)).toList(),
-              ),
-              const SizedBox(height: 16),
-              _buildSection(
-                title: 'Sổ tiết kiệm',
-                children: savings.map((saving) => _buildTransactionRow(saving, AppTheme.incomeColor)).toList(),
-              ),
-              const SizedBox(height: 16),
-              _buildSection(
-                title: 'Hạn mức chi',
-                children: spendingLimits.map((limit) => _buildSpendingLimitRow(limit)).toList(),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Xin chào Lương',
-          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-        ),
-        Row(
-          children: [
-            IconButton(icon: const Icon(Icons.settings_outlined, color: Colors.grey), onPressed: () {}),
-            IconButton(icon: const Icon(Icons.notifications_outlined, color: Colors.grey), onPressed: () {}),
-          ],
-        ),
-      ],
+  Widget _buildSafeArea(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).padding.top,
+      color: AppTheme.lightTheme.colorScheme.primary,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
 
-  Widget _buildMainBalanceAndWallets() {
+  Widget _buildHeader() {
+    return Container(
+      color: AppTheme.lightTheme.colorScheme.primary,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Xin chào Lương',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.lightTheme.colorScheme.surface,
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: AppTheme.lightTheme.colorScheme.surface,
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainBalanceAndWallets(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: _boxDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Phần Tổng số dư
           Text(
             'Tổng số dư',
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.lightTheme.colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
           Text(
-            '2.917.000 đ',
-            style: GoogleFonts.poppins(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.incomeColor),
+            NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(2917000),
+            style: GoogleFonts.poppins(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.incomeColor,
+            ),
             textAlign: TextAlign.center,
           ),
           Row(
@@ -113,10 +186,15 @@ class DashboardScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    AppRoutes.navigateToWallet(context);
+                  },
                   child: Text(
                     'Xem tất cả tài khoản',
-                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.lightBlue),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppTheme.lightTheme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ),
@@ -125,14 +203,15 @@ class DashboardScreen extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: wallets.map((wallet) {
-              return GestureDetector(
-                onTap: () {
-                  // Xử lý sự kiện khi bấm vào ví
-                },
-                child: _buildWalletRow(wallet),
-              );
-            }).toList(),
+            children:
+                wallets.map((wallet) {
+                  return GestureDetector(
+                    onTap: () {
+                      context.goNamed(AppRoutes.walletRoute);
+                    },
+                    child: _buildWalletRow(wallet, context),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -140,18 +219,15 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildChart() {
-    // Kết hợp tất cả giao dịch
     List<Map<String, dynamic>> allTransactions = [
       ...recentTransactions,
       ...loans,
       ...savings,
     ];
 
-    // Tạo danh sách cho thu nhập và chi tiêu
     List<FlSpot> incomeSpots = [];
     List<FlSpot> expenseSpots = [];
 
-    // Tính tổng thu nhập và chi tiêu tích lũy theo thời gian
     double cumulativeIncome = 0;
     double cumulativeExpense = 0;
 
@@ -159,19 +235,16 @@ class DashboardScreen extends StatelessWidget {
       double amount = allTransactions[i]['amount'].toDouble();
 
       if (amount > 0) {
-        // Thu nhập (income)
-        cumulativeIncome += amount / 1000000; // Chia cho 1 triệu để tỷ lệ hợp lý trên biểu đồ
+        cumulativeIncome += amount / 1000000;
         incomeSpots.add(FlSpot(i.toDouble(), cumulativeIncome));
-        expenseSpots.add(FlSpot(i.toDouble(), cumulativeExpense)); // Giữ nguyên chi tiêu
-      } else {
-        // Chi tiêu (expense)
-        cumulativeExpense += (amount.abs() / 1000000); // Lấy giá trị tuyệt đối và chia cho 1 triệu
         expenseSpots.add(FlSpot(i.toDouble(), cumulativeExpense));
-        incomeSpots.add(FlSpot(i.toDouble(), cumulativeIncome)); // Giữ nguyên thu nhập
+      } else {
+        cumulativeExpense += (amount.abs() / 1000000);
+        expenseSpots.add(FlSpot(i.toDouble(), cumulativeExpense));
+        incomeSpots.add(FlSpot(i.toDouble(), cumulativeIncome));
       }
     }
 
-    // Nếu không có dữ liệu, thêm điểm mặc định để tránh lỗi
     if (incomeSpots.isEmpty) {
       incomeSpots.add(const FlSpot(0, 0));
     }
@@ -185,7 +258,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: LineChart(
         LineChartData(
-          gridData: const FlGridData(show: true), // Hiển thị lưới để dễ nhìn
+          gridData: const FlGridData(show: true),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -193,8 +266,12 @@ class DashboardScreen extends StatelessWidget {
                 reservedSize: 40,
                 getTitlesWidget: (value, meta) {
                   return Text(
-                    '${value.toInt()}M', // Hiển thị đơn vị triệu (M)
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+                    '${value.toInt()}M',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: AppTheme.lightTheme.colorScheme.onSurface
+                          .withValues(alpha: 0.6),
+                    ),
                   );
                 },
               ),
@@ -204,14 +281,22 @@ class DashboardScreen extends StatelessWidget {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   return Text(
-                    'G${value.toInt() + 1}', // G1, G2, G3... (Giao dịch thứ mấy)
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+                    'G${value.toInt() + 1}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: AppTheme.lightTheme.colorScheme.onSurface
+                          .withValues(alpha: 0.6),
+                    ),
                   );
                 },
               ),
             ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           borderData: FlBorderData(show: false),
           lineBarsData: [
@@ -235,7 +320,10 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection({required String title, required List<Widget> children}) {
+  Widget _buildSection({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -244,13 +332,20 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.lightTheme.colorScheme.onSurface,
+              ),
             ),
             TextButton(
               onPressed: () {},
               child: Text(
                 'Xem tất cả',
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.lightBlue),
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppTheme.lightTheme.colorScheme.primary,
+                ),
               ),
             ),
           ],
@@ -264,14 +359,24 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWalletRow(Map<String, dynamic> wallet) {
+  Widget _buildWalletRow(Map<String, dynamic> wallet, BuildContext context) {
     return Column(
       children: [
-        Icon(wallet['icon'], size: 32, color: Colors.grey[600]),
+        Icon(
+          wallet['icon'],
+          size: 32,
+          color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+            alpha: 0.6,
+          ),
+        ),
         const SizedBox(height: 8),
         Text(
           wallet['name'],
-          style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.lightTheme.colorScheme.onSurface,
+          ),
           textAlign: TextAlign.center,
         ),
       ],
@@ -283,21 +388,51 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         children: [
-          Icon(tx['icon'], size: 24, color: Colors.grey[600]),
+          Icon(
+            tx['icon'],
+            size: 24,
+            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+              alpha: 0.6,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text((tx['count'] ?? 0) > 1 ? '${tx['title']} (${tx['count']} lần)' : tx['title'],
-                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                Text(
+                  (tx['count'] ?? 0) > 1
+                      ? '${tx['title']} (${tx['count']} lần)'
+                      : tx['title'],
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.lightTheme.colorScheme.onSurface,
+                  ),
+                ),
                 if (tx['note'] != null)
-                  Text(tx['note'], style: GoogleFonts.poppins(fontSize: 12, color: AppTheme.expenseColor)),
+                  Text(
+                    tx['note'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: AppTheme.expenseColor,
+                    ),
+                  ),
               ],
             ),
           ),
-          Text('${tx['amount'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
-              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: amountColor ?? (tx['amount'] < 0 ? AppTheme.expenseColor : AppTheme.incomeColor))),
+          Text(
+            '${tx['amount'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} ₫',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color:
+                  amountColor ??
+                  (tx['amount'] < 0
+                      ? AppTheme.expenseColor
+                      : AppTheme.incomeColor),
+            ),
+          ),
         ],
       ),
     );
@@ -309,20 +444,43 @@ class DashboardScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(limit['icon'], size: 24, color: Colors.grey[600]),
+            Icon(
+              limit['icon'],
+              size: 24,
+              color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+                alpha: 0.6,
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(limit['title'], style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+              child: Text(
+                limit['title'],
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.lightTheme.colorScheme.onSurface,
+                ),
+              ),
             ),
-            Text('${limit['spent'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} / ${limit['limit'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+            Text(
+              '${limit['spent'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} / ${limit['limit'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} ₫',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.lightTheme.colorScheme.onSurface,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         LinearProgressIndicator(
           value: limit['spent'] / limit['limit'],
-          backgroundColor: Colors.grey[200],
-          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF007AFF)),
+          backgroundColor: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+            alpha: 0.2,
+          ),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            AppTheme.lightTheme.colorScheme.primary,
+          ),
         ),
       ],
     );
@@ -330,11 +488,13 @@ class DashboardScreen extends StatelessWidget {
 
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.lightTheme.colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.2),
+          color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+            alpha: 0.2,
+          ),
           blurRadius: 8,
           offset: const Offset(0, 2),
         ),

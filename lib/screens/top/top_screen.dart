@@ -1,3 +1,4 @@
+import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -48,7 +49,7 @@ class TopScreenState extends State<TopScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTransaction,
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -71,7 +72,7 @@ class TopScreenState extends State<TopScreen> {
 
   BottomNavigationBarItem _buildBottomNavigationBarItem(IconData icon, int index) {
     return BottomNavigationBarItem(
-      icon: Icon(icon, color: _selectedIndex == index ? Colors.black : Colors.grey[600]),
+      icon: Icon(icon, color: _selectedIndex == index ? AppTheme.lightTheme.colorScheme.primary : Colors.grey[600]),
       label: '',
     );
   }
