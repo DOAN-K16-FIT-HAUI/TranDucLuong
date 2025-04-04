@@ -2,6 +2,7 @@ import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
+import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,16 +35,28 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Đăng nhập'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Đăng nhập'),
+        centerTitle: true,
+        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
+        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
+      ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error),
+                backgroundColor: AppTheme.lightTheme.colorScheme.error,
+              ),
+            );
           }
         },
-        child: Padding(
+        child: Container(
+          color: AppTheme.lightTheme.colorScheme.surface,
+          height: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Form(
@@ -51,15 +64,19 @@ class LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   CommonWidgets.buildEmailField(_emailController),
-                  const SizedBox(height: 20),
-                  CommonWidgets.buildPasswordField(_passwordController, _isPasswordVisible, () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  }),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
+                  CommonWidgets.buildPasswordField(
+                    _passwordController,
+                    _isPasswordVisible,
+                    () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 15),
                   Row(
                     children: [
                       Checkbox(
@@ -69,13 +86,19 @@ class LoginScreenState extends State<LoginScreen> {
                             _rememberPassword = value ?? false;
                           });
                         },
+                        activeColor: AppTheme.lightTheme.colorScheme.primary,
                       ),
-                      const Text('Ghi nhớ mật khẩu?'),
+                      Text(
+                        'Ghi nhớ mật khẩu?',
+                        style: TextStyle(
+                          color: AppTheme.lightTheme.colorScheme.onSurface,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   CommonWidgets.buildSubmitButton('Đăng nhập', _login),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -83,41 +106,62 @@ class LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           AppRoutes.navigateToForgotPassword(context);
                         },
-                        child: const Text('Quên mật khẩu?'),
+                        child: Text(
+                          'Quên mật khẩu?',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
                           AppRoutes.navigateToRegister(context);
                         },
-                        child: const Text('Đăng ký'),
+                        child: Text(
+                          'Đăng ký',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     children: [
                       const Expanded(child: Divider()),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: const Text('Hoặc'),
+                        child: Text(
+                          'Hoặc',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.onSurface,
+                          ),
+                        ),
                       ),
                       const Expanded(child: Divider()),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildSocialLoginButton(
+                      CommonWidgets.buildSocialLoginButton(
                         onPressed: () {
-                          context.read<AuthBloc>().add(const SignInWithFacebookRequested());
+                          context.read<AuthBloc>().add(
+                            const SignInWithFacebookRequested(),
+                          );
                         },
-                        color: const Color(0xFF1877F2),
+                        color: AppTheme.lightTheme.colorScheme.primary,
                         text: 'f',
                       ),
-                      _buildSocialLoginButton(
+                      CommonWidgets.buildSocialLoginButton(
                         onPressed: () {
-                          context.read<AuthBloc>().add(const SignInWithGoogleRequested());
+                          context.read<AuthBloc>().add(
+                            const SignInWithGoogleRequested(),
+                          );
                         },
                         color: Colors.white,
                         text: 'G',
@@ -134,29 +178,7 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialLoginButton({
-    required VoidCallback onPressed,
-    required Color color,
-    required String text,
-    Color textColor = Colors.white,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(10),
-          elevation: 0,
-          backgroundColor: color,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 24, color: textColor, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
+
 
   @override
   void dispose() {

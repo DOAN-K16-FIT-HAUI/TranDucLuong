@@ -2,6 +2,7 @@ import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
+import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,7 +26,9 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _resetPassword() {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthBloc>().add(PasswordResetRequested(email: _emailController.text.trim()));
+      context.read<AuthBloc>().add(
+        PasswordResetRequested(email: _emailController.text.trim()),
+      );
     }
   }
 
@@ -34,12 +37,13 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => AppRoutes.navigateToLogin(context),
         ),
-        title: const Text('Quên mật khẩu'),
+        title: Text('Quên mật khẩu'),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
+        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
         elevation: 0,
       ),
       body: BlocListener<AuthBloc, AuthState>(
@@ -52,7 +56,9 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             _handleAuthFailure(context, state.error);
           }
         },
-        child: Padding(
+        child: Container(
+          color: AppTheme.lightTheme.colorScheme.surface,
+          height: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
@@ -60,13 +66,16 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Nhập email để khôi phục mật khẩu',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppTheme.lightTheme.colorScheme.onSurface,
+                  ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 CommonWidgets.buildEmailField(_emailController),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 CommonWidgets.buildSubmitButton('Xác nhận', _resetPassword),
               ],
             ),
@@ -87,9 +96,11 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleAuthInitial(BuildContext context) {
     Navigator.of(context, rootNavigator: true).pop();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!'),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: Text(
+          'Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!',
+        ),
+        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
       ),
     );
     AppRoutes.navigateToLogin(context);
@@ -100,7 +111,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Lỗi: $error'),
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.lightTheme.colorScheme.error,
       ),
     );
   }
