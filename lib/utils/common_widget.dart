@@ -263,7 +263,7 @@ class CommonWidgets {
                 child: Text(
                   'Hủy',
                   style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
+                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha:
                       153,
                     ),
                   ),
@@ -288,28 +288,27 @@ class CommonWidgets {
 
   static PreferredSizeWidget buildAppBar({
     required BuildContext context,
-    required bool isSearching,
-    required TextEditingController searchController,
-    required VoidCallback onBackPressed,
-    required VoidCallback onSearchPressed,
-    ValueChanged<String>? onSearchTextChanged,
-    String title = 'Tài khoản',
+    String title = 'Tài khoản', // Tiêu đề mặc định
+    VoidCallback? onBackPressed, // Callback cho nút back (tùy chọn)
+    bool showBackButton = true, // Hiển thị nút back hay không
+    IconData? backIcon, // Icon tùy chỉnh cho nút back (mặc định là arrow_back)
+    List<Widget>? actions, // Danh sách các nút hành động tùy chỉnh
   }) {
     return PreferredSize(
       preferredSize: Size.fromHeight(
         kToolbarHeight + MediaQuery.of(context).padding.top,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildSafeArea(context),
           _buildHeader(
             context: context,
-            isSearching: isSearching,
-            searchController: searchController,
-            onBackPressed: onBackPressed,
-            onSearchPressed: onSearchPressed,
-            onSearchTextChanged: onSearchTextChanged,
             title: title,
+            onBackPressed: onBackPressed,
+            showBackButton: showBackButton,
+            backIcon: backIcon,
+            actions: actions,
           ),
         ],
       ),
@@ -325,12 +324,11 @@ class CommonWidgets {
 
   static Widget _buildHeader({
     required BuildContext context,
-    required bool isSearching,
-    required TextEditingController searchController,
-    required VoidCallback onBackPressed,
-    required VoidCallback onSearchPressed,
-    ValueChanged<String>? onSearchTextChanged,
     required String title,
+    VoidCallback? onBackPressed,
+    bool showBackButton = true,
+    IconData? backIcon,
+    List<Widget>? actions,
   }) {
     return Container(
       height: kToolbarHeight,
@@ -339,81 +337,36 @@ class CommonWidgets {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
+          // Nút Back (tùy chọn)
+          showBackButton
+              ? IconButton(
             icon: Icon(
-              isSearching && searchController.text.isNotEmpty
-                  ? Icons.clear
-                  : Icons.arrow_back,
+              backIcon ?? Icons.arrow_back, // Dùng icon tùy chỉnh hoặc mặc định
               color: AppTheme.lightTheme.colorScheme.surface,
             ),
-            tooltip:
-                isSearching && searchController.text.isNotEmpty
-                    ? 'Xóa tìm kiếm'
-                    : 'Quay lại',
-            onPressed: () {
-              if (isSearching && searchController.text.isNotEmpty) {
-                searchController.clear();
-                onSearchTextChanged?.call('');
-              } else {
-                onBackPressed();
-              }
-            },
-          ),
+            tooltip: 'Quay lại',
+            onPressed: onBackPressed ?? () => Navigator.pop(context),
+          )
+              : const SizedBox(width: 48), // Giữ khoảng trống nếu không có nút back
+          // Tiêu đề
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              child:
-                  isSearching
-                      ? Container(
-                        key: const ValueKey('searchField'),
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: TextField(
-                          controller: searchController,
-                          autofocus: true,
-                          decoration: InputDecoration(
-                            hintText: 'Tìm kiếm ví...',
-                            hintStyle: GoogleFonts.poppins(
-                              color: AppTheme.lightTheme.colorScheme.surface
-                                  .withAlpha(179),
-                              fontSize: 16,
-                            ),
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          style: GoogleFonts.poppins(
-                            color: AppTheme.lightTheme.colorScheme.surface,
-                            fontSize: 16,
-                          ),
-                          cursorColor: AppTheme.lightTheme.colorScheme.surface,
-                          onChanged: onSearchTextChanged,
-                        ),
-                      )
-                      : Container(
-                        key: const ValueKey('title'),
-                        alignment: Alignment.center,
-                        child: Text(
-                          title,
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.lightTheme.colorScheme.surface,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+            child: Container(
+              alignment: Alignment.center,
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: Dimens.textSizeMedium + 2, // 18
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.lightTheme.colorScheme.surface,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-          IconButton(
-            icon: Icon(
-              isSearching ? Icons.close : Icons.search,
-              color: AppTheme.lightTheme.colorScheme.surface,
-            ),
-            tooltip: isSearching ? 'Đóng tìm kiếm' : 'Tìm kiếm',
-            onPressed: onSearchPressed,
+          // Actions (tùy chọn)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: actions ?? [const SizedBox(width: 48)], // Giữ khoảng trống nếu không có actions
           ),
         ],
       ),
@@ -468,7 +421,7 @@ class CommonWidgets {
       labelColor: labelColor ?? AppTheme.lightTheme.colorScheme.primary,
       unselectedLabelColor:
           unselectedLabelColor ??
-          AppTheme.lightTheme.colorScheme.onSurface.withAlpha(153),
+          AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 153),
       indicatorColor: indicatorColor ?? AppTheme.lightTheme.colorScheme.primary,
       onTap: onTabChanged,
       tabs: tabTitles.map((title) => Tab(text: title)).toList(),
@@ -495,7 +448,7 @@ class CommonWidgets {
           isSearching ? 'Không tìm thấy mục phù hợp' : emptyMessage,
           style: GoogleFonts.poppins(
             fontSize: Dimens.textSizeMedium,
-            color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(204),
+            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 204),
           ),
           textAlign: TextAlign.center,
         ),
@@ -528,7 +481,7 @@ class CommonWidgets {
             return Material(
               elevation: elevation,
               color: Colors.transparent,
-              shadowColor: Colors.black.withAlpha(51),
+              shadowColor: Colors.black.withValues(alpha: 51),
               borderRadius: BorderRadius.circular(12),
               child: child,
             );
@@ -551,19 +504,22 @@ class CommonWidgets {
     String? valueLocale,
     List<PopupMenuItem<String>>? menuItems,
     void Function(String)? onMenuSelected,
+    Widget? subtitle,
     EdgeInsetsGeometry margin = const EdgeInsets.only(top: 16),
     EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+    Color? backgroundColor,
   }) {
     return Container(
       key: itemKey,
       margin: margin,
-      decoration: _boxDecoration(),
+      decoration: _boxDecoration().copyWith(
+        color: backgroundColor,
+      ),
       child: Padding(
         padding: padding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(Icons.drag_handle, color: Colors.grey, size: 20),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.all(8),
@@ -592,23 +548,26 @@ class CommonWidgets {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    NumberFormat.currency(
-                      locale: valueLocale ?? 'vi_VN',
-                      symbol: valuePrefix ?? '₫',
-                    ).format(value),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color:
-                          value >= 0
-                              ? AppTheme.incomeColor
-                              : AppTheme.expenseColor,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    subtitle,
+                  ],
+                  if (value != 0) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      NumberFormat.currency(
+                        locale: valueLocale ?? 'vi_VN',
+                        symbol: valuePrefix ?? '₫',
+                      ).format(value),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -617,9 +576,7 @@ class CommonWidgets {
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
-                  color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
-                    153,
-                  ),
+                  color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(153),
                 ),
                 offset: const Offset(0, 40),
                 shape: RoundedRectangleBorder(
@@ -642,7 +599,7 @@ class CommonWidgets {
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: AppTheme.lightTheme.colorScheme.shadow.withAlpha(25),
+          color: AppTheme.lightTheme.colorScheme.shadow.withValues(alpha: 0.25),
           blurRadius: 8,
           offset: const Offset(0, 4),
         ),
@@ -701,7 +658,7 @@ class CommonWidgets {
                             isSelected
                                 ? (selectedColor ??
                                         AppTheme.lightTheme.colorScheme.primary)
-                                    .withAlpha(38)
+                                    .withValues(alpha: 38)
                                 : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -710,7 +667,7 @@ class CommonWidgets {
                                   ? (selectedColor ??
                                       AppTheme.lightTheme.colorScheme.primary)
                                   : AppTheme.lightTheme.colorScheme.onSurface
-                                      .withAlpha(51),
+                                      .withValues(alpha: 51),
                           width: isSelected ? 1.5 : 1.0,
                         ),
                       ),
@@ -732,7 +689,7 @@ class CommonWidgets {
                               style: GoogleFonts.poppins(
                                 fontSize: 10,
                                 color: AppTheme.lightTheme.colorScheme.onSurface
-                                    .withAlpha(204),
+                                    .withValues(alpha: 204),
                                 fontWeight:
                                     isSelected
                                         ? FontWeight.w600
@@ -756,7 +713,7 @@ class CommonWidgets {
                 child: Text(
                   'Hủy',
                   style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
+                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha:
                       204,
                     ),
                   ),
@@ -840,5 +797,60 @@ class CommonWidgets {
         onDeletePressed: () => onDelete(context, item),
       );
     }
+  }
+
+  static Widget buildSearchField({
+    required BuildContext context,
+    required String hintText,
+    required Function(String) onChanged,
+    String? initialValue,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.lightTheme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.lightTheme.colorScheme.shadow.withValues(alpha: 0.25),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: GoogleFonts.poppins(
+            fontSize: Dimens.textSizeMedium,
+            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: AppTheme.lightTheme.colorScheme.primary,
+            size: 24,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: AppTheme.lightTheme.colorScheme.surface,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: AppTheme.lightTheme.colorScheme.primary,
+              width: 1.5,
+            ),
+          ),
+        ),
+        style: GoogleFonts.poppins(
+          fontSize: Dimens.textSizeMedium,
+          color: AppTheme.lightTheme.colorScheme.onSurface,
+        ),
+        cursorColor: AppTheme.lightTheme.colorScheme.primary,
+        onChanged: onChanged,
+      ),
+    );
   }
 }

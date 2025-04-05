@@ -24,48 +24,67 @@ class WalletScreen extends StatelessWidget {
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
-          body: Material(
-            color: AppTheme.lightTheme.colorScheme.surface,
-            child: BlocBuilder<WalletBloc, WalletState>(
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    CommonWidgets.buildAppBar(
-                      context: context,
-                      isSearching: state.isSearching,
-                      searchController: TextEditingController(text: state.searchQuery)
-                        ..selection = TextSelection.fromPosition(TextPosition(offset: state.searchQuery.length)),
-                      onSearchTextChanged: (query) => context.read<WalletBloc>().add(SearchWallets(query)),
-                      onBackPressed: () {
-                        if (state.isSearching) {
-                          context.read<WalletBloc>().add(ToggleSearch(false));
-                        } else {
-                          AppRoutes.navigateToDashboard(context);
-                        }
-                      },
-                      onSearchPressed: () => context.read<WalletBloc>().add(ToggleSearch(!state.isSearching)),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTotalBalance(state),
-                    const SizedBox(height: 16),
-                    CommonWidgets.buildTabBar(
-                      context: context,
-                      tabTitles: const ['Tài khoản', 'Tiết kiệm', 'Đầu tư'],
-                      onTabChanged: (index) => context.read<WalletBloc>().add(TabChanged(index)),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _buildTabContent(context, state, state.wallets, 0),
-                          _buildTabContent(context, state, state.savingsWallets, 1),
-                          _buildTabContent(context, state, state.investmentWallets, 2),
-                        ],
+          backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+          body: BlocBuilder<WalletBloc, WalletState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  CommonWidgets.buildAppBar(
+                    context: context,
+                    title: 'Ví của tôi',
+                    backIcon: Icons.close,
+                    onBackPressed: () {
+                      if (state.isSearching) {
+                        context.read<WalletBloc>().add(ToggleSearch(false));
+                      } else {
+                        AppRoutes.navigateToDashboard(context);
+                      }
+                    },
+                    actions: [
+                      IconButton(
+                        icon: Icon(
+                          state.isSearching ? Icons.close : Icons.search,
+                          color: AppTheme.lightTheme.colorScheme.surface,
+                        ),
+                        tooltip: state.isSearching ? 'Đóng tìm kiếm' : 'Tìm kiếm',
+                        onPressed: () {
+                          context.read<WalletBloc>().add(ToggleSearch(!state.isSearching));
+                        },
                       ),
+                    ],
+                  ),
+                  if (state.isSearching)
+                    Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: CommonWidgets.buildSearchField(
+                          context: context,
+                          hintText: 'Tìm kiếm ví...',
+                          onChanged: (value) {
+                            context.read<WalletBloc>().add(SearchWallets(value));
+                          },
+                        ),
                     ),
-                  ],
-                );
-              },
-            ),
+                  if(!state.isSearching)
+                    const SizedBox(height: 16),
+                  _buildTotalBalance(state),
+                  const SizedBox(height: 16),
+                  CommonWidgets.buildTabBar(
+                    context: context,
+                    tabTitles: const ['Tài khoản', 'Tiết kiệm', 'Đầu tư'],
+                    onTabChanged: (index) => context.read<WalletBloc>().add(TabChanged(index)),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildTabContent(context, state, state.wallets, 0),
+                        _buildTabContent(context, state, state.savingsWallets, 1),
+                        _buildTabContent(context, state, state.investmentWallets, 2),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           floatingActionButton: Builder(
             builder: (fabContext) => FloatingActionButton(

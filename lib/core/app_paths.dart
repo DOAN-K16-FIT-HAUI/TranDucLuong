@@ -13,4 +13,5 @@ class AppPaths {
   static const String forgotPasswordPath = '/forgot-password';
   static const String transactionListPath = '/transaction-list';
   static const String walletListPath = '/wallet';
+  static const String appNotificationListPath = '/app-notification';
 }

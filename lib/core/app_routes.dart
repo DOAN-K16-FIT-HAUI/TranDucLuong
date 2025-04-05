@@ -1,5 +1,6 @@
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_paths.dart';
+import 'package:finance_app/screens/app_notification/notification_screen.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String forgotPasswordRoute = 'forgot-password';
   static const String onBoardingRoute = 'on-boarding';
   static const String walletRoute = 'wallet';
+  static const String appNotificationRoute = 'app-notification';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -62,6 +64,11 @@ class AppRoutes {
         name: walletRoute,
         path: AppPaths.walletListPath,
         builder: (context, state) => WalletScreen(),
+      ),
+      GoRoute(
+        name: appNotificationRoute,
+        path: AppPaths.appNotificationListPath,
+        builder: (context, state) => NotificationScreen(),
       ),
     ],
     redirect: (context, state) async {
@@ -126,4 +133,6 @@ class AppRoutes {
       context.goNamed(dashboardRoute);
   static void navigateToWallet(BuildContext context) =>
       context.goNamed(walletRoute);
+  static void navigateToAppNotification(BuildContext context) =>
+      context.goNamed(appNotificationRoute);
 }
