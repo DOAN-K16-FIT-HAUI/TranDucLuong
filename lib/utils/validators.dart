@@ -1,15 +1,16 @@
-import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/utils/formatter.dart';
-import 'package:flutter/material.dart';
 
 class Validators {
   static String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return 'Vui lòng nhập email';
     }
-    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}\$').hasMatch(value)) {
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
       return 'Email không hợp lệ';
     }
+
     return null;
   }
 

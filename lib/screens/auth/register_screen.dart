@@ -16,8 +16,8 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
 
@@ -35,6 +35,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -50,14 +51,13 @@ class RegisterScreenState extends State<RegisterScreen> {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.error)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error)),
+            );
           }
         },
         child: Container(
           color: AppTheme.lightTheme.colorScheme.surface,
-          height: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Form(
@@ -71,11 +71,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                   CommonWidgets.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                    () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
+                        () => setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    }),
                   ),
                   const SizedBox(height: 15),
                   CommonWidgets.buildSubmitButton('Tạo tài khoản', _register),
@@ -99,7 +97,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ),
                 ],
               ),

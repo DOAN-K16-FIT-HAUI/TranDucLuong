@@ -15,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _rememberPassword = false;
@@ -35,6 +35,7 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
       appBar: AppBar(
         title: const Text('Đăng nhập'),
         centerTitle: true,
@@ -56,7 +57,6 @@ class LoginScreenState extends State<LoginScreen> {
         },
         child: Container(
           color: AppTheme.lightTheme.colorScheme.surface,
-          height: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Form(
@@ -70,22 +70,18 @@ class LoginScreenState extends State<LoginScreen> {
                   CommonWidgets.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                    () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
+                        () => setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    }),
                   ),
                   const SizedBox(height: 15),
                   Row(
                     children: [
                       Checkbox(
                         value: _rememberPassword,
-                        onChanged: (value) {
-                          setState(() {
-                            _rememberPassword = value ?? false;
-                          });
-                        },
+                        onChanged: (value) => setState(() {
+                          _rememberPassword = value ?? false;
+                        }),
                         activeColor: AppTheme.lightTheme.colorScheme.primary,
                       ),
                       Text(
@@ -103,9 +99,7 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          AppRoutes.navigateToForgotPassword(context);
-                        },
+                        onPressed: () => AppRoutes.navigateToForgotPassword(context),
                         child: Text(
                           'Quên mật khẩu?',
                           style: TextStyle(
@@ -115,9 +109,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          AppRoutes.navigateToRegister(context);
-                        },
+                        onPressed: () => AppRoutes.navigateToRegister(context),
                         child: Text(
                           'Đăng ký',
                           style: TextStyle(
@@ -149,20 +141,16 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       CommonWidgets.buildSocialLoginButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(
-                            const SignInWithFacebookRequested(),
-                          );
-                        },
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithFacebookRequested(),
+                        ),
                         color: AppTheme.lightTheme.colorScheme.primary,
                         text: 'f',
                       ),
                       CommonWidgets.buildSocialLoginButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(
-                            const SignInWithGoogleRequested(),
-                          );
-                        },
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithGoogleRequested(),
+                        ),
                         color: Colors.white,
                         text: 'G',
                         textColor: Colors.black,
@@ -177,8 +165,6 @@ class LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-
 
   @override
   void dispose() {
