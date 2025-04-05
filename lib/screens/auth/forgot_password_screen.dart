@@ -35,12 +35,13 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => AppRoutes.navigateToLogin(context),
         ),
-        title: Text('Quên mật khẩu'),
+        title: const Text('Quên mật khẩu'),
         centerTitle: true,
         backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
         foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
@@ -58,7 +59,6 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         },
         child: Container(
           color: AppTheme.lightTheme.colorScheme.surface,
-          height: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
@@ -97,7 +97,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     Navigator.of(context, rootNavigator: true).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
+        content: const Text(
           'Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!',
         ),
         backgroundColor: AppTheme.lightTheme.colorScheme.primary,
