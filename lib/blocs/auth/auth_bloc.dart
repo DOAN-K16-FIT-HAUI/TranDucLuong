@@ -11,6 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInRequested>(_onSignInRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<SignInWithGoogleRequested>(_onSignInWithGoogleRequested);
+    on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<PasswordResetRequested>(_onPasswordResetRequested);
   }
@@ -42,6 +43,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return 'Đăng nhập bằng Google đã bị hủy.';
         case 'google-sign-in-failed':
           return 'Đăng nhập bằng Google thất bại. Vui lòng thử lại.';
+      // Facebook sign-in errors
+        case 'facebook-login-cancelled':
+          return 'Đăng nhập bằng Facebook đã bị hủy.';
+        case 'facebook-token-null':
+          return 'Không nhận được token từ Facebook. Vui lòng thử lại.';
+        case 'account-exists-with-different-credential':
+          return 'Tài khoản đã tồn tại với thông tin đăng nhập khác.';
+        case 'operation-not-allowed':
+          return 'Đăng nhập bằng Facebook chưa được kích hoạt trong Firebase.';
       // Network errors
         case 'network-request-failed':
           return 'Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
@@ -85,6 +95,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final user = await authRepository.signInWithGoogle();
+      emit(AuthAuthenticated(user: user));
+    } catch (e) {
+      emit(AuthFailure(error: _mapFirebaseAuthExceptionToMessage(e)));
+    }
+  }
+
+  Future<void> _onSignInWithFacebookRequested(
+      SignInWithFacebookRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final user = await authRepository.signInWithFacebook();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
       emit(AuthFailure(error: _mapFirebaseAuthExceptionToMessage(e)));

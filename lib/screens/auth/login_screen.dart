@@ -2,6 +2,8 @@ import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
+import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,13 +11,13 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Add a form key for validation
+class LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _rememberPassword = false;
 
@@ -33,9 +35,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
       appBar: AppBar(
         title: const Text('Đăng nhập'),
         centerTitle: true,
+        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
+        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -43,211 +48,112 @@ class _LoginScreenState extends State<LoginScreen> {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
+              SnackBar(
+                content: Text(state.error),
+                backgroundColor: AppTheme.lightTheme.colorScheme.error,
+              ),
             );
           }
         },
-        child: Padding(
+        child: Container(
+          color: AppTheme.lightTheme.colorScheme.surface,
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Form(
-              key: _formKey, // Wrap the form with a key
+              key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  // Email Field
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      label: RichText(
-                        text: const TextSpan(
-                          text: 'Email ',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ],
-                        ),
-                      ),
-                      hintText: 'Nhập email',
-                      border: const OutlineInputBorder(),
-                      errorBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                      focusedErrorBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                      errorStyle: const TextStyle(color: Colors.red),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập email';
-                      }
-                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return 'Email không hợp lệ';
-                      }
-                      return null;
-                    },
+                  const SizedBox(height: 15),
+                  CommonWidgets.buildEmailField(_emailController),
+                  const SizedBox(height: 15),
+                  CommonWidgets.buildPasswordField(
+                    _passwordController,
+                    _isPasswordVisible,
+                        () => setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    }),
                   ),
-                  const SizedBox(height: 20),
-                  // Password Field
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      label: RichText(
-                        text: const TextSpan(
-                          text: 'Mật khẩu ',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ],
-                        ),
-                      ),
-                      hintText: 'Nhập mật khẩu',
-                      border: const OutlineInputBorder(),
-                      errorBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                      focusedErrorBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                      errorStyle: const TextStyle(color: Colors.red),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                    obscureText: !_isPasswordVisible,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập mật khẩu';
-                      }
-                      if (value.length < 6) {
-                        return 'Mật khẩu phải có ít nhất 6 ký tự';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   Row(
                     children: [
                       Checkbox(
                         value: _rememberPassword,
-                        onChanged: (value) {
-                          setState(() {
-                            _rememberPassword = value ?? false;
-                          });
-                        },
+                        onChanged: (value) => setState(() {
+                          _rememberPassword = value ?? false;
+                        }),
+                        activeColor: AppTheme.lightTheme.colorScheme.primary,
                       ),
-                      const Text('Ghi nhớ mật khẩu?'),
+                      Text(
+                        'Ghi nhớ mật khẩu?',
+                        style: TextStyle(
+                          color: AppTheme.lightTheme.colorScheme.onSurface,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      if (state is AuthLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _login, // Call the login method with validation
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Đăng nhập',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
+                  CommonWidgets.buildSubmitButton('Đăng nhập', _login),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          AppRoutes.navigateToForgotPassword(context);
-                        },
-                        child: const Text('Quên mật khẩu?'),
+                        onPressed: () => AppRoutes.navigateToForgotPassword(context),
+                        child: Text(
+                          'Quên mật khẩu?',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          AppRoutes.navigateToRegister(context);
-                        },
-                        child: const Text('Đăng ký'),
+                        onPressed: () => AppRoutes.navigateToRegister(context),
+                        child: Text(
+                          'Đăng ký',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Row(
-                    children: const [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('Hoặc'),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Add Facebook login logic here if needed
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(10),
-                            backgroundColor: Colors.grey[200],
-                          ),
-                          child: const Text(
-                            'f',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'Hoặc',
+                          style: TextStyle(
+                            color: AppTheme.lightTheme.colorScheme.onSurface,
                           ),
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<AuthBloc>()
-                                .add(const SignInWithGoogleRequested());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(10),
-                            backgroundColor: Colors.grey[200],
-                          ),
-                          child: const Text(
-                            'G',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
-                          ),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      CommonWidgets.buildSocialLoginButton(
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithFacebookRequested(),
                         ),
+                        color: AppTheme.lightTheme.colorScheme.primary,
+                        text: 'f',
+                      ),
+                      CommonWidgets.buildSocialLoginButton(
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithGoogleRequested(),
+                        ),
+                        color: Colors.white,
+                        text: 'G',
+                        textColor: Colors.black,
                       ),
                     ],
                   ),

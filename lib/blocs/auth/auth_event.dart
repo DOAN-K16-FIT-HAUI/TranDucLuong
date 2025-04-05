@@ -34,6 +34,10 @@ class SignInWithGoogleRequested extends AuthEvent {
   List<Object?> get props => [];
 }
 
+class SignInWithFacebookRequested extends AuthEvent {
+  const SignInWithFacebookRequested();
+}
+
 class SignOutRequested extends AuthEvent {
   const SignOutRequested();
 }
