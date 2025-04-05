@@ -1,4 +1,5 @@
 import 'package:finance_app/core/app_routes.dart';
+import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
 import 'package:flutter/material.dart';
 
@@ -6,10 +7,10 @@ class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
+  OnboardingScreenState createState() => OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -91,23 +92,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Icon(
                           _onboardingData[index]['icon'],
                           size: 150,
-                          color: Colors.brown,
+                          color: AppTheme.lightTheme.colorScheme.primary,
                         ),
                         const SizedBox(height: 20),
                         Text(
                           _onboardingData[index]['title'],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
+                            color: AppTheme.lightTheme.colorScheme.onSurface,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 10),
                         Text(
                           _onboardingData[index]['description'],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: Colors.black54,
+                            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -123,8 +125,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               width: _currentPage == i ? 24 : 8,
                               decoration: BoxDecoration(
                                 color: _currentPage == i
-                                    ? Colors.black
-                                    : Colors.grey,
+                                    ? AppTheme.lightTheme.colorScheme.primary
+                                    : AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -139,28 +141,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _currentPage < _onboardingData.length - 1
                       ? TextButton(
                     onPressed: _skip,
-                    child: const Text(
+                    child: Text(
                       'Bỏ qua',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
+                      style: TextStyle(fontSize: 16, color: AppTheme.lightTheme.colorScheme.primary),
                     ),
                   )
                       : const SizedBox(),
                   ElevatedButton(
                     onPressed: _next,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 15),
+                      backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     ),
                     child: Text(
-                      _currentPage == _onboardingData.length - 1
-                          ? 'Bắt đầu'
-                          : 'Tiếp tục',
+                      _currentPage == _onboardingData.length - 1 ? 'Bắt đầu' : 'Tiếp tục',
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
@@ -171,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -182,11 +181,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(10),
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: AppTheme.lightTheme.colorScheme.surface,
                         ),
-                        child: const Text(
+                        child: Text(
                           'f',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                          style: TextStyle(fontSize: 20, color: AppTheme.lightTheme.colorScheme.onSurface),
                         ),
                       ),
                     ),
@@ -199,11 +198,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(10),
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: AppTheme.lightTheme.colorScheme.surface,
                         ),
-                        child: const Text(
+                        child: Text(
                           'G',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                          style: TextStyle(fontSize: 20, color: AppTheme.lightTheme.colorScheme.onSurface),
                         ),
                       ),
                     ),

@@ -1,10 +1,13 @@
 import 'package:finance_app/blocs/auth/auth_state.dart';
+import 'package:finance_app/core/app_paths.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
+import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
 import 'package:finance_app/screens/splash/splash_screen.dart';
+import 'package:finance_app/screens/wallet/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -14,9 +17,10 @@ class AppRoutes {
   static const String splashRoute = 'splash';
   static const String loginRoute = 'login';
   static const String registerRoute = 'register';
-  static const String dashboardRoute = 'dashboard';
+  static const String dashboardRoute = 'top';
   static const String forgotPasswordRoute = 'forgot-password';
   static const String onBoardingRoute = 'on-boarding';
+  static const String walletRoute = 'wallet';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -47,13 +51,17 @@ class AppRoutes {
       GoRoute(
         name: dashboardRoute,
         path: AppPaths.dashboardPath,
-        builder: (context, state) =>
-        const Placeholder(), // Replace with your DashboardScreen
+        builder: (context, state) => TopScreen(),
       ),
       GoRoute(
         name: forgotPasswordRoute,
         path: AppPaths.forgotPasswordPath,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        name: walletRoute,
+        path: AppPaths.walletListPath,
+        builder: (context, state) => WalletScreen(),
       ),
     ],
     redirect: (context, state) async {
@@ -72,7 +80,7 @@ class AppRoutes {
         if (!hasSeenOnboarding) {
           return AppPaths.onBoardingPath; // Show onboarding if not seen
         } else if (isAuthenticated) {
-          return AppPaths.dashboardPath; // Go to dashboard if authenticated
+          return AppPaths.dashboardPath; // Go to top if authenticated
         } else {
           return AppPaths.loginPath; // Go to login if not authenticated
         }
@@ -116,20 +124,6 @@ class AppRoutes {
       context.goNamed(forgotPasswordRoute);
   static void navigateToDashboard(BuildContext context) =>
       context.goNamed(dashboardRoute);
-}
-
-class AppPaths {
-  static const String splashPath = '/splash';
-  static const String dashboardPath = '/';
-  static const String onBoardingPath = '/on-boarding';
-  static const String transactionsPath = '/transactions';
-  static const String addTransactionPath = '/transactions/add';
-  static const String editTransactionPath = '/transactions/:id';
-  static const String categoriesPath = '/categories';
-  static const String settingsPath = '/settings';
-  static const String reportsPath = '/reports';
-  static const String loginPath = '/login';
-  static const String registerPath = '/register';
-  static const String forgotPasswordPath = '/forgot-password';
-  static const String transactionListPath = '/transaction-list';
+  static void navigateToWallet(BuildContext context) =>
+      context.goNamed(walletRoute);
 }
