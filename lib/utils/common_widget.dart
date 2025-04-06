@@ -119,7 +119,10 @@ class CommonWidgets {
     );
   }
 
-  static Widget buildBalanceInputField(TextEditingController controller) {
+  static Widget buildBalanceInputField(
+    TextEditingController controller, {
+    String? Function(String?)? validator,
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.number,
@@ -127,7 +130,7 @@ class CommonWidgets {
       decoration: InputDecoration(
         label: RichText(
           text: TextSpan(
-            text: 'Số dư ',
+            text: 'Số tiền ',
             style: GoogleFonts.poppins(
               color: AppTheme.lightTheme.colorScheme.onSurface,
               fontSize: 16,
@@ -140,7 +143,7 @@ class CommonWidgets {
             ],
           ),
         ),
-        hintText: 'Nhập số dư',
+        hintText: 'Nhập số tiền',
         suffixText: '₫',
         suffixStyle: GoogleFonts.poppins(
           color: AppTheme.lightTheme.colorScheme.onSurface,
@@ -164,7 +167,7 @@ class CommonWidgets {
       style: GoogleFonts.poppins(
         color: AppTheme.lightTheme.colorScheme.onSurface,
       ),
-      validator: Validators.validateBalance,
+      validator: validator,
     );
   }
 
@@ -263,8 +266,8 @@ class CommonWidgets {
                 child: Text(
                   'Hủy',
                   style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha:
-                      153,
+                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+                      alpha: 153,
                     ),
                   ),
                 ),
@@ -293,6 +296,10 @@ class CommonWidgets {
     bool showBackButton = true, // Hiển thị nút back hay không
     IconData? backIcon, // Icon tùy chỉnh cho nút back (mặc định là arrow_back)
     List<Widget>? actions, // Danh sách các nút hành động tùy chỉnh
+    bool showDropdown = false, // Hiển thị dropdown thay vì tiêu đề text
+    List<String>? dropdownItems, // Danh sách các mục trong dropdown
+    String? dropdownValue, // Giá trị hiện tại của dropdown
+    ValueChanged<String?>? onDropdownChanged, // Callback khi dropdown thay đổi
   }) {
     return PreferredSize(
       preferredSize: Size.fromHeight(
@@ -309,6 +316,10 @@ class CommonWidgets {
             showBackButton: showBackButton,
             backIcon: backIcon,
             actions: actions,
+            showDropdown: showDropdown,
+            dropdownItems: dropdownItems,
+            dropdownValue: dropdownValue,
+            onDropdownChanged: onDropdownChanged,
           ),
         ],
       ),
@@ -329,6 +340,10 @@ class CommonWidgets {
     bool showBackButton = true,
     IconData? backIcon,
     List<Widget>? actions,
+    bool showDropdown = false,
+    List<String>? dropdownItems,
+    String? dropdownValue,
+    ValueChanged<String?>? onDropdownChanged,
   }) {
     return Container(
       height: kToolbarHeight,
@@ -340,33 +355,86 @@ class CommonWidgets {
           // Nút Back (tùy chọn)
           showBackButton
               ? IconButton(
-            icon: Icon(
-              backIcon ?? Icons.arrow_back, // Dùng icon tùy chỉnh hoặc mặc định
-              color: AppTheme.lightTheme.colorScheme.surface,
-            ),
-            tooltip: 'Quay lại',
-            onPressed: onBackPressed ?? () => Navigator.pop(context),
-          )
-              : const SizedBox(width: 48), // Giữ khoảng trống nếu không có nút back
-          // Tiêu đề
+                icon: Icon(
+                  backIcon ??
+                      Icons.arrow_back, // Dùng icon tùy chỉnh hoặc mặc định
+                  color: AppTheme.lightTheme.colorScheme.surface,
+                ),
+                tooltip: 'Quay lại',
+                onPressed: onBackPressed ?? () => Navigator.pop(context),
+              )
+              : const SizedBox(width: 48),
+          // Giữ khoảng trống nếu không có nút back
+          // Tiêu đề hoặc Dropdown
           Expanded(
             child: Container(
               alignment: Alignment.center,
-              child: Text(
-                title,
-                style: GoogleFonts.poppins(
-                  fontSize: Dimens.textSizeMedium + 2, // 18
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.lightTheme.colorScheme.surface,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+              child:
+                  showDropdown &&
+                          dropdownItems != null &&
+                          dropdownValue != null &&
+                          onDropdownChanged != null
+                      ? DropdownButtonFormField<String>(
+                        value: dropdownValue,
+                        onChanged: onDropdownChanged,
+                        items:
+                            dropdownItems.map<DropdownMenuItem<String>>((
+                              String value,
+                            ) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: Dimens.textSizeMedium + 2, // 18
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        AppTheme.lightTheme.colorScheme.surface,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          border: InputBorder.none,
+                          // Không cần border vì ở trong app bar
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                        ),
+                        style: GoogleFonts.poppins(
+                          fontSize: Dimens.textSizeMedium + 2, // 18
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.lightTheme.colorScheme.surface,
+                        ),
+                        dropdownColor: AppTheme.lightTheme.colorScheme.primary,
+                        iconEnabledColor:
+                            AppTheme.lightTheme.colorScheme.surface,
+                        iconSize: 24,
+                      )
+                      : Text(
+                        title,
+                        style: GoogleFonts.poppins(
+                          fontSize: Dimens.textSizeMedium + 2, // 18
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.lightTheme.colorScheme.surface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
             ),
           ),
           // Actions (tùy chọn)
           Row(
             mainAxisSize: MainAxisSize.min,
-            children: actions ?? [const SizedBox(width: 48)], // Giữ khoảng trống nếu không có actions
+            children:
+                actions ??
+                [
+                  const SizedBox(width: 48),
+                ], // Giữ khoảng trống nếu không có actions
           ),
         ],
       ),
@@ -448,7 +516,9 @@ class CommonWidgets {
           isSearching ? 'Không tìm thấy mục phù hợp' : emptyMessage,
           style: GoogleFonts.poppins(
             fontSize: Dimens.textSizeMedium,
-            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 204),
+            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+              alpha: 204,
+            ),
           ),
           textAlign: TextAlign.center,
         ),
@@ -512,9 +582,7 @@ class CommonWidgets {
     return Container(
       key: itemKey,
       margin: margin,
-      decoration: _boxDecoration().copyWith(
-        color: backgroundColor,
-      ),
+      decoration: _boxDecoration().copyWith(color: backgroundColor),
       child: Padding(
         padding: padding,
         child: Row(
@@ -562,7 +630,10 @@ class CommonWidgets {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                        color:
+                            value >= 0
+                                ? AppTheme.incomeColor
+                                : AppTheme.expenseColor,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -576,7 +647,9 @@ class CommonWidgets {
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
-                  color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(153),
+                  color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
+                    153,
+                  ),
                 ),
                 offset: const Offset(0, 40),
                 shape: RoundedRectangleBorder(
@@ -713,8 +786,8 @@ class CommonWidgets {
                 child: Text(
                   'Hủy',
                   style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha:
-                      204,
+                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+                      alpha: 204,
                     ),
                   ),
                 ),
@@ -811,7 +884,9 @@ class CommonWidgets {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.lightTheme.colorScheme.shadow.withValues(alpha: 0.25),
+            color: AppTheme.lightTheme.colorScheme.shadow.withValues(
+              alpha: 0.25,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -822,7 +897,9 @@ class CommonWidgets {
           hintText: hintText,
           hintStyle: GoogleFonts.poppins(
             fontSize: Dimens.textSizeMedium,
-            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+              alpha: 0.6,
+            ),
           ),
           prefixIcon: Icon(
             Icons.search,
@@ -835,7 +912,10 @@ class CommonWidgets {
           ),
           filled: true,
           fillColor: AppTheme.lightTheme.colorScheme.surface,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 16,
+          ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
@@ -850,6 +930,222 @@ class CommonWidgets {
         ),
         cursorColor: AppTheme.lightTheme.colorScheme.primary,
         onChanged: onChanged,
+      ),
+    );
+  }
+
+  static Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        label: RichText(
+          text: TextSpan(
+            text: '$label ',
+            style: GoogleFonts.poppins(
+              color: AppTheme.lightTheme.colorScheme.onSurface,
+              fontSize: Dimens.textSizeMedium,
+            ),
+            children: const [
+              TextSpan(
+                text: '*',
+                style: TextStyle(color: AppTheme.expenseColor),
+              ),
+            ],
+          ),
+        ),
+        hintText: hint,
+        hintStyle: GoogleFonts.poppins(
+          color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+            alpha: 0.6,
+          ),
+        ),
+        border: const OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: AppTheme.lightTheme.colorScheme.primary,
+          ),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.expenseColor),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.expenseColor),
+        ),
+        errorStyle: const TextStyle(color: AppTheme.expenseColor),
+      ),
+      cursorColor: AppTheme.lightTheme.colorScheme.primary,
+      style: GoogleFonts.poppins(
+        color: AppTheme.lightTheme.colorScheme.onSurface,
+      ),
+      validator: validator,
+    );
+  }
+
+  static Widget buildDropdownField({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    String? Function(String?)? validator,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      onChanged: onChanged,
+      items:
+          items.map<DropdownMenuItem<String>>((String item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                style: GoogleFonts.poppins(
+                  color: AppTheme.lightTheme.colorScheme.onSurface,
+                ),
+              ),
+            );
+          }).toList(),
+      decoration: InputDecoration(
+        label: RichText(
+          text: TextSpan(
+            text: '$label ',
+            style: GoogleFonts.poppins(
+              color: AppTheme.lightTheme.colorScheme.onSurface,
+              fontSize: Dimens.textSizeMedium,
+            ),
+            children: const [
+              TextSpan(
+                text: '*',
+                style: TextStyle(color: AppTheme.expenseColor),
+              ),
+            ],
+          ),
+        ),
+        border: const OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: AppTheme.lightTheme.colorScheme.primary,
+          ),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.expenseColor),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.expenseColor),
+        ),
+        errorStyle: const TextStyle(color: AppTheme.expenseColor),
+      ),
+      style: GoogleFonts.poppins(
+        color: AppTheme.lightTheme.colorScheme.onSurface,
+      ),
+      dropdownColor: AppTheme.lightTheme.colorScheme.surface,
+      iconEnabledColor: AppTheme.lightTheme.colorScheme.onSurface,
+      validator: validator,
+    );
+  }
+
+  static Widget buildDatePickerField({
+    required BuildContext context,
+    required DateTime date,
+    required String label,
+    required VoidCallback onTap,
+    String? errorText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            '$label: ${DateFormat('dd/MM/yyyy').format(date)}',
+            style: GoogleFonts.poppins(
+              fontSize: Dimens.textSizeMedium,
+              color: AppTheme.lightTheme.colorScheme.onSurface,
+            ),
+          ),
+          trailing: Icon(
+            Icons.calendar_today,
+            color: AppTheme.lightTheme.colorScheme.onSurface,
+          ),
+          onTap: onTap,
+        ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              errorText,
+              style: GoogleFonts.poppins(
+                color: AppTheme.expenseColor,
+                fontSize: Dimens.textSizeSmall,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  static Widget buildCategoryChips({
+    required List<String> categories,
+    required String selectedCategory,
+    required ValueChanged<String> onCategorySelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Danh mục yêu thích',
+          style: GoogleFonts.poppins(
+            fontSize: Dimens.textSizeMedium,
+            color: AppTheme.lightTheme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8.0,
+          children:
+              categories.map((category) {
+                return ChoiceChip(
+                  label: Text(
+                    category,
+                    style: GoogleFonts.poppins(
+                      color:
+                          selectedCategory == category
+                              ? AppTheme.lightTheme.colorScheme.primary
+                              : AppTheme.lightTheme.colorScheme.onSurface,
+                    ),
+                  ),
+                  selected: selectedCategory == category,
+                  onSelected: (bool selected) {
+                    if (selected) {
+                      onCategorySelected(category);
+                    }
+                  },
+                  selectedColor: AppTheme.lightTheme.colorScheme.primary
+                      .withValues(alpha: 0.1),
+                  backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+                  side: BorderSide(
+                    color:
+                        selectedCategory == category
+                            ? AppTheme.lightTheme.colorScheme.primary
+                            : AppTheme.lightTheme.colorScheme.onSurface
+                                .withValues(alpha: 0.2),
+                  ),
+                );
+              }).toList(),
+        ),
+      ],
+    );
+  }
+
+  static Widget buildLabel({required String text}) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: Dimens.textSizeMedium,
+        color: AppTheme.lightTheme.colorScheme.onSurface,
       ),
     );
   }
