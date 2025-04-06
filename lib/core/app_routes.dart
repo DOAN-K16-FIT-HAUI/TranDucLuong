@@ -8,6 +8,7 @@ import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
 import 'package:finance_app/screens/splash/splash_screen.dart';
+import 'package:finance_app/screens/transaction/transaction_list.dart';
 import 'package:finance_app/screens/transaction/transaction_screen.dart';
 import 'package:finance_app/screens/wallet/wallet_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class AppRoutes {
   static const String walletRoute = 'wallet';
   static const String appNotificationRoute = 'app-notification';
   static const String transactionRoute = 'transaction';
+  static const String transactionListRoute = 'transaction-list';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -76,6 +78,11 @@ class AppRoutes {
         name: transactionRoute,
         path: AppPaths.addTransactionPath,
         builder: (context, state) => const TransactionScreen(),
+      ),
+      GoRoute(
+        name: transactionListRoute,
+        path: AppPaths.transactionListPath,
+        builder: (context, state) => const TransactionListScreen(),
       ),
     ],
     redirect: (context, state) async {
@@ -144,4 +151,6 @@ class AppRoutes {
       context.goNamed(appNotificationRoute);
   static void navigateToTransaction(BuildContext context) =>
       context.goNamed(transactionRoute);
+  static void navigateToTransactionList(BuildContext context) =>
+      context.goNamed(transactionListRoute);
 }

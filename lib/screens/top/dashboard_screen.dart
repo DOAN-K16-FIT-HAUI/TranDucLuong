@@ -108,6 +108,7 @@ class DashboardScreen extends StatelessWidget {
                         recentTransactions
                             .map((tx) => _buildTransactionRow(tx))
                             .toList(),
+                    onTap: () => AppRoutes.navigateToTransactionList(context),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -116,6 +117,7 @@ class DashboardScreen extends StatelessWidget {
                         loans
                             .map((loan) => _buildTransactionRow(loan))
                             .toList(),
+                    onTap: () {}
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -129,6 +131,7 @@ class DashboardScreen extends StatelessWidget {
                               ),
                             )
                             .toList(),
+                    onTap: () {}
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -137,6 +140,7 @@ class DashboardScreen extends StatelessWidget {
                         spendingLimits
                             .map((limit) => _buildSpendingLimitRow(limit))
                             .toList(),
+                    onTap: () {}
                   ),
                 ],
               ),
@@ -315,6 +319,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildSection({
     required String title,
     required List<Widget> children,
+    required Function()? onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +336,11 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                if (onTap != null) {
+                  onTap();
+                }
+              },
               child: Text(
                 'Xem tất cả',
                 style: GoogleFonts.poppins(

@@ -80,30 +80,9 @@ class Validators {
     return null;
   }
 
-  static String? validateDescription(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập mô tả';
-    }
-    return null;
-  }
-
   static String? validateCategory(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng chọn danh mục';
-    }
-    return null;
-  }
-
-  static String? validateWallet(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng chọn ví';
-    }
-    return null;
-  }
-
-  static String? validateNotEmpty(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Trường này không được để trống';
     }
     return null;
   }
@@ -121,6 +100,61 @@ class Validators {
   static String? validateString(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập giá trị';
+    }
+    return null;
+  }
+
+  static String? validateRepaymentDate(DateTime? repaymentDate, DateTime transactionDate) {
+    if (repaymentDate != null) {
+      // Ngày trả không được trước ngày giao dịch (cùng ngày thì OK)
+      final transactionDayStart = DateTime(transactionDate.year, transactionDate.month, transactionDate.day);
+      final repaymentDayStart = DateTime(repaymentDate.year, repaymentDate.month, repaymentDate.day);
+      if (repaymentDayStart.isBefore(transactionDayStart)){
+        return 'Ngày hẹn trả không được trước ngày giao dịch.';
+      }
+    }
+    return null; // Hợp lệ nếu null hoặc không trước ngày giao dịch
+  }
+
+  static String? validateBalanceAfterAdjustment(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập số dư thực tế.';
+    }
+    final amountString = value.replaceAll(RegExp(r'[^0-9.]'), '');
+    final amount = double.tryParse(amountString);
+    if (amount == null) {
+      return 'Số dư không hợp lệ.';
+    }
+    // Có thể cho phép số dư âm tùy theo logic kinh doanh
+    // if (amount < 0) {
+    //   return 'Số dư không được là số âm.';
+    // }
+    return null;
+  }
+
+  static String? validateDescription(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Vui lòng nhập diễn giải.';
+    }
+    if (value.length > 100) { // Giới hạn độ dài ví dụ
+      return 'Diễn giải quá dài (tối đa 100 ký tự).';
+    }
+    return null;
+  }
+
+  static String? validateWallet(String? value, {String fieldName = "Ví", String? checkAgainst}) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng chọn $fieldName.';
+    }
+    if (checkAgainst != null && value == checkAgainst) {
+      return '$fieldName không được trùng với Ví nguồn.';
+    }
+    return null;
+  }
+
+  static String? validateNotEmpty(String? value, {String fieldName = "Trường này"}) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName không được để trống.';
     }
     return null;
   }
