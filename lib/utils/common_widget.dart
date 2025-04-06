@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/dimens.dart';
 import 'package:finance_app/utils/formatter.dart';
 import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -469,30 +471,36 @@ class CommonWidgets {
     );
   }
 
-  static Widget buildTabBar({
+  static PreferredSizeWidget buildTabBar({
     required BuildContext context,
     required List<String> tabTitles,
     required Function(int) onTabChanged,
+    TabController? controller, // Thêm controller vào đây
     TextStyle? labelStyle,
     TextStyle? unselectedLabelStyle,
     Color? labelColor,
     Color? unselectedLabelColor,
     Color? indicatorColor,
+    Color? backgroundColor, // Màu nền cho vùng TabBar (tùy chọn)
   }) {
-    return TabBar(
-      labelStyle:
-          labelStyle ??
-          GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
-      unselectedLabelStyle:
-          unselectedLabelStyle ??
-          GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
-      labelColor: labelColor ?? AppTheme.lightTheme.colorScheme.primary,
-      unselectedLabelColor:
-          unselectedLabelColor ??
-          AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 153),
-      indicatorColor: indicatorColor ?? AppTheme.lightTheme.colorScheme.primary,
-      onTap: onTabChanged,
-      tabs: tabTitles.map((title) => Tab(text: title)).toList(),
+    return PreferredSize(
+      // Chiều cao tiêu chuẩn cho TabBar
+      preferredSize: const Size.fromHeight(kTextTabBarHeight),
+      child: Material( // Bọc trong Material để có thể set màu nền
+        color: backgroundColor ?? AppTheme.lightTheme.colorScheme.surface, // Màu nền
+        // elevation: 1, // Có thể thêm elevation nếu muốn
+        child: TabBar(
+          controller: controller, // Gán controller
+          labelStyle: labelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: unselectedLabelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+          labelColor: labelColor ?? AppTheme.lightTheme.colorScheme.primary,
+          unselectedLabelColor: unselectedLabelColor ?? AppTheme.lightTheme.colorScheme.onSurface.withOpacity(0.6),
+          indicatorColor: indicatorColor ?? AppTheme.lightTheme.colorScheme.primary,
+          indicatorWeight: 2.5,
+          onTap: onTabChanged,
+          tabs: tabTitles.map((title) => Tab(text: title)).toList(),
+        ),
+      ),
     );
   }
 
@@ -1049,7 +1057,7 @@ class CommonWidgets {
 
   static Widget buildDatePickerField({
     required BuildContext context,
-    required DateTime date,
+    required DateTime? date,
     required String label,
     required VoidCallback onTap,
     String? errorText,
@@ -1060,7 +1068,8 @@ class CommonWidgets {
         ListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(
-            '$label: ${DateFormat('dd/MM/yyyy').format(date)}',
+            // Sửa: Xử lý date có thể null
+            '$label: ${date != null ? DateFormat('dd/MM/yyyy').format(date) : 'Chưa chọn'}',
             style: GoogleFonts.poppins(
               fontSize: Dimens.textSizeMedium,
               color: AppTheme.lightTheme.colorScheme.onSurface,
@@ -1071,10 +1080,13 @@ class CommonWidgets {
             color: AppTheme.lightTheme.colorScheme.onSurface,
           ),
           onTap: onTap,
+          // Thêm nút xóa nếu cần (ví dụ cho ngày hẹn trả)
+          // leading: allowClear && date != null ? IconButton(...) : null,
         ),
         if (errorText != null)
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 8.0, left: 12),
+            // Thêm padding trái
             child: Text(
               errorText,
               style: GoogleFonts.poppins(
@@ -1148,5 +1160,284 @@ class CommonWidgets {
         color: AppTheme.lightTheme.colorScheme.onSurface,
       ),
     );
+  }
+
+  static Widget buildLoadingIndicator({Color? color, double size = 50.0}) {
+    return Center(
+      child: SpinKitFadingCircle(
+        color: color ?? AppTheme.lightTheme.colorScheme.primary,
+        size: size,
+      ),
+    );
+  }
+
+  static Widget buildEmptyState({
+    required String message,
+    String? suggestion,
+    IconData icon = Icons.receipt_long_outlined, // Icon mặc định
+    double iconSize = 80,
+    VoidCallback? onActionPressed,
+    String? actionText,
+    IconData? actionIcon,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: iconSize, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            if (suggestion != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                suggestion,
+                style: GoogleFonts.poppins(color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (onActionPressed != null && actionText != null) ...[
+              const SizedBox(height: 25),
+              ElevatedButton.icon(
+                icon:
+                    actionIcon != null
+                        ? Icon(actionIcon)
+                        : const SizedBox.shrink(),
+                label: Text(actionText),
+                onPressed: onActionPressed,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppTheme.lightTheme.colorScheme.onPrimary,
+                  backgroundColor:
+                      AppTheme.lightTheme.colorScheme.primary, // Màu nút
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget buildErrorState({
+    required String message,
+    required VoidCallback onRetry,
+    String title = 'Lỗi tải dữ liệu',
+    IconData icon = Icons.error_outline,
+    Color iconColor = Colors.red,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: iconColor, size: 60),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: iconColor.withValues(alpha: 0.8),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message, // Hiển thị thông báo lỗi cụ thể từ state
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 25),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Thử lại'),
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: AppTheme.lightTheme.colorScheme.onPrimary,
+                backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Widget để hiển thị một item giao dịch trong danh sách.
+  static Widget buildTransactionListItem({
+    required BuildContext context,
+    required TransactionModel transaction,
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+  }) {
+    final iconData = _getTransactionIcon(
+      transaction.type,
+    ); // Gọi helper nội bộ (hoặc static)
+    final amountColor = getAmountColor(transaction.type);
+    final formattedAmount = Formatter.formatCurrency(transaction.amount);
+    final formattedDate = Formatter.formatDateTime(transaction.date);
+
+    // Xây dựng subtitle
+    String subtitleText = formattedDate;
+    if (transaction.type == 'Chi tiêu' && transaction.category.isNotEmpty) {
+      subtitleText = '${transaction.category} • $formattedDate'; // Dùng dấu •
+    } else if (transaction.type == 'Chuyển khoản') {
+      subtitleText =
+          'Từ: ${transaction.fromWallet ?? '?'} → Đến: ${transaction.toWallet ?? '?'} • $formattedDate';
+    } else if (transaction.type == 'Đi vay' &&
+        transaction.lender != null &&
+        transaction.lender!.isNotEmpty) {
+      subtitleText = 'Vay từ: ${transaction.lender} • $formattedDate';
+    } else if (transaction.type == 'Cho vay' &&
+        transaction.borrower != null &&
+        transaction.borrower!.isNotEmpty) {
+      subtitleText = 'Cho vay: ${transaction.borrower} • $formattedDate';
+    } else if ((transaction.type == 'Thu nhập' ||
+            transaction.type == 'Điều chỉnh số dư' ||
+            transaction.type == 'Đi vay' ||
+            transaction.type == 'Cho vay') &&
+        transaction.wallet != null &&
+        transaction.wallet!.isNotEmpty) {
+      // Hiển thị ví cho các loại giao dịch đơn lẻ (nếu có)
+      subtitleText = 'Ví: ${transaction.wallet} • $formattedDate';
+    }
+    // Chỉ hiển thị ngày nếu không có thông tin nào khác
+    else {
+      subtitleText = formattedDate;
+    }
+
+    return Card(
+      // key: ValueKey(transaction.id), // Key quan trọng cho ReorderableListView nếu dùng
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      // Bo góc nhẹ
+      child: InkWell(
+        // Thêm InkWell để có hiệu ứng khi nhấn
+        onTap: onTap,
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+          child: Row(
+            children: [
+              // Icon
+              CircleAvatar(
+                radius: 18, // Kích thước nhỏ hơn chút
+                backgroundColor: iconData.backgroundColor.withValues(
+                  alpha: 0.8,
+                ),
+                child: Icon(iconData.icon, color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              // Thông tin chính
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.description.isNotEmpty
+                          ? transaction.description
+                          : '(Không có mô tả)',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitleText,
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      // Cho phép 2 dòng cho subtitle dài (như chuyển khoản)
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Số tiền
+              Text(
+                // Thêm dấu +/- cho rõ ràng (trừ Thu nhập, Điều chỉnh)
+                getAmountPrefix(transaction.type) + formattedAmount,
+                style: GoogleFonts.poppins(
+                  color: amountColor,
+                  fontWeight: FontWeight.w600, // Đậm hơn
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.end,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Helpers nội bộ cho buildTransactionListItem ---
+  // (Có thể chuyển thành static nếu muốn)
+
+  static ({IconData icon, Color backgroundColor}) _getTransactionIcon(
+    String type,
+  ) {
+    // ... (Giữ nguyên logic của bạn) ...
+    switch (type) {
+      case 'Thu nhập':
+        return (icon: Icons.arrow_downward, backgroundColor: Colors.green);
+      case 'Chi tiêu':
+        return (icon: Icons.arrow_upward, backgroundColor: Colors.red);
+      case 'Chuyển khoản':
+        return (icon: Icons.swap_horiz, backgroundColor: Colors.blue);
+      case 'Đi vay':
+        return (icon: Icons.call_received, backgroundColor: Colors.purple);
+      case 'Cho vay':
+        return (icon: Icons.call_made, backgroundColor: Colors.orange);
+      case 'Điều chỉnh số dư':
+        return (icon: Icons.tune, backgroundColor: Colors.teal);
+      default:
+        return (icon: Icons.help_outline, backgroundColor: Colors.grey);
+    }
+  }
+
+  static Color getAmountColor(String type) {
+    // ... (Giữ nguyên logic của bạn) ...
+    switch (type) {
+      case 'Thu nhập':
+      case 'Đi vay':
+        return AppTheme.incomeColor; // Dùng màu theme
+      case 'Chi tiêu':
+      case 'Cho vay':
+        return AppTheme.expenseColor; // Dùng màu theme
+      case 'Chuyển khoản':
+      case 'Điều chỉnh số dư':
+      default:
+        return AppTheme.lightTheme.colorScheme.onSurface.withValues(
+          alpha: 0.8,
+        ); // Màu trung tính
+    }
+  }
+
+  static String getAmountPrefix(String type) {
+    switch (type) {
+      case 'Thu nhập':
+      case 'Đi vay':
+        return '+ ';
+      case 'Chi tiêu':
+      case 'Cho vay':
+        return '- ';
+      default:
+        return ''; // Chuyển khoản, điều chỉnh không cần dấu
+    }
   }
 }
