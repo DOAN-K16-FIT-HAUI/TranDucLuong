@@ -1,3 +1,4 @@
+import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class TopScreenState extends State<TopScreen> {
   }
 
   void _addTransaction() {
+    AppRoutes.navigateToTransaction(context);
   }
 
   @override

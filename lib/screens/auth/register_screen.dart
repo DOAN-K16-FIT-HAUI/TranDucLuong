@@ -36,24 +36,20 @@ class RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => AppRoutes.navigateToLogin(context),
-        ),
-        title: const Text('Đăng ký'),
-        centerTitle: true,
-        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
-        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
+      appBar: CommonWidgets.buildAppBar(
+        context: context,
+        title: 'Đăng ký',
+        showBackButton: true,
+        onBackPressed: () => AppRoutes.navigateToLogin(context),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error)));
           }
         },
         child: Container(
@@ -71,7 +67,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                   CommonWidgets.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                        () => setState(() {
+                    () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
                   ),
@@ -92,8 +88,10 @@ class RegisterScreenState extends State<RegisterScreen> {
                             style: TextStyle(
                               color: AppTheme.lightTheme.colorScheme.primary,
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => AppRoutes.navigateToLogin(context),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap =
+                                      () => AppRoutes.navigateToLogin(context),
                           ),
                         ],
                       ),

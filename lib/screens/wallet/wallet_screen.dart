@@ -19,60 +19,75 @@ class WalletScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => WalletBloc()..add(LoadWallets()),
-      child: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          body: Material(
-            color: AppTheme.lightTheme.colorScheme.surface,
-            child: BlocBuilder<WalletBloc, WalletState>(
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    CommonWidgets.buildAppBar(
-                      context: context,
-                      isSearching: state.isSearching,
-                      searchController: TextEditingController(text: state.searchQuery)
-                        ..selection = TextSelection.fromPosition(TextPosition(offset: state.searchQuery.length)),
-                      onSearchTextChanged: (query) => context.read<WalletBloc>().add(SearchWallets(query)),
-                      onBackPressed: () {
-                        if (state.isSearching) {
-                          context.read<WalletBloc>().add(ToggleSearch(false));
-                        } else {
-                          AppRoutes.navigateToDashboard(context);
-                        }
-                      },
-                      onSearchPressed: () => context.read<WalletBloc>().add(ToggleSearch(!state.isSearching)),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTotalBalance(state),
-                    const SizedBox(height: 16),
-                    CommonWidgets.buildTabBar(
-                      context: context,
-                      tabTitles: const ['Tài khoản', 'Tiết kiệm', 'Đầu tư'],
-                      onTabChanged: (index) => context.read<WalletBloc>().add(TabChanged(index)),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _buildTabContent(context, state, state.wallets, 0),
-                          _buildTabContent(context, state, state.savingsWallets, 1),
-                          _buildTabContent(context, state, state.investmentWallets, 2),
-                        ],
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+        body: BlocBuilder<WalletBloc, WalletState>(
+          builder: (context, state) {
+            return Column(
+              children: [
+                CommonWidgets.buildAppBar(
+                  context: context,
+                  title: 'Ví của tôi',
+                  backIcon: Icons.arrow_back,
+                  onBackPressed: () {
+                    if (state.isSearching) {
+                      context.read<WalletBloc>().add(ToggleSearch(false));
+                    } else {
+                      AppRoutes.navigateToDashboard(context);
+                    }
+                  },
+                  actions: [
+                    IconButton(
+                      icon: Icon(
+                        state.isSearching ? Icons.close : Icons.search,
+                        color: AppTheme.lightTheme.colorScheme.surface,
                       ),
+                      tooltip: state.isSearching ? 'Đóng tìm kiếm' : 'Tìm kiếm',
+                      onPressed: () {
+                        context.read<WalletBloc>().add(ToggleSearch(!state.isSearching));
+                      },
                     ),
                   ],
-                );
-              },
-            ),
-          ),
-          floatingActionButton: Builder(
-            builder: (fabContext) => FloatingActionButton(
-              onPressed: () => _showAddWalletDialog(fabContext),
-              backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-              child: Icon(Icons.add, color: AppTheme.lightTheme.colorScheme.surface),
-            ),
+                ),
+                if (state.isSearching)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: CommonWidgets.buildSearchField(
+                      context: context,
+                      hintText: 'Tìm kiếm ví...',
+                      onChanged: (value) {
+                        context.read<WalletBloc>().add(SearchWallets(value));
+                      },
+                    ),
+                  ),
+                if (!state.isSearching) const SizedBox(height: 16),
+                _buildTotalBalance(state),
+                const SizedBox(height: 16),
+                CommonWidgets.buildTabBar(
+                  context: context,
+                  tabTitles: const ['Tài khoản', 'Tiết kiệm', 'Đầu tư'],
+                  onTabChanged: (index) => context.read<WalletBloc>().add(TabChanged(index)),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildTabContent(context, state, state.wallets, 0),
+                      _buildTabContent(context, state, state.savingsWallets, 1),
+                      _buildTabContent(context, state, state.investmentWallets, 2),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        floatingActionButton: Builder(
+          builder: (fabContext) => FloatingActionButton(
+            onPressed: () => _showAddWalletDialog(fabContext),
+            backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+            child: Icon(Icons.add, color: AppTheme.lightTheme.colorScheme.surface),
           ),
         ),
       ),
@@ -91,7 +106,7 @@ class WalletScreen extends StatelessWidget {
       context: context,
       formKey: formKey,
       formFields: [
-        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateWalletName),
+        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateString),
         const SizedBox(height: 16),
         CommonWidgets.buildBalanceInputField(balanceController),
         const SizedBox(height: 16),
@@ -132,7 +147,11 @@ class WalletScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
         NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(tabTotalBalance),
-        style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.bold, color: tabTotalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
+        style: GoogleFonts.poppins(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: tabTotalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+        ),
       ),
     );
   }
@@ -171,7 +190,9 @@ class WalletScreen extends StatelessWidget {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(text: wallet.name);
     final balanceController = TextEditingController(
-      text: Formatter.currencyInputFormatter.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: wallet.balance.toString())).text,
+      text: Formatter.currencyInputFormatter
+          .formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: wallet.balance.toString()))
+          .text,
     );
     IconData selectedIcon = wallet.icon;
 
@@ -179,7 +200,7 @@ class WalletScreen extends StatelessWidget {
       context: context,
       formKey: formKey,
       formFields: [
-        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateWalletName),
+        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateString),
         const SizedBox(height: 16),
         CommonWidgets.buildBalanceInputField(balanceController),
         const SizedBox(height: 16),
@@ -211,25 +232,30 @@ class WalletScreen extends StatelessWidget {
       isSearching: state.isSearching,
       type: type,
       itemBuilder: (context, wallet, type, index) => _buildWalletCard(context, wallet, type, index),
-      onReorder: (type, oldIndex, newIndex) => context.read<WalletBloc>().add(ReorderWallets(type, oldIndex, newIndex)),
+      onReorder: (type, oldIndex, newIndex) =>
+          context.read<WalletBloc>().add(ReorderWallets(type, oldIndex, newIndex)),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, String hint, String? Function(String?) validator) {
+  Widget _buildTextField(
+      TextEditingController controller, String label, String hint, String? Function(String?) validator) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         label: RichText(
           text: TextSpan(
             text: '$label ',
-            style: GoogleFonts.poppins(color: AppTheme.lightTheme.colorScheme.onSurface, fontSize: Dimens.textSizeMedium),
+            style: GoogleFonts.poppins(
+                color: AppTheme.lightTheme.colorScheme.onSurface, fontSize: Dimens.textSizeMedium),
             children: const [TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor))],
           ),
         ),
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6)),
+        hintStyle:
+        GoogleFonts.poppins(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6)),
         border: const OutlineInputBorder(),
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.lightTheme.colorScheme.primary)),
+        focusedBorder:
+        OutlineInputBorder(borderSide: BorderSide(color: AppTheme.lightTheme.colorScheme.primary)),
         errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.expenseColor)),
         focusedErrorBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.expenseColor)),
         errorStyle: const TextStyle(color: AppTheme.expenseColor),
@@ -243,7 +269,8 @@ class WalletScreen extends StatelessWidget {
   Widget _buildIconSelection(BuildContext context, IconData selectedIcon, Function(IconData) onIconSelected) {
     return StatefulBuilder(
       builder: (dialogContext, setState) => ListTile(
-        title: Text('Biểu tượng', style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.lightTheme.colorScheme.onSurface)),
+        title: Text('Biểu tượng',
+            style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.lightTheme.colorScheme.onSurface)),
         trailing: Icon(selectedIcon, color: AppTheme.lightTheme.colorScheme.primary),
         onTap: () async {
           final newIcon = await _showIconSelectionPopup(context, selectedIcon);

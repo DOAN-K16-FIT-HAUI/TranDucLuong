@@ -1,7 +1,11 @@
+import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
+import 'package:finance_app/blocs/app_notification/notification_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -60,13 +64,36 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+      appBar: CommonWidgets.buildAppBar(
+        context: context,
+        title: 'Xin chào Lương',
+        showBackButton: false,
+        backIcon: Icons.notifications_outlined, // Không dùng đến vì showBackButton là false
+        actions: [
+          BlocBuilder<NotificationBloc, NotificationState>(
+            builder: (context, state) {
+              // Kiểm tra nếu có thông báo chưa đọc
+              final hasUnread = state.notifications.any((n) => !n.isRead);
+              return IconButton(
+                icon: Icon(
+                  hasUnread
+                      ? Icons.notifications // Dạng "fill" khi có thông báo mới
+                      : Icons.notifications_outlined, // Dạng "outline" khi không có thông báo mới
+                  color: AppTheme.lightTheme.colorScheme.surface,
+                ),
+                tooltip: 'Thông báo',
+                onPressed: () {
+                  AppRoutes.navigateToAppNotification(context);
+                },
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSafeArea(context),
-            _buildHeader(),
-            const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -81,6 +108,7 @@ class DashboardScreen extends StatelessWidget {
                         recentTransactions
                             .map((tx) => _buildTransactionRow(tx))
                             .toList(),
+                    onTap: () => AppRoutes.navigateToTransactionList(context),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -89,6 +117,7 @@ class DashboardScreen extends StatelessWidget {
                         loans
                             .map((loan) => _buildTransactionRow(loan))
                             .toList(),
+                    onTap: () {}
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -102,6 +131,7 @@ class DashboardScreen extends StatelessWidget {
                               ),
                             )
                             .toList(),
+                    onTap: () {}
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
@@ -110,47 +140,13 @@ class DashboardScreen extends StatelessWidget {
                         spendingLimits
                             .map((limit) => _buildSpendingLimitRow(limit))
                             .toList(),
+                    onTap: () {}
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSafeArea(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).padding.top,
-      color: AppTheme.lightTheme.colorScheme.primary,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      color: AppTheme.lightTheme.colorScheme.primary,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Xin chào Lương',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.lightTheme.colorScheme.surface,
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: AppTheme.lightTheme.colorScheme.surface,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
     );
   }
@@ -323,6 +319,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildSection({
     required String title,
     required List<Widget> children,
+    required Function()? onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,7 +336,11 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                if (onTap != null) {
+                  onTap();
+                }
+              },
               child: Text(
                 'Xem tất cả',
                 style: GoogleFonts.poppins(
