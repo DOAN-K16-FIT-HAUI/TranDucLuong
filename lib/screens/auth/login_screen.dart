@@ -36,11 +36,10 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Đăng nhập'),
-        centerTitle: true,
-        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
-        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
+      appBar: CommonWidgets.buildAppBar(
+        context: context,
+        title: 'Đăng nhập',
+        showBackButton: false,
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -70,7 +69,7 @@ class LoginScreenState extends State<LoginScreen> {
                   CommonWidgets.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                        () => setState(() {
+                    () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
                   ),
@@ -79,9 +78,10 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       Checkbox(
                         value: _rememberPassword,
-                        onChanged: (value) => setState(() {
-                          _rememberPassword = value ?? false;
-                        }),
+                        onChanged:
+                            (value) => setState(() {
+                              _rememberPassword = value ?? false;
+                            }),
                         activeColor: AppTheme.lightTheme.colorScheme.primary,
                       ),
                       Text(
@@ -99,7 +99,8 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () => AppRoutes.navigateToForgotPassword(context),
+                        onPressed:
+                            () => AppRoutes.navigateToForgotPassword(context),
                         child: Text(
                           'Quên mật khẩu?',
                           style: TextStyle(
@@ -141,16 +142,18 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       CommonWidgets.buildSocialLoginButton(
-                        onPressed: () => context.read<AuthBloc>().add(
-                          const SignInWithFacebookRequested(),
-                        ),
+                        onPressed:
+                            () => context.read<AuthBloc>().add(
+                              const SignInWithFacebookRequested(),
+                            ),
                         color: AppTheme.lightTheme.colorScheme.primary,
                         text: 'f',
                       ),
                       CommonWidgets.buildSocialLoginButton(
-                        onPressed: () => context.read<AuthBloc>().add(
-                          const SignInWithGoogleRequested(),
-                        ),
+                        onPressed:
+                            () => context.read<AuthBloc>().add(
+                              const SignInWithGoogleRequested(),
+                            ),
                         color: Colors.white,
                         text: 'G',
                         textColor: Colors.black,

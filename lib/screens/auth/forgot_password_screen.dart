@@ -36,16 +36,11 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => AppRoutes.navigateToLogin(context),
-        ),
-        title: const Text('Quên mật khẩu'),
-        centerTitle: true,
-        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
-        foregroundColor: AppTheme.lightTheme.appBarTheme.foregroundColor,
-        elevation: 0,
+      appBar: CommonWidgets.buildAppBar(
+        context: context,
+        title: 'Quên mật khẩu',
+        showBackButton: true,
+        onBackPressed: () => AppRoutes.navigateToLogin(context),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {

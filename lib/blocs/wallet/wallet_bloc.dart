@@ -1,15 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 
 class WalletBloc extends Bloc<WalletEvent, WalletState> {
-  final WalletRepository _walletRepository = WalletRepository();
+  final WalletRepository walletRepository;
 
-  WalletBloc()
+  WalletBloc({required this.walletRepository})
       : super(WalletState(wallets: [], savingsWallets: [], investmentWallets: [])) {
     on<LoadWallets>(_onLoadWallets);
     on<AddWallet>(_onAddWallet);
@@ -23,20 +22,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
   Future<void> _onLoadWallets(LoadWallets event, Emitter<WalletState> emit) async {
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId == null) {
-        debugPrint("No user logged in");
-        emit(state.copyWith(
-          wallets: [],
-          savingsWallets: [],
-          investmentWallets: [],
-          searchQuery: '',
-          isSearching: false,
-        ));
-        return;
-      }
-
-      final allWallets = await _walletRepository.getWallets();
+      final allWallets = await walletRepository.getWallets();
+      debugPrint("Loaded wallets: ${allWallets.length}");
       emit(state.copyWith(
         wallets: allWallets.where((w) => w.type == 0).toList(),
         savingsWallets: allWallets.where((w) => w.type == 1).toList(),
@@ -56,7 +43,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
   Future<void> _onAddWallet(AddWallet event, Emitter<WalletState> emit) async {
     try {
-      final newWallet = await _walletRepository.addWallet(event.wallet);
+      final newWallet = await walletRepository.addWallet(event.wallet);
       if (newWallet.type == 0) {
         emit(state.copyWith(wallets: List.from(state.wallets)..add(newWallet)));
       } else if (newWallet.type == 1) {
@@ -71,7 +58,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
   Future<void> _onEditWallet(EditWallet event, Emitter<WalletState> emit) async {
     try {
-      await _walletRepository.updateWallet(event.wallet);
+      await walletRepository.updateWallet(event.wallet);
       List<Wallet> updatedList;
       if (event.wallet.type == 0) {
         updatedList = List.from(state.wallets);
@@ -96,7 +83,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
   Future<void> _onDeleteWallet(DeleteWallet event, Emitter<WalletState> emit) async {
     try {
-      await _walletRepository.deleteWallet(event.walletId);
+      await walletRepository.deleteWallet(event.walletId);
       if (event.type == 0) {
         emit(state.copyWith(wallets: List.from(state.wallets)..removeWhere((w) => w.id == event.walletId)));
       } else if (event.type == 1) {
@@ -120,24 +107,20 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     }
 
     if (event.oldIndex >= 0 && event.oldIndex < listToReorder.length && event.newIndex >= 0 && event.newIndex <= listToReorder.length) {
-      // Không cần điều chỉnh newIndex vì ReorderableListView đã xử lý
       final Wallet item = listToReorder.removeAt(event.oldIndex);
       listToReorder.insert(event.newIndex, item);
 
-      // Cập nhật orderIndex cho tất cả ví
       for (int i = 0; i < listToReorder.length; i++) {
         listToReorder[i] = listToReorder[i].copyWith(orderIndex: i);
       }
 
-      // Emit state mới
       emit(state.copyWith(
         wallets: event.type == 0 ? listToReorder : state.wallets,
         savingsWallets: event.type == 1 ? listToReorder : state.savingsWallets,
         investmentWallets: event.type == 2 ? listToReorder : state.investmentWallets,
       ));
 
-      // Đồng bộ với Firestore
-      _walletRepository.updateWalletOrder(listToReorder);
+      walletRepository.updateWalletOrder(listToReorder);
     } else {
       debugPrint("Reorder indices out of bounds: old=${event.oldIndex}, new=${event.newIndex}, len=${listToReorder.length}");
     }
