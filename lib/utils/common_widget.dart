@@ -494,7 +494,7 @@ class CommonWidgets {
           labelStyle: labelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
           unselectedLabelStyle: unselectedLabelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
           labelColor: labelColor ?? AppTheme.lightTheme.colorScheme.primary,
-          unselectedLabelColor: unselectedLabelColor ?? AppTheme.lightTheme.colorScheme.onSurface.withOpacity(0.6),
+          unselectedLabelColor: unselectedLabelColor ?? AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6),
           indicatorColor: indicatorColor ?? AppTheme.lightTheme.colorScheme.primary,
           indicatorWeight: 2.5,
           onTap: onTabChanged,

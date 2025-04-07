@@ -343,7 +343,7 @@ class TransactionRepository {
           throw Exception("Transaction with ID ${transactionWithUser.id} not found for update!");
         }
         final oldTransaction = TransactionModel.fromJson(
-            oldTransactionSnapshot.data()! as Map<String, dynamic>, oldTransactionSnapshot.id);
+            oldTransactionSnapshot.data()!, oldTransactionSnapshot.id);
 
         // --- Cảnh báo về sửa/xóa Điều chỉnh số dư ---
         if (oldTransaction.type == 'Điều chỉnh số dư' || newTransaction.type == 'Điều chỉnh số dư') {
@@ -394,7 +394,7 @@ class TransactionRepository {
           // throw Exception("Transaction with ID $transactionId not found for delete!");
         }
         final transactionToDelete = TransactionModel.fromJson(
-            transactionSnapshot.data()! as Map<String, dynamic>, transactionSnapshot.id);
+            transactionSnapshot.data()!, transactionSnapshot.id);
 
         // --- Cảnh báo về sửa/xóa Điều chỉnh số dư ---
         if (transactionToDelete.type == 'Điều chỉnh số dư') {
@@ -451,7 +451,7 @@ class TransactionRepository {
         // debugPrint("getUserTransactions stream received ${snapshot.docs.length} docs for user $userId");
         return snapshot.docs.map((doc) {
           try {
-            return TransactionModel.fromJson(doc.data() as Map<String, dynamic>, doc.id);
+            return TransactionModel.fromJson(doc.data(), doc.id);
           } catch (e) {
             debugPrint("Error parsing transaction ${doc.id}: $e. Data: ${doc.data()}");
             // Trả về một giá trị mặc định hoặc bỏ qua document lỗi
