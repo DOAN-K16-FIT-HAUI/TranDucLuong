@@ -11,6 +11,7 @@ import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,26 +52,8 @@ class TransactionScreenState extends State<TransactionScreen> {
   bool _isLoadingWallets = true; // Cờ cho lần tải ví đầu tiên
 
   // Danh sách danh mục và loại (nên lấy từ nguồn đáng tin cậy hơn, ví dụ Constants hoặc Remote Config)
-  final List<String> _categories = [
-    'Ẩn uống',
-    'Sinh hoạt',
-    'Đi lại',
-    'Sức khỏe',
-    'Mua sắm',
-    'Giải trí',
-    'Giáo dục',
-    'Hóa đơn',
-    'Quà tặng',
-    'Khác',
-  ];
-  final List<String> _types = [
-    'Chi tiêu',
-    'Thu nhập',
-    'Chuyển khoản',
-    'Đi vay',
-    'Cho vay',
-    'Điều chỉnh số dư',
-  ];
+  final List<String> _categories = Constants.availableCategories;
+  final List<String> _types = Constants.transactionTypes;
 
   @override
   void initState() {
@@ -447,7 +430,7 @@ class TransactionScreenState extends State<TransactionScreen> {
             // === Xử lý trạng thái UI ===
             Widget bodyContent;
             if (_isLoadingWallets) {
-              bodyContent = const Center(child: CircularProgressIndicator());
+              bodyContent = CommonWidgets.buildLoadingIndicator();
             } else if (_allWallets.isEmpty &&
                 context.read<AuthBloc>().state is AuthAuthenticated) {
               // Đã đăng nhập nhưng không có ví
@@ -537,14 +520,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                                   ? SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(
-                                      color:
-                                          AppTheme
-                                              .lightTheme
-                                              .colorScheme
-                                              .surface,
-                                      strokeWidth: 2,
-                                    ),
+                                    child: CommonWidgets.buildLoadingIndicator(),
                                   )
                                   : Icon(
                                     Icons.check,
