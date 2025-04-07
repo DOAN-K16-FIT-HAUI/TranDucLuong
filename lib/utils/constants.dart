@@ -8,4 +8,26 @@ class Constants {
     {'name': 'Đầu tư', 'icon': Icons.trending_up_outlined},
     {'name': 'Bitcoin', 'icon': Icons.currency_bitcoin_outlined},
   ];
+
+  static const List<String> transactionTypes = [
+    'Chi tiêu',
+    'Thu nhập',
+    'Chuyển khoản',
+    'Đi vay',
+    'Cho vay',
+    'Điều chỉnh số dư',
+  ];
+
+  static const List<String> availableCategories = [
+    'Ẩn uống',
+    'Sinh hoạt',
+    'Đi lại',
+    'Sức khỏe',
+    'Mua sắm',
+    'Giải trí',
+    'Giáo dục',
+    'Hóa đơn',
+    'Quà tặng',
+    'Khác',
+  ];
 }
