@@ -241,8 +241,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                   ? transaction.description
                   : 'giao dịch này',
           onEdit:
-              // (context, transaction) => _showEditDialog(context, transaction),
-              (context, transaction) => {},
+              (context, transaction) => _showEditDialog(context, transaction),
           onDelete:
               (context, transaction) => context.read<TransactionBloc>().add(
                 DeleteTransaction(transaction.id),
@@ -252,43 +251,326 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     );
   }
 
-  // void _showEditDialog(BuildContext context, TransactionModel transaction) {
-  //   final formKey = GlobalKey<FormState>();
-  //   final descriptionController = TextEditingController(text: transaction.description);
-  //
-  //     CommonWidgets.showFormDialog(
-  //     context: context,
-  //     formKey: formKey,
-  //     formFields: [
-  //       CommonWidgets.buildTextField(
-  //         controller: descriptionController,
-  //         label: '',
-  //         hint: 'Nhập tên giao dịch',
-  //         validator: Validators.validateString,
-  //       ),
-  //       const SizedBox(height: 16),
-  //       const SizedBox(height: 16),
-  //     ],
-  //     title: 'Sửa thông tin ví',
-  //     actionButtonText: 'Lưu',
-  //     onActionButtonPressed: () {
-  //       if (formKey.currentState!.validate()) {
-  //         context.read<TransactionBloc>().add(
-  //           UpdateTransaction(
-  //             TransactionModel(
-  //               id: '',
-  //               userId: '',
-  //               description: '',
-  //               amount: null,
-  //               date: null,
-  //               type: '',
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
+  void _showEditDialog(BuildContext context, TransactionModel transaction) {
+    final formKey = GlobalKey<FormState>();
+    final descriptionController = TextEditingController(text: transaction.description);
+    final amountController = TextEditingController(
+      text: Formatter.currencyInputFormatter
+          .formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: transaction.amount.toString()))
+          .text,
+    );
+    DateTime selectedDate = transaction.date ?? DateTime.now();
+    String selectedType = transaction.type;
+    String selectedCategory = transaction.category;
+    String? selectedWallet = transaction.wallet;
+    String? selectedFromWallet = transaction.fromWallet;
+    String? selectedToWallet = transaction.toWallet;
+    final lenderController = TextEditingController(text: transaction.lender ?? '');
+    final borrowerController = TextEditingController(text: transaction.borrower ?? '');
+    DateTime? selectedRepaymentDate = transaction.repaymentDate;
+
+    // Danh sách cho dropdown (tương tự TransactionScreen)
+    final List<String> transactionTypes = [
+      'Chi tiêu',
+      'Thu nhập',
+      'Chuyển khoản',
+      'Đi vay',
+      'Cho vay',
+      'Điều chỉnh số dư',
+    ];
+    final List<String> categories = [
+      'Ẩn uống',
+      'Sinh hoạt',
+      'Đi lại',
+      'Sức khỏe',
+      'Mua sắm',
+      'Giải trí',
+      'Giáo dục',
+      'Hóa đơn',
+      'Quà tặng',
+      'Khác',
+    ];
+
+    // Lấy danh sách ví từ WalletBloc
+    List<String> walletNames = [];
+    final walletState = context.read<WalletBloc>().state;
+    final allWallets = [
+      ...walletState.wallets,
+      ...walletState.savingsWallets,
+      ...walletState.investmentWallets,
+    ].where((w) => w.id.isNotEmpty).toList();
+    allWallets.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+    walletNames = allWallets.map((wallet) => wallet.name).toList();
+
+    // Nếu ví hiện tại không có trong danh sách, đặt về giá trị mặc định
+    if (!walletNames.contains(selectedWallet) && walletNames.isNotEmpty) {
+      selectedWallet = walletNames.first;
+    }
+    if (!walletNames.contains(selectedFromWallet) && walletNames.isNotEmpty) {
+      selectedFromWallet = walletNames.first;
+    }
+    if (!walletNames.contains(selectedToWallet) && walletNames.isNotEmpty) {
+      final availableToWallets = walletNames.where((name) => name != selectedFromWallet).toList();
+      selectedToWallet = availableToWallets.isNotEmpty ? availableToWallets.first : walletNames.first;
+    }
+
+    CommonWidgets.showFormDialog(
+      context: context,
+      formKey: formKey,
+      formFields: [
+        CommonWidgets.buildTextField(
+          controller: descriptionController,
+          label: 'Diễn giải',
+          hint: 'Nhập mô tả (vd: Ăn trưa, Tiền nhà)',
+          validator: Validators.validateDescription,
+        ),
+        const SizedBox(height: 16),
+        CommonWidgets.buildBalanceInputField(
+          amountController,
+          validator: Validators.validateBalanceAfterAdjustment,
+        ),
+        const SizedBox(height: 16),
+        CommonWidgets.buildDatePickerField(
+          context: context,
+          date: selectedDate,
+          label: 'Ngày giao dịch',
+          onTap: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+            );
+            if (pickedDate != null) {
+              setState(() => selectedDate = pickedDate);
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        StatefulBuilder(
+          builder: (context, setState) => CommonWidgets.buildDropdownField(
+            label: 'Loại giao dịch',
+            value: selectedType,
+            items: transactionTypes,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  selectedType = newValue;
+                  // Reset các trường không liên quan khi đổi loại giao dịch
+                  if (selectedType != 'Chi tiêu') {
+                    selectedCategory = categories.first;
+                  }
+                  if (selectedType != 'Chuyển khoản') {
+                    selectedFromWallet = walletNames.isNotEmpty ? walletNames.first : null;
+                    selectedToWallet = walletNames.isNotEmpty
+                        ? (walletNames.length > 1
+                        ? walletNames.where((name) => name != selectedFromWallet).first
+                        : walletNames.first)
+                        : null;
+                  }
+                  if (selectedType != 'Đi vay') {
+                    lenderController.clear();
+                  }
+                  if (selectedType != 'Cho vay') {
+                    borrowerController.clear();
+                  }
+                  if (selectedType != 'Đi vay' && selectedType != 'Cho vay') {
+                    selectedRepaymentDate = null;
+                  }
+                });
+              }
+            },
+            validator: Validators.validateNotEmpty,
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (selectedType == 'Chi tiêu') ...[
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Danh mục chi tiêu',
+              value: selectedCategory,
+              items: categories,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedCategory = newValue);
+                }
+              },
+              validator: Validators.validateCategory,
+            ),
+          ),
+          const SizedBox(height: 16),
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Từ ví',
+              value: selectedWallet ?? '',
+              items: walletNames,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedWallet = newValue);
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví chi tiêu"),
+            ),
+          ),
+        ],
+        if (selectedType == 'Thu nhập') ...[
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Vào ví',
+              value: selectedWallet ?? '',
+              items: walletNames,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedWallet = newValue);
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví nhận tiền"),
+            ),
+          ),
+        ],
+        if (selectedType == 'Chuyển khoản') ...[
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Từ ví (Nguồn)',
+              value: selectedFromWallet ?? '',
+              items: walletNames,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedFromWallet = newValue;
+                    // Tự động chọn ví đích khác nếu trùng
+                    if (walletNames.length > 1 && selectedToWallet == newValue) {
+                      final otherWallets = walletNames.where((name) => name != newValue).toList();
+                      selectedToWallet = otherWallets.isNotEmpty ? otherWallets.first : '';
+                    }
+                  });
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví nguồn"),
+            ),
+          ),
+          const SizedBox(height: 16),
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Đến ví (Đích)',
+              value: selectedToWallet ?? '',
+              items: walletNames.where((name) => name != selectedFromWallet).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedToWallet = newValue);
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví đích", checkAgainst: selectedFromWallet),
+            ),
+          ),
+        ],
+        if (selectedType == 'Đi vay') ...[
+          CommonWidgets.buildTextField(
+            controller: lenderController,
+            label: 'Người cho vay',
+            hint: 'Tên người hoặc tổ chức cho vay',
+            validator: Validators.validateNotEmpty,
+          ),
+          const SizedBox(height: 16),
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Vào ví',
+              value: selectedWallet ?? '',
+              items: walletNames,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedWallet = newValue);
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví nhận tiền vay"),
+            ),
+          ),
+          const SizedBox(height: 16),
+          CommonWidgets.buildDatePickerField(
+            context: context,
+            date: selectedRepaymentDate ?? DateTime.now(),
+            label: 'Ngày hẹn trả (tùy chọn)',
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: selectedRepaymentDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (pickedDate != null) {
+                setState(() => selectedRepaymentDate = pickedDate);
+              }
+            },
+          ),
+        ],
+        if (selectedType == 'Cho vay') ...[
+          CommonWidgets.buildTextField(
+            controller: borrowerController,
+            label: 'Người vay tiền',
+            hint: 'Tên người hoặc tổ chức vay',
+            validator: Validators.validateNotEmpty,
+          ),
+          const SizedBox(height: 16),
+          StatefulBuilder(
+            builder: (context, setState) => CommonWidgets.buildDropdownField(
+              label: 'Từ ví',
+              value: selectedWallet ?? '',
+              items: walletNames,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => selectedWallet = newValue);
+                }
+              },
+              validator: (v) => Validators.validateWallet(v, fieldName: "Ví cho vay"),
+            ),
+          ),
+          const SizedBox(height: 16),
+          CommonWidgets.buildDatePickerField(
+            context: context,
+            date: selectedRepaymentDate ?? DateTime.now(),
+            label: 'Ngày hẹn trả (tùy chọn)',
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: selectedRepaymentDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (pickedDate != null) {
+                setState(() => selectedRepaymentDate = pickedDate);
+              }
+            },
+          ),
+        ],
+      ],
+      title: 'Sửa thông tin giao dịch',
+      actionButtonText: 'Lưu',
+      onActionButtonPressed: () {
+        if (formKey.currentState!.validate()) {
+          context.read<TransactionBloc>().add(
+            UpdateTransaction(
+              TransactionModel(
+                id: transaction.id,
+                userId: transaction.userId,
+                description: descriptionController.text.trim(),
+                amount: Formatter.getRawCurrencyValue(amountController.text).toDouble(),
+                date: selectedDate,
+                type: selectedType,
+                category: selectedType == 'Chi tiêu' ? selectedCategory : '',
+                wallet: (selectedType != 'Chuyển khoản') ? selectedWallet : null,
+                fromWallet: (selectedType == 'Chuyển khoản') ? selectedFromWallet : null,
+                toWallet: (selectedType == 'Chuyển khoản') ? selectedToWallet : null,
+                lender: (selectedType == 'Đi vay') ? lenderController.text.trim() : null,
+                borrower: (selectedType == 'Cho vay') ? borrowerController.text.trim() : null,
+                repaymentDate: (selectedType == 'Đi vay' || selectedType == 'Cho vay') ? selectedRepaymentDate : null,
+                balanceAfter: transaction.balanceAfter,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
 
   Future<void> _refreshTransactions() async {
     if (_isInitialized && _userId != null) {
