@@ -1,5 +1,6 @@
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +19,7 @@ class TopScreenState extends State<TopScreen> {
     DashboardScreen(),
     _buildCenteredText('Ghi chú nhóm'),
     _buildCenteredText('Báo cáo'),
-    _buildCenteredText('Tài khoản'),
+    AccountScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -40,7 +41,7 @@ class TopScreenState extends State<TopScreen> {
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: false,
@@ -52,7 +53,7 @@ class TopScreenState extends State<TopScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addTransaction,
         backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: AppTheme.lightTheme.colorScheme.surface),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
@@ -74,7 +75,7 @@ class TopScreenState extends State<TopScreen> {
 
   BottomNavigationBarItem _buildBottomNavigationBarItem(IconData icon, int index) {
     return BottomNavigationBarItem(
-      icon: Icon(icon, color: _selectedIndex == index ? AppTheme.lightTheme.colorScheme.primary : Colors.grey[600]),
+      icon: Icon(icon, color: _selectedIndex == index ? AppTheme.lightTheme.colorScheme.primary : AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6)),
       label: '',
     );
   }

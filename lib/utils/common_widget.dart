@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/dimens.dart';
@@ -11,7 +12,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class CommonWidgets {
-  static Widget buildEmailField(TextEditingController controller) {
+  static Widget buildEmailField({
+    required TextEditingController controller,
+    void Function(String)? onChanged, // Thêm onChanged
+  }) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -47,15 +51,16 @@ class CommonWidgets {
       ),
       cursorColor: AppTheme.lightTheme.colorScheme.primary,
       keyboardType: TextInputType.emailAddress,
+      onChanged: onChanged, // Sử dụng onChanged
       validator: Validators.validateEmail,
     );
   }
 
   static Widget buildPasswordField(
-    TextEditingController controller,
-    bool isPasswordVisible,
-    VoidCallback toggleVisibility,
-  ) {
+      TextEditingController controller,
+      bool isPasswordVisible,
+      VoidCallback toggleVisibility,
+      ) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -241,53 +246,52 @@ class CommonWidgets {
   }) {
     return showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-            title: Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.lightTheme.colorScheme.primary,
-              ),
-            ),
-            content: Text(
-              content,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: AppTheme.lightTheme.colorScheme.onSurface,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Hủy',
-                  style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
-                      alpha: 153,
-                    ),
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  onDeletePressed();
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Xóa',
-                  style: GoogleFonts.poppins(
-                    color: AppTheme.lightTheme.colorScheme.error,
-                  ),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.lightTheme.colorScheme.primary,
           ),
+        ),
+        content: Text(
+          content,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: AppTheme.lightTheme.colorScheme.onSurface,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Hủy',
+              style: GoogleFonts.poppins(
+                color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
+                  alpha: 153,
+                ),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onDeletePressed();
+            },
+            child: Text(
+              'Xác nhận',
+              style: GoogleFonts.poppins(
+                color: AppTheme.lightTheme.colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -590,7 +594,7 @@ class CommonWidgets {
     return Container(
       key: itemKey,
       margin: margin,
-      decoration: _boxDecoration().copyWith(color: backgroundColor),
+      decoration: boxDecoration().copyWith(color: backgroundColor),
       child: Padding(
         padding: padding,
         child: Row(
@@ -674,7 +678,7 @@ class CommonWidgets {
     );
   }
 
-  static BoxDecoration _boxDecoration() {
+  static BoxDecoration boxDecoration() {
     return BoxDecoration(
       color: AppTheme.lightTheme.colorScheme.surface,
       borderRadius: BorderRadius.circular(12),

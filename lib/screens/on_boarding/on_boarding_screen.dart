@@ -140,18 +140,9 @@ class OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _currentPage < _onboardingData.length - 1
-                      ? TextButton(
-                    onPressed: _skip,
-                    child: Text(
-                      'Bỏ qua',
-                      style: TextStyle(fontSize: 16, color: AppTheme.lightTheme.colorScheme.primary),
-                    ),
-                  )
-                      : const SizedBox(),
                   ElevatedButton(
                     onPressed: _next,
                     style: ElevatedButton.styleFrom(
@@ -163,52 +154,18 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
+                  _currentPage < _onboardingData.length - 1
+                      ? TextButton(
+                    onPressed: _skip,
+                    child: Text(
+                      'Bỏ qua',
+                      style: TextStyle(fontSize: 16, color: AppTheme.lightTheme.colorScheme.primary),
+                    ),
+                  )
+                      : const SizedBox(),
                 ],
               ),
             ),
-            if (_currentPage == _onboardingData.length - 1)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Add Facebook login logic here if needed
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(10),
-                          backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-                        ),
-                        child: Text(
-                          'f',
-                          style: TextStyle(fontSize: 20, color: AppTheme.lightTheme.colorScheme.onSurface),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Add Google login logic here if needed
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(10),
-                          backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-                        ),
-                        child: Text(
-                          'G',
-                          style: TextStyle(fontSize: 20, color: AppTheme.lightTheme.colorScheme.onSurface),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
       ),
