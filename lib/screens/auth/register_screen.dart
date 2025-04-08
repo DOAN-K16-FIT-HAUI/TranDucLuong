@@ -62,7 +62,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
-                  CommonWidgets.buildEmailField(_emailController),
+                  CommonWidgets.buildEmailField(controller: _emailController),
                   const SizedBox(height: 15),
                   CommonWidgets.buildPasswordField(
                     _passwordController,

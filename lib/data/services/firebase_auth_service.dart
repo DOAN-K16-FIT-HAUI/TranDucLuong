@@ -6,23 +6,25 @@ import 'package:google_sign_in/google_sign_in.dart';
 class FirebaseAuthService {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
-  // final FacebookAuth _facebookAuth;
+  final FacebookAuth _facebookAuth;
 
   FirebaseAuthService({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FacebookAuth? facebookAuth,
-  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? GoogleSignIn();
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn(),
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
-  // Sign in with email and password
+  User? get currentUser => _firebaseAuth.currentUser;
+
   Future<UserModel> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
       if (userCredential.user == null) {
@@ -34,9 +36,12 @@ class FirebaseAuthService {
       return UserModel(
         id: userCredential.user!.uid,
         email: userCredential.user!.email ?? '',
+        displayName: userCredential.user!.displayName,
+        photoUrl: userCredential.user!.photoURL,
+        loginMethod: 'email',
       );
     } on FirebaseAuthException {
-      rethrow; // Propagate the FirebaseAuthException
+      rethrow;
     } catch (e) {
       throw FirebaseAuthException(
         code: 'unknown-error',
@@ -45,14 +50,13 @@ class FirebaseAuthService {
     }
   }
 
-  // Sign up with email and password
   Future<UserModel> createUserWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     try {
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
       if (credential.user == null) {
@@ -65,9 +69,11 @@ class FirebaseAuthService {
         id: credential.user!.uid,
         email: credential.user!.email ?? '',
         displayName: credential.user!.displayName,
+        photoUrl: credential.user!.photoURL,
+        loginMethod: 'email',
       );
     } on FirebaseAuthException {
-      rethrow; // Propagate the FirebaseAuthException
+      rethrow;
     } catch (e) {
       throw FirebaseAuthException(
         code: 'unknown-error',
@@ -76,7 +82,6 @@ class FirebaseAuthService {
     }
   }
 
-  // Sign in with Google
   Future<UserModel> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -86,15 +91,12 @@ class FirebaseAuthService {
           message: 'Đăng nhập bằng Google đã bị hủy.',
         );
       }
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
       if (userCredential.user == null) {
         throw FirebaseAuthException(
           code: 'user-not-found',
@@ -105,9 +107,11 @@ class FirebaseAuthService {
         id: userCredential.user!.uid,
         email: userCredential.user!.email ?? '',
         displayName: userCredential.user!.displayName,
+        photoUrl: userCredential.user!.photoURL,
+        loginMethod: 'google',
       );
     } on FirebaseAuthException {
-      rethrow; // Propagate the FirebaseAuthException
+      rethrow;
     } catch (e) {
       throw FirebaseAuthException(
         code: 'google-sign-in-failed',
@@ -116,11 +120,9 @@ class FirebaseAuthService {
     }
   }
 
-  // Sign in with Facebook
   Future<UserModel> signInWithFacebook() async {
     try {
-      // Trigger the Facebook Authentication flow
-      final LoginResult loginResult = await FacebookAuth.instance.login(
+      final LoginResult loginResult = await _facebookAuth.login(
         permissions: ['email', 'public_profile'],
       );
 
@@ -150,6 +152,8 @@ class FirebaseAuthService {
           id: user.uid,
           email: user.email ?? '',
           displayName: user.displayName ?? '',
+          photoUrl: user.photoURL,
+          loginMethod: 'facebook',
         );
       } else {
         throw FirebaseAuthException(
@@ -157,18 +161,23 @@ class FirebaseAuthService {
           message: 'Đăng nhập bằng Facebook đã bị hủy: ${loginResult.message}',
         );
       }
-    } catch (e) {
+    } on FirebaseAuthException {
       rethrow;
+    } catch (e) {
+      throw FirebaseAuthException(
+        code: 'facebook-sign-in-failed',
+        message: 'Đăng nhập bằng Facebook thất bại: $e',
+      );
     }
   }
 
-  // Sign out
   Future<void> signOut() async {
     try {
-      await _googleSignIn.signOut(); // Sign out from Google if signed in
-      await _firebaseAuth.signOut(); // Sign out from Firebase
+      await _googleSignIn.signOut();
+      await _facebookAuth.logOut();
+      await _firebaseAuth.signOut();
     } on FirebaseAuthException {
-      rethrow; // Propagate the FirebaseAuthException
+      rethrow;
     } catch (e) {
       throw FirebaseAuthException(
         code: 'sign-out-failed',
@@ -177,12 +186,11 @@ class FirebaseAuthService {
     }
   }
 
-  // Password reset
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException {
-      rethrow; // Propagate the FirebaseAuthException
+      rethrow;
     } catch (e) {
       throw FirebaseAuthException(
         code: 'password-reset-failed',
