@@ -71,7 +71,11 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 20),
                 CommonWidgets.buildEmailField(controller: _emailController),
                 const SizedBox(height: 20),
-                CommonWidgets.buildSubmitButton('Xác nhận', _resetPassword),
+                CommonWidgets.buildSubmitButton(
+                  'Xác nhận',
+                  _resetPassword,
+                  context,
+                ),
               ],
             ),
           ),

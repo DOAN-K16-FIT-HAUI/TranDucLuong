@@ -13,9 +13,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     AccountRepository? accountRepository,
     required AuthBloc authBloc,
-  })  : _accountRepository = accountRepository ?? AccountRepository(),
-        _authBloc = authBloc,
-        super(AccountLoading()) {
+  }) : _accountRepository = accountRepository ?? AccountRepository(),
+       _authBloc = authBloc,
+       super(AccountLoading()) {
     on<LoadAccountDataEvent>(_onLoadAccountData);
     on<ToggleDarkModeEvent>(_onToggleDarkMode);
     on<ChangePasswordEvent>(_onChangePassword);
@@ -48,7 +48,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onLoadAccountData(
-      LoadAccountDataEvent event, Emitter<AccountState> emit) async {
+    LoadAccountDataEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     emit(AccountLoading());
     try {
       final user = await _accountRepository.getAccountData();
@@ -59,12 +61,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onToggleDarkMode(
-      ToggleDarkModeEvent event, Emitter<AccountState> emit) async {
+    ToggleDarkModeEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     if (state is AccountLoaded) {
       final currentState = state as AccountLoaded;
       try {
         await _accountRepository.saveDarkMode(event.isDarkMode);
-        final updatedUser = currentState.user.copyWith(isDarkMode: event.isDarkMode);
+        final updatedUser = currentState.user.copyWith(
+          isDarkMode: event.isDarkMode,
+        );
         emit(AccountLoaded(user: updatedUser));
       } catch (e) {
         emit(AccountError(_mapExceptionToMessage(e)));
@@ -73,10 +79,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onChangePassword(
-      ChangePasswordEvent event, Emitter<AccountState> emit) async {
+    ChangePasswordEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     emit(AccountLoading());
     try {
-      await _accountRepository.changePassword(event.oldPassword, event.newPassword);
+      await _accountRepository.changePassword(
+        event.oldPassword,
+        event.newPassword,
+      );
       emit(AccountPasswordChanged());
       add(LoadAccountDataEvent());
     } catch (e) {
@@ -85,12 +96,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onChangeLanguage(
-      ChangeLanguageEvent event, Emitter<AccountState> emit) async {
+    ChangeLanguageEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     if (state is AccountLoaded) {
       final currentState = state as AccountLoaded;
       try {
         await _accountRepository.saveLanguage(event.language);
-        final updatedUser = currentState.user.copyWith(language: event.language);
+        final updatedUser = currentState.user.copyWith(
+          language: event.language,
+        );
         emit(AccountLoaded(user: updatedUser));
       } catch (e) {
         emit(AccountError(_mapExceptionToMessage(e)));
@@ -99,7 +114,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onUpdateUserInfo(
-      UpdateUserInfoEvent event, Emitter<AccountState> emit) async {
+    UpdateUserInfoEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     if (state is AccountLoaded) {
       final currentState = state as AccountLoaded;
       try {
@@ -122,7 +139,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _onDeleteAccount(
-      DeleteAccountEvent event, Emitter<AccountState> emit) async {
+    DeleteAccountEvent event,
+    Emitter<AccountState> emit,
+  ) async {
     try {
       await _accountRepository.deleteAccount();
       emit(AccountLoggedOut());

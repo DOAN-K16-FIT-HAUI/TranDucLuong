@@ -210,7 +210,7 @@ class WalletScreen extends StatelessWidget {
       title: wallet.name,
       value: wallet.balance.toDouble(),
       icon: wallet.icon,
-      menuItems: CommonWidgets.buildEditDeleteMenuItems(),
+      menuItems: CommonWidgets.buildEditDeleteMenuItems(context: context),
       onMenuSelected: (result) {
         CommonWidgets.handleEditDeleteActions(
           context: context,

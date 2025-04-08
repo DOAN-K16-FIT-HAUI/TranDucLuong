@@ -1,14 +1,15 @@
 name: finance_app
-description: "A personcnal finance management app build with Flutter"
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "A personal finance management app built with Flutter"
+publish_to: 'none'
 version: 0.0.0+1
+
 environment:
   sdk: ^3.7.0
+
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-
   shared_preferences: ^2.5.3
 
   # Firebase
@@ -16,7 +17,7 @@ dependencies:
   firebase_auth: ^4.18.0
   cloud_firestore: ^4.15.9
   google_sign_in: ^6.2.0
-  firebase_messaging: ^14.8.4
+  firebase_messaging: ^14.6.9
   flutter_facebook_auth: ^6.0.0
 
   # State Management
@@ -35,12 +36,19 @@ dependencies:
   # Dependency Injection
   get_it: ^8.0.3
 
+  # Thêm flutter_localizations
+  flutter_localizations:
+    sdk: flutter
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
 
-assets:
-  - assets/
+  # Thêm phần generate để sinh mã AppLocalizations
+  generate: true

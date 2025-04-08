@@ -430,7 +430,7 @@ class TransactionScreenState extends State<TransactionScreen> {
             // === Xử lý trạng thái UI ===
             Widget bodyContent;
             if (_isLoadingWallets) {
-              bodyContent = CommonWidgets.buildLoadingIndicator();
+              bodyContent = CommonWidgets.buildLoadingIndicator(context);
             } else if (_allWallets.isEmpty &&
                 context.read<AuthBloc>().state is AuthAuthenticated) {
               // Đã đăng nhập nhưng không có ví
@@ -520,7 +520,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                                   ? SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CommonWidgets.buildLoadingIndicator(),
+                                    child: CommonWidgets.buildLoadingIndicator(context),
                                   )
                                   : Icon(
                                     Icons.check,
@@ -778,6 +778,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                               ),
                               const SizedBox(height: 16),
                               CommonWidgets.buildLabel(
+                                context,
                                 text: 'Số dư thực tế sau điều chỉnh',
                               ),
                               const SizedBox(height: 8),

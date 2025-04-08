@@ -93,7 +93,7 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildSubmitButton('Đăng nhập', _login),
+                  CommonWidgets.buildSubmitButton('Đăng nhập', _login, context),
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,6 +142,7 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       CommonWidgets.buildSocialLoginButton(
+                        context: context,
                         onPressed:
                             () => context.read<AuthBloc>().add(
                               const SignInWithFacebookRequested(),
@@ -150,6 +151,7 @@ class LoginScreenState extends State<LoginScreen> {
                         text: 'f',
                       ),
                       CommonWidgets.buildSocialLoginButton(
+                        context: context,
                         onPressed:
                             () => context.read<AuthBloc>().add(
                               const SignInWithGoogleRequested(),

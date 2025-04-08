@@ -19,14 +19,15 @@ class AccountLoaded extends AccountState {
   List<Object?> get props => [user];
 }
 
-class AccountPasswordChanged extends AccountState {}
-
 class AccountError extends AccountState {
   final String message;
+
   const AccountError(this.message);
 
   @override
   List<Object?> get props => [message];
 }
+
+class AccountPasswordChanged extends AccountState {}
 
 class AccountLoggedOut extends AccountState {}
