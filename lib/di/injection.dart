@@ -1,7 +1,10 @@
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
+import 'package:finance_app/blocs/localization/localization_bloc.dart';
+import 'package:finance_app/blocs/theme/theme_bloc.dart';
 import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
+import 'package:finance_app/data/repositories/account_repository.dart';
 import 'package:finance_app/data/repositories/auth_repository.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
@@ -39,6 +42,9 @@ void setupDependencies() {
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepository(firebaseAuthService: sl<FirebaseAuthService>()),
   );
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepository(),
+  );
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepository(sl<FirebaseMessagingService>()),
   );
@@ -62,4 +68,6 @@ void setupDependencies() {
   sl.registerFactory<WalletBloc>(
     () => WalletBloc(walletRepository: sl<WalletRepository>()),
   );
+  sl.registerFactory<ThemeBloc>(() => ThemeBloc());
+  sl.registerFactory<LocalizationBloc>(() => LocalizationBloc());
 }

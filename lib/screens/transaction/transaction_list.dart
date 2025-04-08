@@ -231,7 +231,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           transaction.type == 'Thu nhập' || transaction.type == 'Đi vay'
               ? Icons.arrow_downward
               : Icons.arrow_upward,
-      menuItems: CommonWidgets.buildEditDeleteMenuItems(),
+      menuItems: CommonWidgets.buildEditDeleteMenuItems(context: context),
       onMenuSelected: (result) {
         CommonWidgets.handleEditDeleteActions(
           context: context,
@@ -786,9 +786,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
 
   Widget _buildTabViewContent(TransactionState state, int type) {
     if (state is TransactionInitial) {
-      return CommonWidgets.buildLoadingIndicator();
+      return CommonWidgets.buildLoadingIndicator(context);
     } else if (state is TransactionLoading) {
-      return CommonWidgets.buildLoadingIndicator();
+      return CommonWidgets.buildLoadingIndicator(context);
     } else if (state is TransactionLoaded) {
       final transactions = _filterTransactions(
         _searchQuery,
@@ -797,6 +797,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       transactions.sort((a, b) => b.date.compareTo(a.date));
       if (transactions.isEmpty) {
         return CommonWidgets.buildEmptyState(
+          context: context,
           message: 'Chưa có giao dịch nào',
           suggestion: 'Hãy nhấn nút "+" để tạo giao dịch đầu tiên!',
           icon: Icons.receipt_long_outlined,
@@ -819,11 +820,12 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       }
     } else if (state is TransactionError) {
       return CommonWidgets.buildErrorState(
+        context: context,
         message: state.message,
         onRetry: _refreshTransactions,
       );
     } else {
-      return CommonWidgets.buildLoadingIndicator();
+      return CommonWidgets.buildLoadingIndicator(context);
     }
   }
 }

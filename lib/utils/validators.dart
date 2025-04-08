@@ -1,23 +1,24 @@
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Validators {
-  static String? validateEmail(String? value) {
+  static String? validateEmail(String? value, AppLocalizations l10n) {
     if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập email';
+      return l10n.enterEmailHint; // Dịch "Nhập email"
     }
-    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegExp.hasMatch(value)) {
-      return 'Email không hợp lệ';
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return l10n.invalidEmail; // Dịch "Email không hợp lệ"
     }
     return null;
   }
 
-  static String? validatePassword(String? value) {
+  static String? validatePassword(String? value, AppLocalizations l10n) {
     if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập mật khẩu';
+      return l10n.enterPasswordHint; // Dịch "Nhập mật khẩu"
     }
     if (value.length < 6) {
-      return 'Mật khẩu phải có ít nhất 6 ký tự';
+      return l10n.passwordMinLength; // Dịch "Mật khẩu phải có ít nhất 6 ký tự"
     }
     return null;
   }

@@ -72,7 +72,11 @@ class RegisterScreenState extends State<RegisterScreen> {
                     }),
                   ),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildSubmitButton('Tạo tài khoản', _register),
+                  CommonWidgets.buildSubmitButton(
+                    'Tạo tài khoản',
+                    _register,
+                    context,
+                  ),
                   const SizedBox(height: 15),
                   Center(
                     child: RichText(
