@@ -445,8 +445,9 @@ class CommonWidgets {
     required Key itemKey,
     required String title,
     double? value,
-    required IconData icon,
+    IconData? icon,
     Color? iconColor,
+    Color? amountColor, // Thêm tham số amountColor
     String? valuePrefix,
     String? valueLocale,
     List<PopupMenuItem<String>>? menuItems,
@@ -458,68 +459,87 @@ class CommonWidgets {
   }) {
     final theme = Theme.of(context);
     final locale = valueLocale ?? Intl.getCurrentLocale();
-    final currencySymbol = valuePrefix ?? NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
 
     return Container(
       key: itemKey,
       margin: margin,
-      decoration: boxDecoration(context).copyWith( // Dùng boxDecoration đã sửa
-          color: backgroundColor ?? theme.cardColor,
-          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5), width: 1.5) // Thêm border ở đây nếu boxDecoration ko có
+      decoration: BoxDecoration(
+        color: backgroundColor ?? theme.cardColor,
+        borderRadius: BorderRadius.circular(10), // Giả sử bạn dùng boxDecoration với radius 10
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5), width: 2),
       ),
       child: Padding(
         padding: padding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container( // Icon container
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+            if (icon != null)
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: iconColor ?? theme.colorScheme.primary,
+                ),
               ),
-              child: Icon(
-                icon, size: 22,
-                color: iconColor ?? theme.colorScheme.primary, // Dùng theme
-              ),
-            ),
             const SizedBox(width: 12),
-            Expanded( // Info
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text( // Title
+                  Text(
                     title,
-                    style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface), // theme
-                    overflow: TextOverflow.ellipsis, maxLines: 1,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
-                  if (subtitle != null) ...[ // Subtitle
+                  if (subtitle != null) ...[
                     const SizedBox(height: 3),
-                    DefaultTextStyle(style: theme.textTheme.bodySmall ?? const TextStyle(), child: subtitle),
+                    DefaultTextStyle(
+                      style: theme.textTheme.bodySmall ?? const TextStyle(),
+                      child: subtitle,
+                    ),
                   ],
-                  if (value != null && value != 0) ...[ // Value
+                  if (value != null && value != 0) ...[
                     const SizedBox(height: 3),
-                    Text(
+                    Text(valuePrefix.toString() +
                       NumberFormat.currency(locale: locale, symbol: currencySymbol, decimalDigits: 0).format(value),
-                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500,
-                          color: value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor), // Giữ màu income/expense
-                      overflow: TextOverflow.ellipsis, maxLines: 1,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ],
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            if (menuItems != null && onMenuSelected != null) // Menu
+            if (menuItems != null && onMenuSelected != null)
               PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), size: 22), // theme
+                icon: Icon(
+                  Icons.more_vert,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 22,
+                ),
                 offset: const Offset(0, 35),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                color: theme.colorScheme.surfaceContainerHighest, // theme
+                color: theme.colorScheme.surfaceContainerHighest,
                 elevation: 4,
                 onSelected: onMenuSelected,
-                itemBuilder: (context) => menuItems, // context của PopupMenuButton
+                itemBuilder: (context) => menuItems,
               ),
           ],
         ),
@@ -1093,19 +1113,37 @@ class CommonWidgets {
     }
   }
 
-  static Color getAmountColor(BuildContext context, String typeKey) {
-    switch (typeKey) {
-      case 'income': case 'borrow': return AppTheme.incomeColor;
-      case 'expense': case 'lend': return AppTheme.expenseColor;
-      default: return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8); // theme
+  // Hàm hỗ trợ lấy màu dựa trên type (giữ nguyên từ code hiện tại của bạn)
+  static Color getAmountColor(BuildContext context, String type) {
+    switch (type) {
+      case 'Thu nhập':
+      case 'Đi vay':
+        return AppTheme.incomeColor;
+      case 'Chi tiêu':
+      case 'Cho vay':
+      case 'Chuyển khoản':
+        return AppTheme.expenseColor;
+      case 'Điều chỉnh số dư':
+        return Theme.of(context).colorScheme.onSurface; // Màu trung tính cho điều chỉnh
+      default:
+        return Theme.of(context).colorScheme.onSurface;
     }
   }
 
-  static String getAmountPrefix(BuildContext context, String typeKey) {
-    switch (typeKey) {
-      case 'income': case 'borrow': return '+ ';
-      case 'expense': case 'lend': return '- ';
-      default: return '';
+  // Hàm hỗ trợ lấy prefix dựa trên type (giữ nguyên từ code hiện tại của bạn)
+  static String getAmountPrefix(BuildContext context, String type) {
+    switch (type) {
+      case 'Thu nhập':
+      case 'Đi vay':
+        return '';
+      case 'Chi tiêu':
+      case 'Cho vay':
+      case 'Chuyển khoản':
+        return '-';
+      case 'Điều chỉnh số dư':
+        return '';
+      default:
+        return '';
     }
   }
 }

@@ -211,5 +211,21 @@
             "description": "The description of the transaction to be deleted"
           }
         }
-      }
+      },
+      "transactionTypeIncome": "収入",
+        "transactionTypeExpense": "支出",
+        "transactionTypeTransfer": "振替",
+        "transactionTypeBorrow": "借入",
+        "transactionTypeLend": "貸出",
+        "transactionTypeAdjustment": "残高調整",
+        "categoryFood": "飲食",
+        "categoryLiving": "生活",
+        "categoryTransport": "交通",
+        "categoryHealth": "健康",
+        "categoryShopping": "買い物",
+        "categoryEntertainment": "娯楽",
+        "categoryEducation": "教育",
+        "categoryBills": "請求書",
+        "categoryGift": "贈り物",
+        "categoryOther": "その他"
 }

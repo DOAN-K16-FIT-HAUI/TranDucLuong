@@ -284,7 +284,7 @@ class WalletScreen extends StatelessWidget {
       value: wallet.balance.toDouble(),
       icon: wallet.icon,
       valueLocale: locale.toString(),
-      valuePrefix: _getCurrencySymbol(locale),
+      valuePrefix: '',
       menuItems: CommonWidgets.buildEditDeleteMenuItems(context: context),
       onMenuSelected: (result) {
         if (result == 'edit') {
