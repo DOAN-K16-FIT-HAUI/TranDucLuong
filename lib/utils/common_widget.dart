@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/core/app_theme.dart'; // Vẫn cần cho income/expense color
 import 'package:finance_app/data/models/transaction.dart';
-import 'package:finance_app/utils/dimens.dart';
+// import 'package:finance_app/utils/dimens.dart'; // Dimens không được dùng trong file này
 import 'package:finance_app/utils/formatter.dart';
 import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
@@ -12,137 +12,128 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class CommonWidgets {
+  // Giữ nguyên Builder vì lấy l10n cho validator
   static Widget buildEmailField({
     required TextEditingController controller,
     void Function(String)? onChanged,
   }) {
     return Builder(
-      builder: (context) {
+      builder: (context) { // context này hợp lệ
         final l10n = AppLocalizations.of(context)!;
+        final theme = Theme.of(context); // Lấy theme từ context hợp lệ
         return TextFormField(
           controller: controller,
           decoration: InputDecoration(
             label: RichText(
               text: TextSpan(
-                text: l10n.emailLabel, // Dịch "Email"
+                text: l10n.emailLabel,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Dùng theme
                   fontSize: 16,
                 ),
                 children: const [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: AppTheme.expenseColor),
-                  ),
+                  TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor)),
                 ],
               ),
             ),
-            hintText: l10n.enterEmailHint, // Dịch "Nhập email"
-            border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            errorStyle: const TextStyle(color: AppTheme.expenseColor),
+            hintText: l10n.enterEmailHint,
+            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+            enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+            focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
+            errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+            focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+            errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           ),
-          cursorColor: Theme.of(context).colorScheme.primary,
+          cursorColor: theme.colorScheme.primary, // Dùng theme
           keyboardType: TextInputType.emailAddress,
           onChanged: onChanged,
-          validator: (value) => Validators.validateEmail(value, l10n), // Truyền l10n vào validator
+          validator: (value) => Validators.validateEmail(value, l10n),
         );
       },
     );
   }
 
+  // Giữ nguyên Builder vì lấy l10n cho validator
   static Widget buildPasswordField(
       TextEditingController controller,
       bool isPasswordVisible,
       VoidCallback toggleVisibility,
       ) {
     return Builder(
-      builder: (context) {
+      builder: (context) { // context này hợp lệ
         final l10n = AppLocalizations.of(context)!;
+        final theme = Theme.of(context); // Lấy theme từ context hợp lệ
         return TextFormField(
           controller: controller,
           decoration: InputDecoration(
             label: RichText(
               text: TextSpan(
-                text: l10n.passwordLabel, // Dịch "Mật khẩu"
+                text: l10n.passwordLabel,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Dùng theme
                   fontSize: 16,
                 ),
                 children: const [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: AppTheme.expenseColor),
-                  ),
+                  TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor)),
                 ],
               ),
             ),
-            hintText: l10n.enterPasswordHint, // Dịch "Nhập mật khẩu"
-            border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            errorStyle: const TextStyle(color: AppTheme.expenseColor),
+            hintText: l10n.enterPasswordHint,
+            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+            enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+            focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
+            errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+            focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+            errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
             suffixIcon: IconButton(
-              icon: Icon(
-                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              ),
+              icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
               onPressed: toggleVisibility,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Thêm màu cho icon
             ),
           ),
-          cursorColor: Theme.of(context).colorScheme.primary,
+          cursorColor: theme.colorScheme.primary, // Dùng theme
           obscureText: !isPasswordVisible,
-          validator: (value) => Validators.validatePassword(value, l10n), // Truyền l10n vào validator
+          validator: (value) => Validators.validatePassword(value, l10n),
         );
       },
     );
   }
 
-  static Widget buildSubmitButton(String text, VoidCallback onPressed, BuildContext context) {
+  // *** SỬA: Thêm BuildContext context ***
+  static Widget buildSubmitButton(BuildContext context, String text, VoidCallback onPressed) {
+    final theme = Theme.of(context); // Lấy theme
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: theme.colorScheme.primary, // Dùng theme
           padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), // Thêm bo góc
         ),
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 18,
-            color: Theme.of(context).colorScheme.onPrimary,
+          style: GoogleFonts.poppins( // Dùng GoogleFonts
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onPrimary, // Dùng theme
           ),
         ),
       ),
     );
   }
 
+  // Giữ nguyên Builder vì lấy l10n cho label/hint
   static Widget buildBalanceInputField(
       TextEditingController controller, {
         String? Function(String?)? validator,
       }) {
     return Builder(
-      builder: (context) {
+      builder: (context) { // context này hợp lệ
         final l10n = AppLocalizations.of(context)!;
+        final theme = Theme.of(context); // Lấy theme từ context hợp lệ
         return TextFormField(
           controller: controller,
           keyboardType: TextInputType.number,
@@ -150,42 +141,36 @@ class CommonWidgets {
           decoration: InputDecoration(
             label: RichText(
               text: TextSpan(
-                text: l10n.amountLabel, // Dịch "Số tiền"
+                text: l10n.amountLabel,
                 style: GoogleFonts.poppins(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Dùng theme
                   fontSize: 16,
                 ),
                 children: const [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: AppTheme.expenseColor),
-                  ),
+                  TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor)),
                 ],
               ),
             ),
-            hintText: l10n.enterAmountHint, // Dịch "Nhập số tiền"
-            suffixText: '₫',
+            hintText: l10n.enterAmountHint,
+            // Nên dùng NumberFormat để lấy currency symbol dựa trên locale
+            // suffixText: NumberFormat.simpleCurrency(locale: Intl.getCurrentLocale()).currencySymbol,
+            suffixText: '₫', // Hoặc giữ nguyên nếu chỉ dùng VND
             suffixStyle: GoogleFonts.poppins(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: theme.colorScheme.onSurface, // Dùng theme
               fontSize: 16,
             ),
-            border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            errorStyle: const TextStyle(color: AppTheme.expenseColor),
+            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+            enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+            focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
+            errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+            focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+            errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           ),
-          cursorColor: Theme.of(context).colorScheme.primary,
+          cursorColor: theme.colorScheme.primary, // Dùng theme
           style: GoogleFonts.poppins(
-            color: Theme.of(context).colorScheme.onSurface,
+            color: theme.colorScheme.onSurface, // Dùng theme
+            fontSize: 16,
           ),
           validator: validator,
         );
@@ -193,6 +178,7 @@ class CommonWidgets {
     );
   }
 
+  // context đã được yêu cầu
   static Future<void> showFormDialog({
     required BuildContext context,
     required GlobalKey<FormState> formKey,
@@ -202,50 +188,43 @@ class CommonWidgets {
     required Function onActionButtonPressed,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: theme.colorScheme.surface,
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         title: Text(
           title,
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: theme.colorScheme.primary),
         ),
         content: Form(
           key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: formFields,
+          child: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: formFields),
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              l10n.cancel, // Dịch "Hủy"
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              l10n.cancel,
+              style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w500),
             ),
           ),
           TextButton(
             onPressed: () {
               if (formKey.currentState!.validate()) {
                 onActionButtonPressed();
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               }
             },
             child: Text(
               actionButtonText,
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              style: GoogleFonts.poppins(color: theme.colorScheme.primary, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -253,6 +232,7 @@ class CommonWidgets {
     );
   }
 
+  // context đã được yêu cầu
   static Future<void> showDeleteDialog({
     required BuildContext context,
     required String title,
@@ -260,50 +240,39 @@ class CommonWidgets {
     required VoidCallback onDeletePressed,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: theme.colorScheme.surface,
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+        contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         title: Text(
           title,
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: theme.colorScheme.primary),
         ),
         content: Text(
           content,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+          style: GoogleFonts.poppins(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.8)),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              l10n.cancel, // Dịch "Hủy"
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.onSurface.withValues(
-                  alpha: 153,
-                ),
-              ),
+              l10n.cancel,
+              style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w500),
             ),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               onDeletePressed();
             },
             child: Text(
-              l10n.confirm, // Dịch "Xác nhận"
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              l10n.confirm,
+              style: GoogleFonts.poppins(color: theme.colorScheme.error, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -311,172 +280,86 @@ class CommonWidgets {
     );
   }
 
+  // context đã được yêu cầu
   static PreferredSizeWidget buildAppBar({
     required BuildContext context,
-    String title = '', // Tiêu đề mặc định sẽ được dịch trong l10n
+    String title = '',
+    Widget? titleWidget,
     VoidCallback? onBackPressed,
     bool showBackButton = true,
     IconData? backIcon,
     List<Widget>? actions,
-    bool showDropdown = false,
-    List<String>? dropdownItems,
-    String? dropdownValue,
-    ValueChanged<String?>? onDropdownChanged,
+    PreferredSizeWidget? bottom,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    double? elevation,
+    // Bỏ các tham số dropdown
   }) {
     final l10n = AppLocalizations.of(context)!;
-    return PreferredSize(
-      preferredSize: Size.fromHeight(
-        kToolbarHeight + MediaQuery.of(context).padding.top,
+    final theme = Theme.of(context);
+
+    final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.primary;
+    final effectiveForegroundColor = foregroundColor ?? theme.colorScheme.onPrimary;
+    final effectiveTitle = title.isEmpty ? l10n.appTitle : title; // Sử dụng appTitle làm mặc định
+
+    return AppBar(
+      backgroundColor: effectiveBackgroundColor,
+      foregroundColor: effectiveForegroundColor,
+      elevation: elevation ?? 1.0,
+      scrolledUnderElevation: 1.0, // Thêm để có hiệu ứng đổ bóng nhẹ khi cuộn dưới
+      leading: showBackButton
+          ? IconButton(
+        icon: Icon(backIcon ?? Icons.arrow_back),
+        tooltip: l10n.backTooltip,
+        onPressed: onBackPressed ?? () => Navigator.maybePop(context),
+      )
+          : null,
+      title: titleWidget ?? Text(
+        effectiveTitle, // Sử dụng tiêu đề hiệu quả
+        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildSafeArea(context),
-          _buildHeader(
-            context: context,
-            title: title.isEmpty ? l10n.accountTitle : title, // Dịch "Tài khoản" nếu không có title
-            onBackPressed: onBackPressed,
-            showBackButton: showBackButton,
-            backIcon: backIcon,
-            actions: actions,
-            showDropdown: showDropdown,
-            dropdownItems: dropdownItems,
-            dropdownValue: dropdownValue,
-            onDropdownChanged: onDropdownChanged,
-          ),
-        ],
-      ),
+      centerTitle: true,
+      actions: actions,
+      bottom: bottom,
     );
   }
 
-  static Widget _buildSafeArea(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).padding.top,
-      color: Theme.of(context).colorScheme.primary,
-    );
-  }
+  // --- Các hàm _buildSafeArea, _buildHeader không cần thiết nữa ---
 
-  static Widget _buildHeader({
-    required BuildContext context,
-    required String title,
-    VoidCallback? onBackPressed,
-    bool showBackButton = true,
-    IconData? backIcon,
-    List<Widget>? actions,
-    bool showDropdown = false,
-    List<String>? dropdownItems,
-    String? dropdownValue,
-    ValueChanged<String?>? onDropdownChanged,
-  }) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      height: kToolbarHeight,
-      color: Theme.of(context).colorScheme.primary,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          showBackButton
-              ? IconButton(
-            icon: Icon(
-              backIcon ?? Icons.arrow_back,
-              color: Theme.of(context).colorScheme.surface,
-            ),
-            tooltip: l10n.backTooltip, // Dịch "Quay lại"
-            onPressed: onBackPressed ?? () => Navigator.pop(context),
-          )
-              : const SizedBox(width: 48),
-          Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              child: showDropdown &&
-                  dropdownItems != null &&
-                  dropdownValue != null &&
-                  onDropdownChanged != null
-                  ? DropdownButtonFormField<String>(
-                value: dropdownValue,
-                onChanged: onDropdownChanged,
-                items: dropdownItems.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: GoogleFonts.poppins(
-                        fontSize: Dimens.textSizeMedium + 2,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                ),
-                style: GoogleFonts.poppins(
-                  fontSize: Dimens.textSizeMedium + 2,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                dropdownColor: Theme.of(context).colorScheme.primary,
-                iconEnabledColor: Theme.of(context).colorScheme.surface,
-                iconSize: 24,
-              )
-                  : Text(
-                title,
-                style: GoogleFonts.poppins(
-                  fontSize: Dimens.textSizeMedium + 2,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: actions ?? [const SizedBox(width: 48)],
-          ),
-        ],
-      ),
-    );
-  }
-
+  // *** SỬA: Thêm BuildContext context ***
   static Widget buildSocialLoginButton({
+    required BuildContext context, // Thêm context
     required VoidCallback onPressed,
     required Color? color,
-    required String text, required BuildContext context,
+    required String text, // Chữ cái
     Color? textColor,
   }) {
+    final theme = Theme.of(context); // Lấy theme
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
-          padding: const EdgeInsets.all(10),
-          elevation: 3,
-          backgroundColor: color ?? Theme.of(context).colorScheme.primary,
+          padding: const EdgeInsets.all(12),
+          elevation: 2,
+          backgroundColor: color ?? theme.colorScheme.surface, // Nền là surface
+          foregroundColor: textColor ?? theme.colorScheme.primary, // Chữ/Icon là primary
         ),
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 24,
-            color: textColor ?? Theme.of(context).colorScheme.surface,
+          style: GoogleFonts.poppins(
+            fontSize: 22,
             fontWeight: FontWeight.bold,
+            color: textColor ?? theme.colorScheme.primary, // Màu chữ
           ),
         ),
       ),
     );
   }
 
+  // context đã được yêu cầu
   static PreferredSizeWidget buildTabBar({
     required BuildContext context,
     required List<String> tabTitles,
@@ -489,74 +372,63 @@ class CommonWidgets {
     Color? indicatorColor,
     Color? backgroundColor,
   }) {
+    final theme = Theme.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(kTextTabBarHeight),
       child: Material(
-        color: backgroundColor ?? Theme.of(context).colorScheme.surface,
+        color: backgroundColor ?? theme.colorScheme.surface, // Dùng theme
+        // elevation: 1, // Bỏ elevation ở đây nếu AppBar đã có
         child: TabBar(
           controller: controller,
           labelStyle: labelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
           unselectedLabelStyle: unselectedLabelStyle ?? GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
-          labelColor: labelColor ?? Theme.of(context).colorScheme.primary,
-          unselectedLabelColor: unselectedLabelColor ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-          indicatorColor: indicatorColor ?? Theme.of(context).colorScheme.primary,
+          labelColor: labelColor ?? theme.colorScheme.primary, // Dùng theme
+          unselectedLabelColor: unselectedLabelColor ?? theme.colorScheme.onSurface.withValues(alpha: 0.7), // Dùng theme
+          indicatorColor: indicatorColor ?? theme.colorScheme.primary, // Dùng theme
           indicatorWeight: 2.5,
           onTap: onTabChanged,
           tabs: tabTitles.map((title) => Tab(text: title)).toList(),
+          tabAlignment: TabAlignment.fill,
+          dividerColor: theme.dividerColor.withValues(alpha: 0.5),
         ),
       ),
     );
   }
 
+  // context đã được yêu cầu
   static Widget buildTabContent<T>({
     required BuildContext context,
     required List<T> items,
-    required String emptyMessage,
-    required String searchQuery,
-    required List<T> Function(String query, List<T> items) filterItems,
-    required bool isSearching,
-    required int type,
-    required Widget Function(BuildContext context, T item, int type, int index) itemBuilder,
-    required void Function(int type, int oldIndex, int newIndex) onReorder,
+    required Widget Function(BuildContext context, T item, int index) itemBuilder,
+    required void Function(int oldIndex, int newIndex) onReorder,
+    // Bỏ các tham số không cần thiết
   }) {
-    final l10n = AppLocalizations.of(context)!;
-    final filteredItems = filterItems(searchQuery, items);
-
-    if (filteredItems.isEmpty) {
-      return Center(
-        child: Text(
-          isSearching ? l10n.noItemsFound : emptyMessage, // Dịch "Không tìm thấy mục phù hợp"
-          style: GoogleFonts.poppins(
-            fontSize: Dimens.textSizeMedium,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 204),
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
+    // final l10n = AppLocalizations.of(context)!; // Không cần l10n
+    // Việc kiểm tra empty xử lý bên ngoài
 
     return ReorderableListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 80),
-      itemCount: filteredItems.length,
-      itemBuilder: (context, index) => itemBuilder(context, filteredItems[index], type, index),
+      padding: const EdgeInsets.all(16).copyWith(bottom: 80),
+      itemCount: items.length,
+      itemBuilder: (context, index) => itemBuilder(context, items[index], index),
       onReorder: (oldIndex, newIndex) {
         if (oldIndex < newIndex) newIndex -= 1;
-        if (oldIndex >= 0 && oldIndex < filteredItems.length && newIndex >= 0 && newIndex <= filteredItems.length) {
-          onReorder(type, oldIndex, newIndex);
+        if (oldIndex >= 0 && oldIndex < items.length && newIndex >= 0 && newIndex < items.length) {
+          onReorder(oldIndex, newIndex);
         } else {
-          debugPrint("Error: Reorder indices out of bounds.");
+          debugPrint("ReorderableListView: Invalid indices ($oldIndex, $newIndex) for list length ${items.length}");
         }
       },
-      proxyDecorator: (child, index, animation) {
+      proxyDecorator: (Widget child, int index, Animation<double> animation) {
+        final theme = Theme.of(context); // Lấy theme
         return AnimatedBuilder(
           animation: animation,
-          builder: (context, _) {
-            final elevation = lerpDouble(0, 8, Curves.easeInOut.transform(animation.value))!;
+          builder: (BuildContext context, Widget? _) {
+            final double elevation = lerpDouble(1.0, 6.0, animation.value)!;
             return Material(
+              borderRadius: BorderRadius.circular(10),
               elevation: elevation,
-              color: Colors.transparent,
-              shadowColor: Colors.black.withValues(alpha: 51),
-              borderRadius: BorderRadius.circular(12),
+              color: theme.colorScheme.surface, // Dùng theme
+              shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.3), // Dùng theme
               child: child,
             );
           },
@@ -566,12 +438,13 @@ class CommonWidgets {
     );
   }
 
+  // context đã được yêu cầu
   static Widget buildItemCard<T>({
     required BuildContext context,
     required T item,
     required Key itemKey,
     required String title,
-    required double value,
+    double? value,
     required IconData icon,
     Color? iconColor,
     String? valuePrefix,
@@ -579,85 +452,74 @@ class CommonWidgets {
     List<PopupMenuItem<String>>? menuItems,
     void Function(String)? onMenuSelected,
     Widget? subtitle,
-    EdgeInsetsGeometry margin = const EdgeInsets.only(top: 16),
-    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+    EdgeInsetsGeometry margin = const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
     Color? backgroundColor,
   }) {
+    final theme = Theme.of(context);
+    final locale = valueLocale ?? Intl.getCurrentLocale();
+    final currencySymbol = valuePrefix ?? NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+
     return Container(
       key: itemKey,
       margin: margin,
-      decoration: boxDecoration(context).copyWith(color: backgroundColor),
+      decoration: boxDecoration(context).copyWith( // Dùng boxDecoration đã sửa
+          color: backgroundColor ?? theme.cardColor,
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5), width: 1.5) // Thêm border ở đây nếu boxDecoration ko có
+      ),
       child: Padding(
         padding: padding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.all(8),
+            Container( // Icon container
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withAlpha(25),
+                color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                icon,
-                size: 24,
-                color: iconColor ?? Theme.of(context).colorScheme.primary,
+                icon, size: 22,
+                color: iconColor ?? theme.colorScheme.primary, // Dùng theme
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
+            const SizedBox(width: 12),
+            Expanded( // Info
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  Text( // Title
                     title,
-                    style: GoogleFonts.poppins(
-                      fontSize: Dimens.textSizeMedium,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface), // theme
+                    overflow: TextOverflow.ellipsis, maxLines: 1,
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 4),
-                    subtitle,
+                  if (subtitle != null) ...[ // Subtitle
+                    const SizedBox(height: 3),
+                    DefaultTextStyle(style: theme.textTheme.bodySmall ?? const TextStyle(), child: subtitle),
                   ],
-                  if (value != 0) ...[
-                    const SizedBox(height: 4),
+                  if (value != null && value != 0) ...[ // Value
+                    const SizedBox(height: 3),
                     Text(
-                      NumberFormat.currency(
-                        locale: valueLocale ?? 'vi_VN',
-                        symbol: valuePrefix ?? '₫',
-                      ).format(value),
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                      NumberFormat.currency(locale: locale, symbol: currencySymbol, decimalDigits: 0).format(value),
+                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500,
+                          color: value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor), // Giữ màu income/expense
+                      overflow: TextOverflow.ellipsis, maxLines: 1,
                     ),
                   ],
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            if (menuItems != null && onMenuSelected != null)
+            if (menuItems != null && onMenuSelected != null) // Menu
               PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(153),
-                ),
-                offset: const Offset(0, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                color: Theme.of(context).colorScheme.surface,
-                elevation: 8,
+                icon: Icon(Icons.more_vert, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), size: 22), // theme
+                offset: const Offset(0, 35),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                color: theme.colorScheme.surfaceContainerHighest, // theme
+                elevation: 4,
                 onSelected: onMenuSelected,
-                itemBuilder: (context) => menuItems,
+                itemBuilder: (context) => menuItems, // context của PopupMenuButton
               ),
           ],
         ),
@@ -665,99 +527,86 @@ class CommonWidgets {
     );
   }
 
-  static BoxDecoration boxDecoration(BuildContext context,) {
+  // *** SỬA: Thêm BuildContext context ***
+  static BoxDecoration boxDecoration(BuildContext context) {
+    final theme = Theme.of(context);
     return BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
+      color: theme.cardColor, // Dùng theme cardColor
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.25),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
+          color: theme.colorScheme.shadow.withValues(alpha: 0.06),
+          blurRadius: 10, offset: const Offset(0, 3), // Giảm offset Y
         ),
       ],
+      // Bỏ border ở đây để linh hoạt hơn, có thể thêm ở nơi gọi hoặc trong buildItemCard
+      // border: Border.all(...)
     );
   }
 
+  // context đã được yêu cầu
   static Future<IconData?> showIconSelectionDialog({
     required BuildContext context,
     required IconData currentIcon,
     required List<Map<String, dynamic>> availableIcons,
-    String title = '', // Tiêu đề mặc định sẽ được dịch trong l10n
-    double dialogHeightFactor = 0.3,
+    String title = '',
+    double dialogHeightFactor = 0.6,
     int crossAxisCount = 3,
-    double iconSize = 28,
+    double iconSize = 26,
     Color? selectedColor,
-    Color? unselectedColor,
   }) async {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final effectiveSelectedColor = selectedColor ?? theme.colorScheme.primary;
+
     return await showDialog<IconData>(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: theme.colorScheme.surface,
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         title: Text(
-          title.isEmpty ? l10n.selectIconTitle : title, // Dịch "Chọn biểu tượng"
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          title.isEmpty ? l10n.selectIconTitle : title, // l10n
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: theme.colorScheme.primary), // theme
         ),
         content: SizedBox(
           width: double.maxFinite,
-          height: MediaQuery.of(context).size.height * dialogHeightFactor,
+          height: MediaQuery.of(dialogContext).size.height * dialogHeightFactor,
           child: GridView.builder(
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1.2,
+              crossAxisCount: crossAxisCount, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.0,
             ),
             itemCount: availableIcons.length,
-            itemBuilder: (context, index) {
-              final iconData = availableIcons[index];
-              final bool isSelected = iconData['icon'] == currentIcon;
+            itemBuilder: (gridContext, index) {
+              final iconMap = availableIcons[index];
+              final iconData = iconMap['icon'] as IconData;
+              final iconName = iconMap['name'] as String;
+              final bool isSelected = iconData == currentIcon;
 
-              return GestureDetector(
-                onTap: () => Navigator.pop(context, iconData['icon']),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? (selectedColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 38)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected
-                          ? (selectedColor ?? Theme.of(context).colorScheme.primary)
-                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 51),
-                      width: isSelected ? 1.5 : 1.0,
+              return InkWell(
+                onTap: () => Navigator.pop(dialogContext, iconData),
+                borderRadius: BorderRadius.circular(8),
+                child: Tooltip(
+                  message: iconName,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: isSelected ? effectiveSelectedColor.withValues(alpha: 0.15) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: isSelected ? effectiveSelectedColor : theme.dividerColor, width: isSelected ? 1.5 : 1.0),
                     ),
-                  ),
-                  child: Tooltip(
-                    message: iconData['name'],
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          iconData['icon'],
-                          color: selectedColor ?? Theme.of(context).colorScheme.primary,
-                          size: iconSize,
-                        ),
+                        Icon(iconData, color: effectiveSelectedColor, size: iconSize),
                         const SizedBox(height: 4),
                         Text(
-                          iconData['name'],
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 204),
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          iconName,
+                          style: GoogleFonts.poppins(fontSize: 9, color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400), // theme
+                          textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -769,48 +618,35 @@ class CommonWidgets {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, null),
-            child: Text(
-              l10n.cancel, // Dịch "Hủy"
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 204),
-              ),
-            ),
+            onPressed: () => Navigator.pop(dialogContext, null),
+            child: Text(l10n.cancel, style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w500)), // l10n, theme
           ),
         ],
       ),
     );
   }
 
+  // *** SỬA: Thêm BuildContext context ***
   static List<PopupMenuItem<String>> buildEditDeleteMenuItems({
+    required BuildContext context, // Thêm context
     IconData editIcon = Icons.edit_outlined,
     IconData deleteIcon = Icons.delete_outline,
-    String editText = '', // Sẽ được dịch trong l10n
-    String deleteText = '', // Sẽ được dịch trong l10n
+    String editText = '',
+    String deleteText = '',
     Color? editIconColor,
     Color? deleteIconColor,
-    required BuildContext context,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return [
       PopupMenuItem<String>(
         value: 'edit',
         child: Row(
           children: [
-            Icon(
-              editIcon,
-              size: 20,
-              color: editIconColor ?? Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              editText.isEmpty ? l10n.edit : editText, // Dịch "Sửa"
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+            Icon(editIcon, size: 20, color: editIconColor ?? theme.colorScheme.primary), // theme
+            const SizedBox(width: 12),
+            Text(editText.isEmpty ? l10n.edit : editText, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)), // l10n, theme
           ],
         ),
       ),
@@ -818,33 +654,23 @@ class CommonWidgets {
         value: 'delete',
         child: Row(
           children: [
-            Icon(
-              deleteIcon,
-              size: 20,
-              color: deleteIconColor ?? Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              deleteText.isEmpty ? l10n.delete : deleteText, // Dịch "Xóa"
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+            Icon(deleteIcon, size: 20, color: deleteIconColor ?? theme.colorScheme.error), // theme
+            const SizedBox(width: 12),
+            Text(deleteText.isEmpty ? l10n.delete : deleteText, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)), // l10n, theme
           ],
         ),
       ),
     ];
   }
 
+  // context đã được yêu cầu
   static void handleEditDeleteActions<T>({
     required BuildContext context,
     required String action,
     required T item,
     required String itemName,
-    required void Function(BuildContext, T) onEdit,
-    required void Function(BuildContext, T) onDelete,
+    required void Function(BuildContext context, T item) onEdit,
+    required void Function(BuildContext context, T item) onDelete,
   }) {
     final l10n = AppLocalizations.of(context)!;
     if (action == 'edit') {
@@ -852,281 +678,240 @@ class CommonWidgets {
     } else if (action == 'delete') {
       showDeleteDialog(
         context: context,
-        title: l10n.confirmDeleteTitle, // Dịch "Xác nhận xóa"
-        content: l10n.confirmDeleteContent(itemName), // Dịch "Bạn có chắc chắn muốn xóa...?"
+        title: l10n.confirmDeleteTitle, // l10n
+        content: l10n.confirmDeleteContent(itemName), // l10n placeholder
         onDeletePressed: () => onDelete(context, item),
       );
     }
   }
 
+  // context đã được yêu cầu
   static Widget buildSearchField({
     required BuildContext context,
     required String hintText,
     required Function(String) onChanged,
-    String? initialValue,
+    TextEditingController? controller,
+    FocusNode? focusNode,
   }) {
-    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: boxDecoration(context).copyWith(borderRadius: BorderRadius.circular(30)), // Dùng boxDecoration
       child: TextField(
+        controller: controller,
+        focusNode: focusNode,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.poppins(
-            fontSize: Dimens.textSizeMedium,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: Theme.of(context).colorScheme.primary,
-            size: 24,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Theme.of(context).colorScheme.surface,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 12,
-            horizontal: 16,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 1.5,
-            ),
-          ),
+          hintStyle: GoogleFonts.poppins(fontSize: 15, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)), // theme
+          prefixIcon: Icon(Icons.search, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), size: 22), // theme
+          border: InputBorder.none,
+          filled: false,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
-        style: GoogleFonts.poppins(
-          fontSize: Dimens.textSizeMedium,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        cursorColor: Theme.of(context).colorScheme.primary,
+        style: GoogleFonts.poppins(fontSize: 15, color: theme.colorScheme.onSurface), // theme
+        cursorColor: theme.colorScheme.primary, // theme
         onChanged: onChanged,
       ),
     );
   }
 
+  // Giữ Builder vì cần l10n cho validator nếu có
   static Widget buildTextField({
     required TextEditingController controller,
     required String label,
     required String hint,
     String? Function(String?)? validator,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    int? maxLines = 1,
+    FocusNode? focusNode,
+    bool isRequired = true,
   }) {
-    return Builder(
-      builder: (context) {
-        final l10n = AppLocalizations.of(context)!;
-        return TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            label: RichText(
-              text: TextSpan(
-                text: '$label ',
-                style: GoogleFonts.poppins(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: Dimens.textSizeMedium,
-                ),
-                children: const [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: AppTheme.expenseColor),
-                  ),
-                ],
-              ),
+    return Builder(builder: (context) {
+      final theme = Theme.of(context);
+      // final l10n = AppLocalizations.of(context)!; // Chỉ lấy nếu validator cần
+
+      return TextFormField(
+        controller: controller,
+        focusNode: focusNode,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          label: isRequired ? RichText(
+            text: TextSpan(
+              text: '$label ',
+              style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16),
+              children: const [TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor))],
             ),
-            hintText: hint,
-            hintStyle: GoogleFonts.poppins(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-            border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            errorStyle: const TextStyle(color: AppTheme.expenseColor),
-          ),
-          cursorColor: Theme.of(context).colorScheme.primary,
-          style: GoogleFonts.poppins(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          validator: validator,
-        );
-      },
-    );
+          ) : Text(label, style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16)),
+          hintText: hint,
+          hintStyle: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(width: 1)),
+          enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+          focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
+          errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+          focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+          errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+          suffixIcon: suffixIcon,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        ),
+        cursorColor: theme.colorScheme.primary,
+        style: GoogleFonts.poppins(color: theme.colorScheme.onSurface, fontSize: 16),
+        validator: validator,
+      );
+    });
   }
 
-  static Widget buildDropdownField({
+  // Giữ Builder vì cần l10n cho validator nếu có
+  static Widget buildDropdownField<T>({
     required String label,
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    String? Function(String?)? validator,
+    required T? value,
+    required List<DropdownMenuItem<T>> items,
+    required ValueChanged<T?> onChanged,
+    String? Function(T?)? validator,
+    String? hint,
+    bool isRequired = true,
   }) {
-    return Builder(
-      builder: (context) {
-        final l10n = AppLocalizations.of(context)!;
-        return DropdownButtonFormField<String>(
-          value: value,
-          onChanged: onChanged,
-          items: items.map<DropdownMenuItem<String>>((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
-                style: GoogleFonts.poppins(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            );
-          }).toList(),
-          decoration: InputDecoration(
-            label: RichText(
-              text: TextSpan(
-                text: '$label ',
-                style: GoogleFonts.poppins(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: Dimens.textSizeMedium,
-                ),
-                children: const [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: AppTheme.expenseColor),
-                  ),
-                ],
-              ),
+    return Builder(builder: (context) {
+      final theme = Theme.of(context);
+      final l10n = AppLocalizations.of(context)!;
+
+      return DropdownButtonFormField<T>(
+        value: value,
+        items: items,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          label: isRequired ? RichText(
+            text: TextSpan(
+              text: '$label ',
+              style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16),
+              children: const [TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor))],
             ),
-            border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.expenseColor),
-            ),
-            errorStyle: const TextStyle(color: AppTheme.expenseColor),
-          ),
-          style: GoogleFonts.poppins(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          dropdownColor: Theme.of(context).colorScheme.surface,
-          iconEnabledColor: Theme.of(context).colorScheme.onSurface,
-          validator: validator ?? (value) {
-            if (value == null || value.isEmpty) {
-              return l10n.selectValueError; // Dịch "Vui lòng chọn một giá trị"
-            }
-            return null;
-          },
-        );
-      },
-    );
+          ) : Text(label, style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16)),
+          hintText: hint,
+          hintStyle: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(width: 1)),
+          enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+          focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
+          errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+          focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+          errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12).copyWith(right: 0),
+        ),
+        style: GoogleFonts.poppins(color: theme.colorScheme.onSurface, fontSize: 16),
+        dropdownColor: theme.colorScheme.surfaceContainerHighest,
+        iconEnabledColor: theme.colorScheme.onSurfaceVariant,
+        validator: validator ?? (value) {
+          if (isRequired && value == null) return l10n.selectValueError;
+          return null;
+        },
+        isExpanded: true,
+        alignment: AlignmentDirectional.centerStart,
+      );
+    });
   }
 
+  // context đã được yêu cầu
   static Widget buildDatePickerField({
     required BuildContext context,
     required DateTime? date,
     required String label,
-    required VoidCallback onTap,
+    required ValueChanged<DateTime?> onTap,
     String? errorText,
+    DateTime? firstDate,
+    DateTime? lastDate,
+    bool isRequired = true,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final displayFormat = DateFormat('dd/MM/yyyy');
+
+    Future<void> handleTap() async {
+      final DateTime? picked = await showDatePicker(
+        context: context, initialDate: date ?? DateTime.now(),
+        firstDate: firstDate ?? DateTime(2000), lastDate: lastDate ?? DateTime(2101),
+        builder: (context, child) => Theme(
+          data: theme.copyWith(
+              colorScheme: theme.colorScheme.copyWith(primary: theme.colorScheme.primary, onPrimary: theme.colorScheme.onPrimary, surface: theme.colorScheme.surface, onSurface: theme.colorScheme.onSurface),
+              textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary)), dialogTheme: DialogThemeData(backgroundColor: theme.colorScheme.surface)),
+          child: child!,
+        ),
+      );
+      onTap(picked);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(
-            '$label: ${date != null ? DateFormat('dd/MM/yyyy').format(date) : l10n.notSelected}', // Dịch "Chưa chọn"
-            style: GoogleFonts.poppins(
-              fontSize: Dimens.textSizeMedium,
-              color: Theme.of(context).colorScheme.onSurface,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6.0),
+          child: isRequired ? RichText(
+            text: TextSpan(
+              text: '$label ', style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16),
+              children: const [TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor))],
             ),
-          ),
-          trailing: Icon(
-            Icons.calendar_today,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onTap: onTap,
+          ) : Text(label, style: GoogleFonts.poppins(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 16)),
         ),
-        if (errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 12),
+        InkWell(
+          onTap: handleTap, borderRadius: BorderRadius.circular(8),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(width: 1)),
+              enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+              focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: theme.dividerColor, width: 1)),
+              errorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1)),
+              focusedErrorBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(color: AppTheme.expenseColor, width: 1.5)),
+              errorText: errorText, errorStyle: const TextStyle(color: AppTheme.expenseColor, fontSize: 11),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              suffixIcon: Icon(Icons.calendar_today, color: theme.colorScheme.onSurfaceVariant, size: 20),
+            ),
             child: Text(
-              errorText,
+              date != null ? displayFormat.format(date) : l10n.notSelected, // l10n
               style: GoogleFonts.poppins(
-                color: AppTheme.expenseColor,
-                fontSize: Dimens.textSizeSmall,
+                fontSize: 16,
+                color: date != null ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.5), // theme
               ),
             ),
           ),
+        ),
       ],
     );
   }
 
+  // *** SỬA: Thêm BuildContext context ***
   static Widget buildCategoryChips({
+    required BuildContext context, // Thêm context
     required List<String> categories,
     required String selectedCategory,
     required ValueChanged<String> onCategorySelected,
-    required BuildContext context,
+    String? title,
   }) {
-    final l10n = AppLocalizations.of(context)!;
+    // final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.favoriteCategories, // Dịch "Danh mục yêu thích"
-          style: GoogleFonts.poppins(
-            fontSize: Dimens.textSizeMedium,
-            color: Theme.of(context).colorScheme.onSurface,
+        if (title != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
           ),
-        ),
-        const SizedBox(height: 8),
         Wrap(
-          spacing: 8.0,
+          spacing: 8.0, runSpacing: 4.0,
           children: categories.map((category) {
+            final bool isSelected = selectedCategory == category;
             return ChoiceChip(
-              label: Text(
-                category,
-                style: GoogleFonts.poppins(
-                  color: selectedCategory == category
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              selected: selectedCategory == category,
-              onSelected: (bool selected) {
-                if (selected) {
-                  onCategorySelected(category);
-                }
-              },
-              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              side: BorderSide(
-                color: selectedCategory == category
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-              ),
+              label: Text(category),
+              labelStyle: GoogleFonts.poppins(fontSize: 13, color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.8)), // theme
+              selected: isSelected,
+              onSelected: (bool selected) { if (selected) onCategorySelected(category); },
+              selectedColor: theme.colorScheme.primary.withValues(alpha: 0.12), // theme
+              backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // theme
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: isSelected ? theme.colorScheme.primary : theme.dividerColor, width: isSelected ? 1.0 : 0.8)), // theme
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              showCheckmark: false,
             );
           }).toList(),
         ),
@@ -1134,65 +919,60 @@ class CommonWidgets {
     );
   }
 
-  static Widget buildLabel(BuildContext context,{required String text,}) {
-    return Text(
-      text,
-      style: GoogleFonts.poppins(
-        fontSize: Dimens.textSizeMedium,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
+  // *** SỬA: Thêm BuildContext context ***
+  static Widget buildLabel({required BuildContext context, required String text}) { // Thêm context
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Text(text, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8))), // theme
     );
   }
 
-  static Widget buildLoadingIndicator(BuildContext context,{Color? color, double size = 50.0}) {
+  // *** SỬA: Thêm BuildContext context ***
+  static Widget buildLoadingIndicator({required BuildContext context, Color? color, double size = 40.0}) { // Thêm context
     return Center(
       child: SpinKitFadingCircle(
-        color: color ?? Theme.of(context).colorScheme.primary,
+        color: color ?? Theme.of(context).colorScheme.primary, // theme
         size: size,
       ),
     );
   }
 
+  // *** SỬA: Thêm BuildContext context ***
   static Widget buildEmptyState({
+    required BuildContext context, // Thêm context
     required String message,
-    required BuildContext context,
     String? suggestion,
-    IconData icon = Icons.receipt_long_outlined,
-    double iconSize = 80,
+    IconData icon = Icons.inbox_outlined,
+    double iconSize = 60,
     VoidCallback? onActionPressed,
     String? actionText,
     IconData? actionIcon,
   }) {
+    final theme = Theme.of(context); // Lấy theme
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: iconSize, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
+            Icon(icon, size: iconSize, color: theme.disabledColor), // theme
+            const SizedBox(height: 20),
+            Text(message, style: GoogleFonts.poppins(fontSize: 17, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)), textAlign: TextAlign.center), // theme
             if (suggestion != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                suggestion,
-                style: GoogleFonts.poppins(color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
+              const SizedBox(height: 10),
+              Text(suggestion, style: GoogleFonts.poppins(fontSize: 14, color: theme.hintColor), textAlign: TextAlign.center), // theme
             ],
             if (onActionPressed != null && actionText != null) ...[
-              const SizedBox(height: 25),
+              const SizedBox(height: 30),
               ElevatedButton.icon(
-                icon: actionIcon != null ? Icon(actionIcon) : const SizedBox.shrink(),
+                icon: actionIcon != null ? Icon(actionIcon, size: 18) : const SizedBox.shrink(),
                 label: Text(actionText),
                 onPressed: onActionPressed,
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary, // theme
+                  backgroundColor: theme.colorScheme.primary, // theme
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -1202,46 +982,40 @@ class CommonWidgets {
     );
   }
 
+  // *** SỬA: Thêm BuildContext context ***
   static Widget buildErrorState({
+    required BuildContext context, // Thêm context
     required String message,
     required VoidCallback onRetry,
-    required BuildContext context,
-    String title = '', // Sẽ được dịch trong l10n
-    IconData icon = Icons.error_outline,
-    Color iconColor = Colors.red,
+    String title = '',
+    IconData icon = Icons.error_outline_rounded,
+    Color iconColor = AppTheme.expenseColor, // Giữ màu đỏ
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final effectiveTitle = title.isEmpty ? l10n.errorLoadingData : title; // l10n
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: iconColor, size: 60),
+            Icon(icon, color: iconColor, size: 50),
             const SizedBox(height: 16),
-            Text(
-              title.isEmpty ? l10n.errorLoadingData : title, // Dịch "Lỗi tải dữ liệu"
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: iconColor.withValues(alpha: 0.8),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 25),
+            Text(effectiveTitle, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: iconColor), textAlign: TextAlign.center),
+            const SizedBox(height: 10),
+            Text(message, textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 14, color: theme.hintColor)), // theme
+            const SizedBox(height: 30),
             ElevatedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.retry), // Dịch "Thử lại"
+              icon: const Icon(Icons.refresh, size: 18),
+              label: Text(l10n.retry), // l10n
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary, // theme
+                backgroundColor: theme.colorScheme.primary, // theme
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -1250,6 +1024,7 @@ class CommonWidgets {
     );
   }
 
+  // context đã được yêu cầu
   static Widget buildTransactionListItem({
     required BuildContext context,
     required TransactionModel transaction,
@@ -1257,87 +1032,47 @@ class CommonWidgets {
     VoidCallback? onLongPress,
   }) {
     final l10n = AppLocalizations.of(context)!;
-    final iconData = _getTransactionIcon(transaction.type);
-    final amountColor = getAmountColor(transaction.type, context);
-    final formattedAmount = Formatter.formatCurrency(transaction.amount);
-    final formattedDate = Formatter.formatDateTime(transaction.date);
+    final theme = Theme.of(context);
 
-    String subtitleText = formattedDate;
-    if (transaction.type == l10n.expenseType && transaction.category.isNotEmpty) {
-      subtitleText = '${transaction.category} • $formattedDate';
-    } else if (transaction.type == l10n.transferType) {
-      subtitleText = '${l10n.from}: ${transaction.fromWallet ?? '?'} → ${l10n.to}: ${transaction.toWallet ?? '?'} • $formattedDate';
-    } else if (transaction.type == l10n.borrowType && transaction.lender != null && transaction.lender!.isNotEmpty) {
-      subtitleText = '${l10n.borrowFrom}: ${transaction.lender} • $formattedDate';
-    } else if (transaction.type == l10n.lendType && transaction.borrower != null && transaction.borrower!.isNotEmpty) {
-      subtitleText = '${l10n.lendTo}: ${transaction.borrower} • $formattedDate';
-    } else if ((transaction.type == l10n.incomeType ||
-        transaction.type == l10n.balanceAdjustmentType ||
-        transaction.type == l10n.borrowType ||
-        transaction.type == l10n.lendType) &&
-        transaction.wallet != null &&
-        transaction.wallet!.isNotEmpty) {
-      subtitleText = '${l10n.wallet}: ${transaction.wallet} • $formattedDate';
-    } else {
-      subtitleText = formattedDate;
-    }
+    // !! Logic icon/màu/prefix cần dựa trên type gốc !!
+    final iconData = getTransactionIcon(transaction.type); // Dùng type gốc
+    final amountColor = getAmountColor(context, transaction.type); // Dùng type gốc
+    final amountPrefix = getAmountPrefix(context, transaction.type); // Dùng type gốc
+
+    final formattedAmount = Formatter.formatCurrency(transaction.amount);
+    final formattedTime = Formatter.formatTime(transaction.date);
+
+    // --- Subtitle ---
+    String subtitleText = '$formattedTime • ${transaction.wallet ?? ''}';
+    // !! So sánh type gốc !!
+    if (transaction.type == 'expense' && transaction.category.isNotEmpty) { subtitleText = '$formattedTime • ${transaction.category}'; }
+    else if (transaction.type == 'transfer') { subtitleText = '$formattedTime • ${l10n.from}: ${transaction.fromWallet ?? '?'} → ${l10n.to}: ${transaction.toWallet ?? '?'}'; }
+    else if (transaction.type == 'borrow' && transaction.lender != null) { subtitleText = '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}'; }
+    else if (transaction.type == 'lend' && transaction.borrower != null) { subtitleText = '$formattedTime • ${l10n.lendTo}: ${transaction.borrower}'; }
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      elevation: 3.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.5), width: 1.5)),
+      color: theme.cardColor,
       child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(8),
+        onTap: onTap, onLongPress: onLongPress, borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: iconData['backgroundColor'].withAlpha(204),
-                child: Icon(iconData['icon'], color: Colors.white, size: 18),
-              ),
+              CircleAvatar(radius: 18, backgroundColor: iconData['backgroundColor']?.withValues(alpha: 0.15) ?? theme.colorScheme.primary.withValues(alpha: 0.15), child: Icon(iconData['icon'], color: iconData['backgroundColor'] ?? theme.colorScheme.primary, size: 18)),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      transaction.description.isNotEmpty
-                          ? transaction.description
-                          : l10n.noDescription, // Dịch "(Không có mô tả)"
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14.5,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitleText,
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                child: Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(transaction.description.isNotEmpty ? transaction.description : l10n.noDescription, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 14.5, color: theme.colorScheme.onSurface), maxLines: 1, overflow: TextOverflow.ellipsis), // theme
+                  const SizedBox(height: 3),
+                  Text(subtitleText, style: GoogleFonts.poppins(color: theme.hintColor, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis), // theme
+                ],
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                getAmountPrefix(transaction.type, context) + formattedAmount,
-                style: GoogleFonts.poppins(
-                  color: amountColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.end,
-              ),
+              Text(amountPrefix + formattedAmount, style: GoogleFonts.poppins(color: amountColor, fontWeight: FontWeight.w600, fontSize: 14), textAlign: TextAlign.end),
             ],
           ),
         ),
@@ -1345,52 +1080,32 @@ class CommonWidgets {
     );
   }
 
-  static Map<String, dynamic> _getTransactionIcon(String type) {
-    switch (type) {
-      case 'Thu nhập':
-        return {'icon': Icons.arrow_downward, 'backgroundColor': Colors.green};
-      case 'Chi tiêu':
-        return {'icon': Icons.arrow_upward, 'backgroundColor': Colors.red};
-      case 'Chuyển khoản':
-        return {'icon': Icons.swap_horiz, 'backgroundColor': Colors.blue};
-      case 'Đi vay':
-        return {'icon': Icons.call_received, 'backgroundColor': Colors.purple};
-      case 'Cho vay':
-        return {'icon': Icons.call_made, 'backgroundColor': Colors.orange};
-      case 'Điều chỉnh số dư':
-        return {'icon': Icons.tune, 'backgroundColor': Colors.teal};
-      default:
-        return {'icon': Icons.help_outline, 'backgroundColor': Colors.grey};
+  // --- Các hàm helper nội bộ (Giữ nguyên logic key gốc) ---
+  static Map<String, dynamic> getTransactionIcon(String typeKey) {
+    switch (typeKey) {
+      case 'income': return {'icon': Icons.arrow_downward, 'backgroundColor': Colors.green};
+      case 'expense': return {'icon': Icons.arrow_upward, 'backgroundColor': Colors.red};
+      case 'transfer': return {'icon': Icons.swap_horiz, 'backgroundColor': Colors.blue};
+      case 'borrow': return {'icon': Icons.call_received, 'backgroundColor': Colors.purple};
+      case 'lend': return {'icon': Icons.call_made, 'backgroundColor': Colors.orange};
+      case 'adjustment': return {'icon': Icons.tune, 'backgroundColor': Colors.teal};
+      default: return {'icon': Icons.help_outline, 'backgroundColor': Colors.grey};
     }
   }
 
-  static Color getAmountColor(String type, BuildContext context,) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (type) {
-      case 'Thu nhập':
-      case 'Đi vay':
-        return AppTheme.incomeColor;
-      case 'Chi tiêu':
-      case 'Cho vay':
-        return AppTheme.expenseColor;
-      case 'Chuyển khoản':
-      case 'Điều chỉnh số dư':
-      default:
-        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8);
+  static Color getAmountColor(BuildContext context, String typeKey) {
+    switch (typeKey) {
+      case 'income': case 'borrow': return AppTheme.incomeColor;
+      case 'expense': case 'lend': return AppTheme.expenseColor;
+      default: return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8); // theme
     }
   }
 
-  static String getAmountPrefix(String type, BuildContext context,) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (type) {
-      case 'Thu nhập':
-      case 'Đi vay':
-        return '+ ';
-      case 'Chi tiêu':
-      case 'Cho vay':
-        return '- ';
-      default:
-        return '';
+  static String getAmountPrefix(BuildContext context, String typeKey) {
+    switch (typeKey) {
+      case 'income': case 'borrow': return '+ ';
+      case 'expense': case 'lend': return '- ';
+      default: return '';
     }
   }
 }

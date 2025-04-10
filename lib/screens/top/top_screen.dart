@@ -76,8 +76,6 @@ class TopScreenState extends State<TopScreen> {
         onPressed: _addTransaction,
         backgroundColor: theme.colorScheme.primary, // Sử dụng màu từ theme
         foregroundColor: theme.colorScheme.onPrimary, // Màu icon trên FAB
-        elevation: 2.0, // Giảm elevation chút
-        shape: const CircleBorder(), // Đảm bảo hình tròn
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, // Neo FAB vào giữa

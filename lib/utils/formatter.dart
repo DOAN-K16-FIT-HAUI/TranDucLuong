@@ -14,7 +14,7 @@ class Formatter {
 
   // Format số nguyên sang chuỗi có dấu phân cách ngàn
   static String formatCurrency(double value) {
-    final formatter = NumberFormat('#,### đ');
+    final formatter = NumberFormat('#,###');
     return formatter.format(value);
   }
 

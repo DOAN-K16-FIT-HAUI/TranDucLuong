@@ -64,13 +64,13 @@ class AccountScreen extends StatelessWidget {
                 ),
               );
             } else if (state is AccountLoggedOut) {
-              print("AccountLoggedOut state received. Should redirect to login via GoRouter.");
+              AppRoutes.navigateToLogin(context);
             }
           },
           child: BlocBuilder<AccountBloc, AccountState>(
             builder: (context, state) {
               if (state is AccountLoading) {
-                return CommonWidgets.buildLoadingIndicator(context);
+                return CommonWidgets.buildLoadingIndicator(context: context);
               } else if (state is AccountLoaded) {
                 final isEmailLogin = state.user.loginMethod == 'email';
                 return SingleChildScrollView(
@@ -376,12 +376,29 @@ class AccountScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final languages = ['Tiếng Việt', 'English', '日本語'];
 
+    final List<DropdownMenuItem<String>> languageDropdownItems = languages
+        .map<DropdownMenuItem<String>>((String languageValue) {
+      return DropdownMenuItem<String>(
+        value: languageValue, // Giá trị sẽ được trả về khi chọn
+        child: Text(
+          languageValue,
+          // Có thể thêm style nếu muốn
+          // style: GoogleFonts.poppins(color: theme.colorScheme.onSurface),
+        ),
+      );
+    }).toList();
+
+    // Đảm bảo giá trị hiện tại nằm trong danh sách, nếu không thì dùng giá trị đầu tiên
+    final String currentValue = languages.contains(state.user.language)
+        ? state.user.language!
+        : languages.first;
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       child: CommonWidgets.buildDropdownField(
         label: l10n.language,
         value: state.user.language ?? 'Tiếng Việt',
-        items: languages,
+        items: languageDropdownItems,
         onChanged: (newLanguage) {
           if (newLanguage != null) {
             context.read<AccountBloc>().add(ChangeLanguageEvent(newLanguage));

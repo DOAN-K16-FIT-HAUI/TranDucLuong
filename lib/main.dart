@@ -74,12 +74,15 @@ class MyApp extends StatelessWidget {
         builder: (context, themeState) {
           return BlocBuilder<LocalizationBloc, LocalizationState>(
             builder: (context, localizationState) {
+              final themeData = themeState.themeData;
+              final locale = localizationState.locale;
+
               return MaterialApp.router(
                 routerConfig: AppRoutes.router,
                 debugShowCheckedModeBanner: false,
                 title: AppLocalizations.of(context)?.appTitle ?? 'Finance App',
-                theme: themeState.themeData,
-                locale: localizationState.locale,
+                theme: themeData,
+                locale: locale,
                 supportedLocales: const [
                   Locale('en', 'US'),
                   Locale('vi', 'VN'),
