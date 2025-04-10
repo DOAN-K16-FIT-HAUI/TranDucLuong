@@ -107,5 +107,109 @@
     "thisTransaction": "this transaction",
     "noMatchingTransactions": "No matching transactions found",
     "groupNotesPlaceholder": "Group Notes",
-    "reportsPlaceholder": "Reports"
+    "reportsPlaceholder": "Reports",
+    "myWalletsTitle": "My Wallets",
+    "searchWalletsHint": "Search wallets...",
+    "tabAccounts": "Accounts",
+    "tabSavings": "Savings",
+    "tabInvestments": "Investments",
+    "addWalletTooltip": "Add new wallet",
+    "addWalletDialogTitle": "Add New Wallet",
+    "addWalletButton": "Add",
+    "walletNameLabel": "Wallet Name",
+    "walletNameHint": "Enter wallet name",
+    "iconLabel": "Icon",
+    "thisWallet": "this wallet",
+    "editWalletDialogTitle": "Edit Wallet",
+    "saveButton": "Save",
+    "noWalletsFound": "No wallets found",
+    "totalBalance": "Total Balance",
+    "confirmDeleteWalletContent": "Are you sure you want to delete the wallet \"{walletName}\"? This action cannot be undone.",
+    "@confirmDeleteWalletContent": {
+        "description": "Confirmation message for deleting a wallet",
+        "placeholders": {
+            "walletName": {
+                "type": "String",
+                "example": "Cash"
+            }
+        }
+    },
+    "errorLoadingWallets": "Error loading wallets. Please try again.",
+    "noWalletsFoundSearch": "No wallets found matching your search.",
+    "noWalletsInThisCategory": "No wallets in this category yet.",
+    "addWalletSuggestion": "Press the '+' button to add one!",
+    "genericError": "An unexpected error occurred.",
+    "loginToAddTransaction": "Please log in to add transactions.",
+    "checkDateError": "Please check the selected dates.",
+    "userNotLoggedInError": "User not logged in.",
+    "selectSourceAndDestinationWalletError": "Please select both source and destination wallets.",
+    "sourceAndDestinationWalletCannotBeSameError": "Source and destination wallets cannot be the same.",
+    "selectWalletForTransactionError": "Please select a wallet for the {transactionType} transaction.",
+    "@selectWalletForTransactionError": {
+        "placeholders": {
+            "transactionType": { "type": "String" }
+        }
+    },
+    "insufficientBalanceError": "Insufficient balance in wallet \"{walletName}\" ({balance}) to perform transaction of {amount}.",
+    "@insufficientBalanceError": {
+        "placeholders": {
+            "walletName": { "type": "String" },
+            "balance": { "type": "String" },
+            "amount": { "type": "String" }
+        }
+    },
+    "checkInputError": "Please check the entered information again.",
+    "noWalletsAvailable": "No wallets available!",
+    "pleaseCreateWalletFirst": "Please create a wallet in Wallet Management before adding transactions.",
+    "goToWalletManagement": "Go to Wallet Management",
+    "pleaseLoginToManageTransactions": "Please log in to manage transactions.",
+    "saveTransactionTooltip": "Save transaction",
+    "walletToAdjustLabel": "Wallet to Adjust",
+    "actualBalanceAfterAdjustmentLabel": "Actual Balance After Adjustment",
+    "transactionTypeName": "{key, select, income{Income} expense{Expense} transfer{Transfer} borrow{Borrow} lend{Lend} adjustment{Adjustment} other{Transaction}}",
+    "@transactionTypeName": {
+        "description": "Display name for transaction type key",
+        "placeholders": {
+            "key": {"type": "String"}
+        }
+    },
+    "invalidAmount": "Invalid amount",
+    "amountMustBePositive": "Amount must be greater than 0",
+    "insufficientBalanceShortError": "Insufficient balance ({balance})",
+    "@insufficientBalanceShortError": {
+       "placeholders": { "balance": { "type": "String" } }
+    },
+    "pleaseEnterBalance": "Please enter balance",
+    "invalidBalance": "Invalid balance",
+    "balanceCannotBeNegative": "Balance cannot be negative",
+    "pleaseSelectCategory": "Please select category",
+    "pleaseEnterValue": "Please enter value",
+    "pleaseEnterDescription": "Please enter description.",
+    "descriptionTooLong": "Description too long (max 100 chars).",
+    "fieldCannotBeEmpty": "{fieldName} cannot be empty.",
+    "@fieldCannotBeEmpty": {"placeholders": {"fieldName": {"type": "String"}}},
+    "pleaseSelectDate": "Please select a date.",
+    "dateCannotBeInFuture": "Date cannot be in the future.",
+    "repaymentDateCannotBeBeforeTransactionDate": "Repayment date cannot be before the transaction date.",
+    "pleaseEnterActualBalance": "Please enter the actual balance.",
+    "pleaseSelectField": "Please select {fieldName}.",
+    "@pleaseSelectField": {"placeholders": {"fieldName": {"type": "String"}}},
+    "fieldCannotBeSameAsSource": "{fieldName} cannot be the same as the Source Wallet.",
+    "@fieldCannotBeSameAsSource": {"placeholders": {"fieldName": {"type": "String"}}},
+    "cancelButton": "Cancel",
+      "@cancelButton": {
+        "description": "Label for the cancel button in dialogs",
+        "type": "text"
+      },
+  "confirmDeleteTransactionContent": "Are you sure you want to delete the transaction '{description}'?",
+    "@confirmDeleteTransactionContent": {
+      "description": "Confirmation message for deleting a transaction with its description",
+      "type": "text",
+      "placeholders": {
+        "description": {
+          "type": "Object",
+          "description": "The description of the transaction to be deleted"
+        }
+      }
+    }
 }

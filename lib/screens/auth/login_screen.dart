@@ -93,7 +93,7 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildSubmitButton('Đăng nhập', _login, context),
+                  CommonWidgets.buildSubmitButton(context, 'Đăng nhập', _login),
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,7 +147,7 @@ class LoginScreenState extends State<LoginScreen> {
                             () => context.read<AuthBloc>().add(
                               const SignInWithFacebookRequested(),
                             ),
-                        color: AppTheme.lightTheme.colorScheme.primary,
+                        color: AppTheme.lightTheme.colorScheme.surface,
                         text: 'f',
                       ),
                       CommonWidgets.buildSocialLoginButton(

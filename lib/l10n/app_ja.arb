@@ -107,5 +107,109 @@
     "thisTransaction": "この取引",
     "noMatchingTransactions": "一致する取引が見つかりません",
     "groupNotesPlaceholder": "グループノート",
-    "reportsPlaceholder": "レポート"
+    "reportsPlaceholder": "レポート",
+    "myWalletsTitle": "マイウォレット",
+    "searchWalletsHint": "ウォレットを検索...",
+    "tabAccounts": "口座",
+    "tabSavings": "貯蓄",
+    "tabInvestments": "投資",
+    "addWalletTooltip": "新しいウォレットを追加",
+    "addWalletDialogTitle": "新しいウォレットを追加",
+    "addWalletButton": "追加",
+    "walletNameLabel": "ウォレット名",
+    "walletNameHint": "ウォレット名を入力",
+    "iconLabel": "アイコン",
+    "thisWallet": "このウォレット",
+    "editWalletDialogTitle": "ウォレットを編集",
+    "saveButton": "保存",
+    "noWalletsFound": "ウォレットが見つかりません",
+    "totalBalance": "合計残高",
+    "confirmDeleteWalletContent": "ウォレット「{walletName}」を削除してもよろしいですか？この操作は元に戻せません。",
+    "@confirmDeleteWalletContent": {
+        "description": "ウォレット削除の確認メッセージ",
+        "placeholders": {
+            "walletName": {
+                "type": "String",
+                "example": "現金"
+            }
+        }
+    },
+    "errorLoadingWallets": "ウォレットの読み込みエラー。再試行してください。",
+    "noWalletsFoundSearch": "検索に一致するウォレットが見つかりません。",
+    "noWalletsInThisCategory": "このカテゴリにはまだウォレットがありません。",
+    "addWalletSuggestion": "「+」ボタンを押して追加してください！",
+    "genericError": "予期せぬエラーが発生しました。",
+    "loginToAddTransaction": "取引を追加するにはログインしてください。",
+    "checkDateError": "選択した日付を確認してください。",
+    "userNotLoggedInError": "ユーザーがログインしていません。",
+    "selectSourceAndDestinationWalletError": "支払元と入金先の両方のウォレットを選択してください。",
+    "sourceAndDestinationWalletCannotBeSameError": "支払元と入金先のウォレットを同じにすることはできません。",
+    "selectWalletForTransactionError": "{transactionType} 取引のウォレットを選択してください。",
+    "@selectWalletForTransactionError": {
+        "placeholders": {
+            "transactionType": { "type": "String" }
+        }
+    },
+    "insufficientBalanceError": "ウォレット「{walletName}」（残高{balance}）では、{amount} の取引を実行するには残高が不足しています。",
+    "@insufficientBalanceError": {
+        "placeholders": {
+            "walletName": { "type": "String" },
+            "balance": { "type": "String" },
+            "amount": { "type": "String" }
+        }
+    },
+    "checkInputError": "入力情報を再確認してください。",
+    "noWalletsAvailable": "利用可能なウォレットがありません！",
+    "pleaseCreateWalletFirst": "取引を追加する前に、ウォレット管理でウォレットを作成してください。",
+    "goToWalletManagement": "ウォレット管理へ",
+    "pleaseLoginToManageTransactions": "取引を管理するにはログインしてください。",
+    "saveTransactionTooltip": "取引を保存",
+    "walletToAdjustLabel": "調整するウォレット",
+    "actualBalanceAfterAdjustmentLabel": "調整後の実際残高",
+    "transactionTypeName": "{key, select, income{収入} expense{支出} transfer{振替} borrow{借入} lend{貸付} adjustment{残高調整} other{取引}}",
+    "@transactionTypeName": {
+        "description": "取引種類キーの表示名",
+        "placeholders": {
+            "key": {"type": "String"}
+        }
+    },
+    "invalidAmount": "無効な金額",
+    "amountMustBePositive": "金額は0より大きい必要があります",
+    "insufficientBalanceShortError": "残高不足 ({balance})",
+    "@insufficientBalanceShortError": {
+       "placeholders": { "balance": { "type": "String" } }
+    },
+    "pleaseEnterBalance": "残高を入力してください",
+    "invalidBalance": "無効な残高",
+    "balanceCannotBeNegative": "残高をマイナスにすることはできません",
+    "pleaseSelectCategory": "カテゴリを選択してください",
+    "pleaseEnterValue": "値を入力してください",
+    "pleaseEnterDescription": "説明を入力してください。",
+    "descriptionTooLong": "説明が長すぎます（最大100文字）。",
+    "fieldCannotBeEmpty": "{fieldName} は空にできません。",
+    "@fieldCannotBeEmpty": {"placeholders": {"fieldName": {"type": "String"}}},
+    "pleaseSelectDate": "日付を選択してください。",
+    "dateCannotBeInFuture": "未来の日付は選択できません。",
+    "repaymentDateCannotBeBeforeTransactionDate": "返済予定日は取引日より前に設定できません。",
+    "pleaseEnterActualBalance": "実際の残高を入力してください。",
+    "pleaseSelectField": "{fieldName} を選択してください。",
+    "@pleaseSelectField": {"placeholders": {"fieldName": {"type": "String"}}},
+    "fieldCannotBeSameAsSource": "{fieldName} は支払元ウォレットと同じにすることはできません。",
+    "@fieldCannotBeSameAsSource": {"placeholders": {"fieldName": {"type": "String"}}},
+    "cancelButton": "キャンセル",
+      "@cancelButton": {
+        "description": "Label for the cancel button in dialogs",
+        "type": "text"
+      },
+    "confirmDeleteTransactionContent": "取引 '{description}' を削除してもよろしいですか？",
+      "@confirmDeleteTransactionContent": {
+        "description": "Confirmation message for deleting a transaction with its description",
+        "type": "text",
+        "placeholders": {
+          "description": {
+            "type": "Object",
+            "description": "The description of the transaction to be deleted"
+          }
+        }
+      }
 }

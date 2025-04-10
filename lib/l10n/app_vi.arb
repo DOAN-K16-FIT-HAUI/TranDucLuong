@@ -107,5 +107,114 @@
     "thisTransaction": "giao dịch này",
     "noMatchingTransactions": "Không tìm thấy giao dịch phù hợp",
     "groupNotesPlaceholder": "Ghi chú nhóm",
-    "reportsPlaceholder": "Báo cáo"
+    "reportsPlaceholder": "Báo cáo",
+    "myWalletsTitle": "Ví của tôi",
+    "searchWalletsHint": "Tìm kiếm ví...",
+    "tabAccounts": "Tài khoản",
+    "tabSavings": "Tiết kiệm",
+    "tabInvestments": "Đầu tư",
+    "addWalletTooltip": "Thêm ví mới",
+    "addWalletDialogTitle": "Thêm ví mới",
+    "addWalletButton": "Thêm",
+    "walletNameLabel": "Tên ví",
+    "walletNameHint": "Nhập tên ví",
+    "iconLabel": "Biểu tượng",
+    "thisWallet": "ví này",
+    "editWalletDialogTitle": "Sửa thông tin ví",
+    "saveButton": "Lưu",
+    "noWalletsFound": "Không tìm thấy ví nào",
+    "totalBalance": "Tổng số dư",
+    "confirmDeleteWalletContent": "Bạn có chắc chắn muốn xóa ví \"{walletName}\" không? Hành động này không thể hoàn tác.",
+    "@confirmDeleteWalletContent": {
+        "description": "Thông báo xác nhận xóa một ví",
+        "placeholders": {
+            "walletName": {
+                "type": "String",
+                "example": "Tiền mặt"
+            }
+        }
+    },
+    "errorLoadingWallets": "Lỗi tải danh sách ví. Vui lòng thử lại.",
+    "noWalletsFoundSearch": "Không tìm thấy ví phù hợp với tìm kiếm.",
+    "noWalletsInThisCategory": "Chưa có ví nào trong mục này.",
+    "addWalletSuggestion": "Nhấn nút '+' để thêm ví!",
+    "genericError": "Đã có lỗi không mong muốn xảy ra.",
+    "loginToAddTransaction": "Vui lòng đăng nhập để thêm giao dịch.",
+    "checkDateError": "Vui lòng kiểm tra lại ngày đã chọn.",
+    "userNotLoggedInError": "Người dùng chưa đăng nhập.",
+    "selectSourceAndDestinationWalletError": "Vui lòng chọn cả ví nguồn và ví đích.",
+    "sourceAndDestinationWalletCannotBeSameError": "Ví nguồn và ví đích không được trùng nhau.",
+    "selectWalletForTransactionError": "Vui lòng chọn ví cho giao dịch {transactionType}.",
+    "@selectWalletForTransactionError": {
+        "placeholders": {
+            "transactionType": { "type": "String" }
+        }
+    },
+    "insufficientBalanceError": "Số dư trong ví \"{walletName}\" không đủ ({balance}) để thực hiện giao dịch {amount}.",
+    "@insufficientBalanceError": {
+        "placeholders": {
+            "walletName": { "type": "String" },
+            "balance": { "type": "String" },
+            "amount": { "type": "String" }
+        }
+    },
+    "checkInputError": "Vui lòng kiểm tra lại thông tin đã nhập.",
+    "noWalletsAvailable": "Bạn chưa có ví nào!",
+    "pleaseCreateWalletFirst": "Vui lòng tạo ví trong phần Quản lý Ví trước khi thêm giao dịch.",
+    "goToWalletManagement": "Đến Quản lý Ví",
+    "pleaseLoginToManageTransactions": "Vui lòng đăng nhập để quản lý giao dịch.",
+    "saveTransactionTooltip": "Lưu giao dịch",
+    "walletToAdjustLabel": "Ví cần điều chỉnh",
+    "actualBalanceAfterAdjustmentLabel": "Số dư thực tế sau điều chỉnh",
+    "transactionTypeName": "{key, select, income{Thu nhập} expense{Chi tiêu} transfer{Chuyển khoản} borrow{Đi vay} lend{Cho vay} adjustment{Điều chỉnh số dư} other{Giao dịch}}",
+    "@transactionTypeName": {
+        "description": "Tên hiển thị cho khóa loại giao dịch",
+        "placeholders": {
+            "key": {"type": "String"}
+        }
+    },
+    "invalidAmount": "Số tiền không hợp lệ",
+    "amountMustBePositive": "Số tiền phải lớn hơn 0",
+    "insufficientBalanceShortError": "Số dư không đủ ({balance})",
+    "@insufficientBalanceShortError": {
+       "placeholders": { "balance": { "type": "String" } }
+    },
+    "pleaseEnterBalance": "Vui lòng nhập số dư",
+    "invalidBalance": "Số dư không hợp lệ",
+    "balanceCannotBeNegative": "Số dư không thể âm",
+    "pleaseSelectCategory": "Vui lòng chọn danh mục",
+    "pleaseEnterValue": "Vui lòng nhập giá trị",
+    "pleaseEnterDescription": "Vui lòng nhập diễn giải.",
+    "descriptionTooLong": "Diễn giải quá dài (tối đa 100 ký tự).",
+    "fieldCannotBeEmpty": "{fieldName} không được để trống.",
+    "@fieldCannotBeEmpty": {"placeholders": {"fieldName": {"type": "String"}}},
+    "pleaseSelectDate": "Vui lòng chọn ngày.",
+    "dateCannotBeInFuture": "Ngày không được trong tương lai.",
+    "repaymentDateCannotBeBeforeTransactionDate": "Ngày hẹn trả không được trước ngày giao dịch.",
+    "pleaseEnterActualBalance": "Vui lòng nhập số dư thực tế.",
+    "pleaseSelectField": "Vui lòng chọn {fieldName}.",
+    "@pleaseSelectField": {"placeholders": {"fieldName": {"type": "String"}}},
+    "fieldCannotBeSameAsSource": "{fieldName} không được trùng với Ví nguồn.",
+    "@fieldCannotBeSameAsSource": {"placeholders": {"fieldName": {"type": "String"}}},
+    "cancelButton": "Hủy",
+      "@cancelButton": {
+        "description": "Label for the cancel button in dialogs",
+        "type": "text"
+      },
+      "cancelButton": "Hủy",
+        "@cancelButton": {
+          "description": "Label for the cancel button in dialogs",
+          "type": "text"
+        },
+    "confirmDeleteTransactionContent": "Bạn có chắc chắn muốn xóa giao dịch '{description}' không?",
+      "@confirmDeleteTransactionContent": {
+        "description": "Confirmation message for deleting a transaction with its description",
+        "type": "text",
+        "placeholders": {
+          "description": {
+            "type": "Object",
+            "description": "The description of the transaction to be deleted"
+          }
+        }
+      }
 }
