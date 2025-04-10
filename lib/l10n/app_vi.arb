@@ -216,5 +216,21 @@
             "description": "The description of the transaction to be deleted"
           }
         }
-      }
+      },
+      "transactionTypeIncome": "Thu nhập",
+        "transactionTypeExpense": "Chi tiêu",
+        "transactionTypeTransfer": "Chuyển khoản",
+        "transactionTypeBorrow": "Đi vay",
+        "transactionTypeLend": "Cho vay",
+        "transactionTypeAdjustment": "Điều chỉnh số dư",
+        "categoryFood": "Ẩn uống",
+        "categoryLiving": "Sinh hoạt",
+        "categoryTransport": "Đi lại",
+        "categoryHealth": "Sức khỏe",
+        "categoryShopping": "Mua sắm",
+        "categoryEntertainment": "Giải trí",
+        "categoryEducation": "Giáo dục",
+        "categoryBills": "Hóa đơn",
+        "categoryGift": "Quà tặng",
+        "categoryOther": "Khác"
 }

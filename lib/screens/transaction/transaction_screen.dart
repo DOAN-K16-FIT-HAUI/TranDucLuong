@@ -52,10 +52,6 @@ class TransactionScreenState extends State<TransactionScreen> {
   bool _isSaving = false;
   bool _isLoadingWallets = true;
 
-  final List _categories = Constants.availableCategories;
-  // !! Giữ nguyên logic dùng chuỗi cứng từ Constants !!
-  final List<String> _types = Constants.transactionTypes; // Sửa kiểu thành List<String>
-
   @override
   void initState() {
     super.initState();
@@ -68,10 +64,13 @@ class TransactionScreenState extends State<TransactionScreen> {
   }
 
   void _initializeDefaultValues() {
+    final l10n = AppLocalizations.of(context)!;
+    final categories = Constants.getAvailableCategories(l10n);
+    final types = Constants.getTransactionTypes(l10n);
     if (mounted) {
       setState(() {
-        _selectedCategory = _categories.isNotEmpty ? _categories.first as String : ''; // Ép kiểu nếu cần
-        _selectedType = _types.isNotEmpty ? _types.first : '';
+        _selectedCategory = categories.isNotEmpty ? categories.first : '';
+        _selectedType = types.isNotEmpty ? types.first : '';
         _setDefaultWallets();
       });
     }
@@ -192,13 +191,16 @@ class TransactionScreenState extends State<TransactionScreen> {
 
   void _resetForm() {
     _formKey.currentState?.reset();
+    final l10n = AppLocalizations.of(context)!;
+    final categories = Constants.getAvailableCategories(l10n);
+    final types = Constants.getTransactionTypes(l10n);
     if (mounted) {
       setState(() {
         _descriptionController.clear(); _amountController.clear(); _balanceAfterController.clear();
         _lenderController.clear(); _borrowerController.clear();
         _selectedDate = DateTime.now(); _repaymentDate = null;
-        _selectedCategory = _categories.isNotEmpty ? _categories.first as String : '';
-        _selectedType = _types.isNotEmpty ? _types.first : '';
+        _selectedCategory = categories.isNotEmpty ? categories.first : '';
+        _selectedType = types.isNotEmpty ? types.first : '';
         _dateError = null; _repaymentDateError = null;
         _setDefaultWallets();
       });
@@ -274,11 +276,11 @@ class TransactionScreenState extends State<TransactionScreen> {
 
               // --- Dropdown Items ---
               // !! Dùng giá trị hiển thị từ _types !!
-              final List<DropdownMenuItem<String>> transactionTypeItems = _types
+              final List<DropdownMenuItem<String>> transactionTypeItems = Constants.getTransactionTypes(l10n)
                   .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                   .toList();
-              final List<DropdownMenuItem<String>> categoryItems = _categories
-                  .map((cat) => DropdownMenuItem(value: cat as String, child: Text(cat))) // Ép kiểu nếu cần
+              final List<DropdownMenuItem<String>> categoryItems = Constants.getAvailableCategories(l10n)
+                  .map((cat) => DropdownMenuItem(value: cat, child: Text(cat))) // Ép kiểu nếu cần
                   .toList();
               final List<DropdownMenuItem<String>> walletDropdownItems = walletNames
                   .map((name) => DropdownMenuItem(value: name, child: Text(name)))

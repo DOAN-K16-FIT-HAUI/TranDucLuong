@@ -211,5 +211,21 @@
           "description": "The description of the transaction to be deleted"
         }
       }
-    }
+    },
+    "transactionTypeIncome": "Income",
+      "transactionTypeExpense": "Expense",
+      "transactionTypeTransfer": "Transfer",
+      "transactionTypeBorrow": "Borrow",
+      "transactionTypeLend": "Lend",
+      "transactionTypeAdjustment": "Adjustment",
+      "categoryFood": "Food",
+      "categoryLiving": "Living",
+      "categoryTransport": "Transport",
+      "categoryHealth": "Health",
+      "categoryShopping": "Shopping",
+      "categoryEntertainment": "Entertainment",
+      "categoryEducation": "Education",
+      "categoryBills": "Bills",
+      "categoryGift": "Gift",
+      "categoryOther": "Other"
 }
