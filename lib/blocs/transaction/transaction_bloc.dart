@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:finance_app/blocs/transaction/transaction_event.dart';
 import 'package:finance_app/blocs/transaction/transaction_state.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final TransactionRepository transactionRepository;
@@ -17,9 +18,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     emit(TransactionLoading());
     try {
       await transactionRepository.addTransaction(event.transaction);
-      emit(TransactionSuccess('Transaction added successfully'));
+      emit(TransactionSuccess(
+            (context) => AppLocalizations.of(context)!.transactionAddedSuccess,
+      ));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(
+            (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -27,9 +32,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     emit(TransactionLoading());
     try {
       await transactionRepository.updateTransaction(event.transaction);
-      emit(TransactionSuccess('Transaction updated successfully'));
+      emit(TransactionSuccess(
+            (context) => AppLocalizations.of(context)!.transactionUpdatedSuccess,
+      ));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(
+            (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -37,9 +46,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     emit(TransactionLoading());
     try {
       await transactionRepository.deleteTransaction(event.transactionId);
-      emit(TransactionSuccess('Transaction deleted successfully'));
+      emit(TransactionSuccess(
+            (context) => AppLocalizations.of(context)!.transactionDeletedSuccess,
+      ));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(
+            (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -51,7 +64,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         emit(TransactionLoaded(transactions));
       }
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(
+            (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 }

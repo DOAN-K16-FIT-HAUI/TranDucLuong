@@ -1,0 +1,298 @@
+{
+  "@@locale": "vi",
+  "appTitle": "Ứng dụng Tài chính",
+  "settingsTitle": "Cài đặt chung",
+  "passwordChangedSuccess": "Đổi mật khẩu thành công!",
+  "personalInfo": "Thông tin cá nhân",
+  "defaultUser": "Người dùng",
+  "appearance": "Giao diện",
+  "darkMode": "Chế độ tối",
+  "language": "Ngôn ngữ",
+  "selectLanguageError": "Vui lòng chọn một ngôn ngữ",
+  "security": "Bảo mật và quyền riêng tư",
+  "changePassword": "Đổi mật khẩu",
+  "biometrics": "Sinh trắc học",
+  "deleteAccount": "Xóa tài khoản",
+  "deleteAccountConfirm": "Bạn có chắc chắn xóa tài khoản không?",
+  "actionCannotBeUndone": "Hành động này không thể hoàn tác.",
+  "changePasswordTitle": "Đổi mật khẩu",
+  "confirm": "Xác nhận",
+  "oldPassword": "Mật khẩu cũ",
+  "enterOldPassword": "Nhập mật khẩu cũ",
+  "newPassword": "Mật khẩu mới",
+  "enterNewPassword": "Nhập mật khẩu mới",
+  "passwordMinLength": "Mật khẩu phải dài ít nhất 6 ký tự",
+  "confirmNewPassword": "Xác nhận mật khẩu mới",
+  "enterConfirmPassword": "Xác nhận mật khẩu mới",
+  "passwordsDoNotMatch": "Mật khẩu xác nhận không khớp",
+  "editPersonalInfo": "Sửa thông tin cá nhân",
+  "save": "Lưu",
+  "displayName": "Tên hiển thị",
+  "enterDisplayName": "Nhập tên hiển thị",
+  "photoUrl": "URL ảnh đại diện",
+  "enterPhotoUrl": "Nhập URL ảnh đại diện",
+  "invalidUrl": "URL không hợp lệ",
+  "confirmLogout": "Bạn có chắc chắn đăng xuất tài khoản không?",
+  "logout": "Đăng xuất",
+  "emailLabel": "Email",
+  "enterEmailHint": "Nhập email của bạn",
+  "invalidEmail": "Email không hợp lệ",
+  "passwordLabel": "Mật khẩu",
+  "enterPasswordHint": "Nhập mật khẩu của bạn",
+  "amountLabel": "Số tiền",
+  "enterAmountHint": "Nhập số tiền",
+  "cancel": "Hủy",
+  "accountTitle": "Tài khoản",
+  "backTooltip": "Quay lại",
+  "noItemsFound": "Không tìm thấy mục phù hợp",
+  "selectIconTitle": "Chọn biểu tượng",
+  "edit": "Sửa",
+  "delete": "Xóa",
+  "confirmDeleteTitle": "Xác nhận xóa",
+  "confirmDeleteContent": "Bạn có chắc chắn muốn xóa \"{itemName}\" không? Hành động này không thể hoàn tác.",
+  "@confirmDeleteContent": {
+    "description": "Thông báo xác nhận xóa một mục",
+    "placeholders": {
+      "itemName": {
+        "type": "String",
+        "example": "Lương"
+      }
+    }
+  },
+  "selectValueError": "Vui lòng chọn một giá trị",
+  "notSelected": "Chưa chọn",
+  "favoriteCategories": "Danh mục yêu thích",
+  "errorLoadingData": "Lỗi tải dữ liệu",
+  "retry": "Thử lại",
+  "noDescription": "(Không có mô tả)",
+  "from": "Từ",
+  "to": "Đến",
+  "borrowFrom": "Vay từ",
+  "lendTo": "Cho vay",
+  "wallet": "Ví",
+  "expenseType": "Chi tiêu",
+  "transferType": "Chuyển khoản",
+  "borrowType": "Đi vay",
+  "lendType": "Cho vay",
+  "incomeType": "Thu nhập",
+  "balanceAdjustmentType": "Điều chỉnh số dư",
+  "noTransactionsYet": "Chưa có giao dịch nào",
+  "addFirstTransactionHint": "Hãy nhấn nút '+' để tạo giao dịch đầu tiên!",
+  "addTransactionButton": "Thêm giao dịch",
+  "searchTransactions": "Tìm kiếm giao dịch",
+  "transactionHistoryTitle": "Lịch sử Giao dịch",
+  "closeSearchTooltip": "Đóng tìm kiếm",
+  "searchTooltip": "Tìm kiếm",
+  "searchTransactionsHint": "Tìm theo mô tả, loại, ví...",
+  "tabByDay": "Theo Ngày",
+  "tabByMonth": "Theo Tháng",
+  "tabByYear": "Theo Năm",
+  "addTransactionTooltip": "Thêm giao dịch mới",
+  "descriptionLabel": "Diễn giải",
+  "descriptionHint": "Nhập mô tả (vd: Ăn trưa, Tiền nhà)",
+  "transactionDateLabel": "Ngày giao dịch",
+  "transactionTypeLabel": "Loại giao dịch",
+  "expenseCategoryLabel": "Danh mục chi tiêu",
+  "fromWalletLabel": "Từ ví",
+  "toWalletLabel": "Đến ví",
+  "fromWalletSourceLabel": "Từ ví (Nguồn)",
+  "toWalletDestinationLabel": "Đến ví (Đích)",
+  "lenderLabel": "Người cho vay",
+  "lenderHint": "Tên người hoặc tổ chức cho vay",
+  "borrowerLabel": "Người vay tiền",
+  "borrowerHint": "Tên người hoặc tổ chức vay",
+  "repaymentDateOptionalLabel": "Ngày hẹn trả (tùy chọn)",
+  "editTransactionTitle": "Sửa giao dịch",
+  "errorUserNotAuthenticated": "Lỗi: Người dùng chưa được xác thực.",
+  "thisTransaction": "giao dịch này",
+  "noMatchingTransactions": "Không tìm thấy giao dịch phù hợp",
+  "groupNotesPlaceholder": "Ghi chú nhóm",
+  "reportsPlaceholder": "Báo cáo",
+  "myWalletsTitle": "Ví của tôi",
+  "searchWalletsHint": "Tìm kiếm ví...",
+  "tabAccounts": "Tài khoản",
+  "tabSavings": "Tiết kiệm",
+  "tabInvestments": "Đầu tư",
+  "addWalletTooltip": "Thêm ví mới",
+  "addWalletDialogTitle": "Thêm ví mới",
+  "addWalletButton": "Thêm",
+  "walletNameLabel": "Tên ví",
+  "walletNameHint": "Nhập tên ví",
+  "iconLabel": "Biểu tượng",
+  "thisWallet": "ví này",
+  "editWalletDialogTitle": "Sửa thông tin ví",
+  "saveButton": "Lưu",
+  "noWalletsFound": "Không tìm thấy ví nào",
+  "totalBalance": "Tổng số dư",
+  "confirmDeleteWalletContent": "Bạn có chắc chắn muốn xóa ví \"{walletName}\" không? Hành động này không thể hoàn tác.",
+  "@confirmDeleteWalletContent": {
+    "description": "Thông báo xác nhận xóa một ví",
+    "placeholders": {
+      "walletName": {
+        "type": "String",
+        "example": "Tiền mặt"
+      }
+    }
+  },
+  "errorLoadingWallets": "Lỗi tải danh sách ví. Vui lòng thử lại.",
+  "noWalletsFoundSearch": "Không tìm thấy ví phù hợp với tìm kiếm.",
+  "noWalletsInThisCategory": "Chưa có ví nào trong mục này.",
+  "addWalletSuggestion": "Nhấn nút '+' để thêm ví!",
+  "genericError": "Đã có lỗi không mong muốn xảy ra.",
+  "loginToAddTransaction": "Vui lòng đăng nhập để thêm giao dịch.",
+  "checkDateError": "Vui lòng kiểm tra lại ngày đã chọn.",
+  "userNotLoggedInError": "Người dùng chưa đăng nhập.",
+  "selectSourceAndDestinationWalletError": "Vui lòng chọn cả ví nguồn và ví đích.",
+  "sourceAndDestinationWalletCannotBeSameError": "Ví nguồn và ví đích không được trùng nhau.",
+  "selectWalletForTransactionError": "Vui lòng chọn ví cho giao dịch {transactionType}.",
+  "@selectWalletForTransactionError": {
+    "placeholders": {
+      "transactionType": {
+        "type": "String"
+      }
+    }
+  },
+  "insufficientBalanceError": "Số dư trong ví \"{walletName}\" không đủ ({balance}) để thực hiện giao dịch {amount}.",
+  "@insufficientBalanceError": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInputError": "Vui lòng kiểm tra lại thông tin đã nhập.",
+  "noWalletsAvailable": "Bạn chưa có ví nào!",
+  "pleaseCreateWalletFirst": "Vui lòng tạo ví trong phần Quản lý Ví trước khi thêm giao dịch.",
+  "goToWalletManagement": "Đến Quản lý Ví",
+  "pleaseLoginToManageTransactions": "Vui lòng đăng nhập để quản lý giao dịch.",
+  "saveTransactionTooltip": "Lưu giao dịch",
+  "walletToAdjustLabel": "Ví cần điều chỉnh",
+  "actualBalanceAfterAdjustmentLabel": "Số dư thực tế sau điều chỉnh",
+  "transactionTypeName": "{key, select, income{Thu nhập} expense{Chi tiêu} transfer{Chuyển khoản} borrow{Đi vay} lend{Cho vay} adjustment{Điều chỉnh số dư} other{Giao dịch}}",
+  "@transactionTypeName": {
+    "description": "Tên hiển thị cho khóa loại giao dịch",
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidAmount": "Số tiền không hợp lệ",
+  "amountMustBePositive": "Số tiền phải lớn hơn 0",
+  "insufficientBalanceShortError": "Số dư không đủ ({balance})",
+  "@insufficientBalanceShortError": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseEnterBalance": "Vui lòng nhập số dư",
+  "invalidBalance": "Số dư không hợp lệ",
+  "balanceCannotBeNegative": "Số dư không thể âm",
+  "pleaseSelectCategory": "Vui lòng chọn danh mục",
+  "pleaseEnterValue": "Vui lòng nhập giá trị",
+  "pleaseEnterDescription": "Vui lòng nhập diễn giải.",
+  "descriptionTooLong": "Diễn giải quá dài (tối đa 100 ký tự).",
+  "fieldCannotBeEmpty": "{fieldName} không được để trống.",
+  "@fieldCannotBeEmpty": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectDate": "Vui lòng chọn ngày.",
+  "dateCannotBeInFuture": "Ngày không được trong tương lai.",
+  "repaymentDateCannotBeBeforeTransactionDate": "Ngày hẹn trả không được trước ngày giao dịch.",
+  "pleaseEnterActualBalance": "Vui lòng nhập số dư thực tế.",
+  "pleaseSelectField": "Vui lòng chọn {fieldName}.",
+  "@pleaseSelectField": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldCannotBeSameAsSource": "{fieldName} không được trùng với Ví nguồn.",
+  "@fieldCannotBeSameAsSource": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelButton": "Hủy",
+  "@cancelButton": {
+    "description": "Label for the cancel button in dialogs",
+    "type": "text"
+  },
+  "confirmDeleteTransactionContent": "Bạn có chắc chắn muốn xóa giao dịch '{description}' không?",
+  "@confirmDeleteTransactionContent": {
+    "description": "Confirmation message for deleting a transaction with its description",
+    "type": "text",
+    "placeholders": {
+      "description": {
+        "type": "Object",
+        "description": "The description of the transaction to be deleted"
+      }
+    }
+  },
+  "transactionTypeIncome": "Thu nhập",
+  "transactionTypeExpense": "Chi tiêu",
+  "transactionTypeTransfer": "Chuyển khoản",
+  "transactionTypeBorrow": "Đi vay",
+  "transactionTypeLend": "Cho vay",
+  "transactionTypeAdjustment": "Điều chỉnh số dư",
+  "categoryFood": "Ăn uống",
+  "categoryLiving": "Sinh hoạt",
+  "categoryTransport": "Đi lại",
+  "categoryHealth": "Sức khỏe",
+  "categoryShopping": "Mua sắm",
+  "categoryEntertainment": "Giải trí",
+  "categoryEducation": "Giáo dục",
+  "categoryBills": "Hóa đơn",
+  "categoryGift": "Quà tặng",
+  "categoryOther": "Khác",
+  "requiresRecentLoginError": "Hành động này yêu cầu đăng nhập lại. Vui lòng đăng xuất và đăng nhập lại để tiếp tục.",
+  "wrongPasswordError": "Mật khẩu hiện tại không đúng. Vui lòng kiểm tra lại.",
+  "tooManyRequestsError": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+  "networkRequestFailedError": "Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+  "emailAlreadyInUseError": "Email này đã được sử dụng. Vui lòng chọn email khác.",
+  "invalidEmailError": "Email không hợp lệ. Vui lòng kiểm tra lại.",
+  "genericErrorWithMessage": "Đã xảy ra lỗi: {message}. Vui lòng thử lại.",
+  "invalidCredentialError": "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.",
+  "weakPasswordError": "Mật khẩu quá yếu. Vui lòng sử dụng mật khẩu mạnh hơn.",
+  "userDisabledError": "Tài khoản của bạn đã bị vô hiệu hóa.",
+  "userNotFoundError": "Không tìm thấy tài khoản với email này.",
+  "googleSignInCancelledError": "Đăng nhập bằng Google đã bị hủy.",
+  "googleSignInFailedError": "Đăng nhập bằng Google thất bại. Vui lòng thử lại.",
+  "facebookLoginCancelledError": "Đăng nhập bằng Facebook đã bị hủy.",
+  "facebookTokenNullError": "Không nhận được token từ Facebook. Vui lòng thử lại.",
+  "accountExistsWithDifferentCredentialError": "Tài khoản đã tồn tại với thông tin đăng nhập khác.",
+  "operationNotAllowedError": "Đăng nhập bằng Facebook chưa được kích hoạt trong Firebase.",
+  "forgotPasswordTitle": "Quên mật khẩu",
+  "enterEmailToResetPassword": "Nhập email để khôi phục mật khẩu",
+  "passwordResetRequestSent": "Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!",
+  "error": "Lỗi",
+  "loginTitle": "Đăng nhập",
+  "rememberPassword": "Ghi nhớ mật khẩu?",
+  "loginButton": "Đăng nhập",
+  "forgotPasswordQuestion": "Quên mật khẩu?",
+  "registerButton": "Đăng ký",
+  "or": "Hoặc",
+  "registerTitle": "Đăng ký",
+  "createAccountButton": "Tạo tài khoản",
+  "alreadyHaveAccount": "Đã có tài khoản? ",
+  "loginNow": "Đăng nhập ngay",
+  "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
+  "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
+  "transactionDeletedSuccess": "Giao dịch đã được xóa thành công",
+  "dashboardTitle": "Bảng điều khiển"
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Constants {
   static const List<Map<String, dynamic>> availableIcons = [
@@ -9,25 +10,30 @@ class Constants {
     {'name': 'Bitcoin', 'icon': Icons.currency_bitcoin_outlined},
   ];
 
-  static const List<String> transactionTypes = [
-    'Chi tiêu',
-    'Thu nhập',
-    'Chuyển khoản',
-    'Đi vay',
-    'Cho vay',
-    'Điều chỉnh số dư',
-  ];
+  static List<String> getTransactionTypes(AppLocalizations l10n) {
+    return [
+      l10n.transactionTypeExpense,
+      l10n.transactionTypeIncome,
+      l10n.transactionTypeTransfer,
+      l10n.transactionTypeBorrow,
+      l10n.transactionTypeLend,
+      l10n.transactionTypeAdjustment,
+    ];
+  }
 
-  static const List<String> availableCategories = [
-    'Ẩn uống',
-    'Sinh hoạt',
-    'Đi lại',
-    'Sức khỏe',
-    'Mua sắm',
-    'Giải trí',
-    'Giáo dục',
-    'Hóa đơn',
-    'Quà tặng',
-    'Khác',
-  ];
+  // Hàm lấy danh sách availableCategories từ l10n (nếu muốn dịch danh mục)
+  static List<String> getAvailableCategories(AppLocalizations l10n) {
+    return [
+      'food',
+      'living',
+      'transport',
+      'health',
+      'shopping',
+      'entertainment',
+      'education',
+      'bills',
+      'gift',
+      'other',
+    ];
+  }
 }

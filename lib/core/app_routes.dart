@@ -1,5 +1,6 @@
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_paths.dart';
+import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/app_notification/notification_screen.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
@@ -27,6 +28,7 @@ class AppRoutes {
   static const String appNotificationRoute = 'app-notification';
   static const String transactionRoute = 'transaction';
   static const String transactionListRoute = 'transaction-list';
+  static const String accountRoute = 'account';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -83,6 +85,11 @@ class AppRoutes {
         name: transactionListRoute,
         path: AppPaths.transactionListPath,
         builder: (context, state) => const TransactionListScreen(),
+      ),
+      GoRoute(
+        name: accountRoute,
+        path: AppPaths.accountPath,
+        builder: (context, state) => const AccountScreen(),
       ),
     ],
     redirect: (context, state) async {
@@ -153,4 +160,6 @@ class AppRoutes {
       context.goNamed(transactionRoute);
   static void navigateToTransactionList(BuildContext context) =>
       context.goNamed(transactionListRoute);
+  static void navigateToAccount(BuildContext context) =>
+      context.goNamed(accountRoute);
 }

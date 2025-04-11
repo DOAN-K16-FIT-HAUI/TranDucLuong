@@ -6,7 +6,7 @@ class AppPaths {
   static const String addTransactionPath = '/transactions/add';
   static const String editTransactionPath = '/transactions/:id';
   static const String categoriesPath = '/categories';
-  static const String settingsPath = '/settings';
+  static const String accountPath = '/account';
   static const String reportsPath = '/reports';
   static const String loginPath = '/login';
   static const String registerPath = '/register';

@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm để dùng l10n
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 
@@ -37,6 +38,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         wallets: [],
         savingsWallets: [],
         investmentWallets: [],
+        error: (context) => AppLocalizations.of(context)!.errorLoadingWallets,
       ));
     }
   }
@@ -53,6 +55,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       }
     } catch (e) {
       debugPrint("Error in Bloc adding wallet: $e");
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -78,6 +83,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       }
     } catch (e) {
       debugPrint("Error in Bloc editing wallet: $e");
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -93,6 +101,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       }
     } catch (e) {
       debugPrint("Error in Bloc deleting wallet: $e");
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
+      ));
     }
   }
 
@@ -106,7 +117,10 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       listToReorder = List.from(state.investmentWallets);
     }
 
-    if (event.oldIndex >= 0 && event.oldIndex < listToReorder.length && event.newIndex >= 0 && event.newIndex <= listToReorder.length) {
+    if (event.oldIndex >= 0 &&
+        event.oldIndex < listToReorder.length &&
+        event.newIndex >= 0 &&
+        event.newIndex <= listToReorder.length) {
       final Wallet item = listToReorder.removeAt(event.oldIndex);
       listToReorder.insert(event.newIndex, item);
 
@@ -123,6 +137,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       walletRepository.updateWalletOrder(listToReorder);
     } else {
       debugPrint("Reorder indices out of bounds: old=${event.oldIndex}, new=${event.newIndex}, len=${listToReorder.length}");
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.genericError,
+      ));
     }
   }
 

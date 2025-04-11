@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:finance_app/data/models/user.dart';
+import 'package:flutter/material.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -24,10 +25,6 @@ class AuthAuthenticated extends AuthState {
 class AuthUnauthenticated extends AuthState {}
 
 class AuthFailure extends AuthState {
-  final String error;
-
+  final String Function(BuildContext) error;
   const AuthFailure({required this.error});
-
-  @override
-  List<Object?> get props => [error];
 }
