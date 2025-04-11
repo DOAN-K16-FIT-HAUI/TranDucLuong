@@ -6,6 +6,7 @@ import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
 import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm import l10n
@@ -99,13 +100,10 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleAuthInitial(BuildContext context) {
     final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
     Navigator.of(context, rootNavigator: true).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.passwordResetRequestSent, // Sử dụng l10n
-        ),
-        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-      ),
+    UtilityWidgets.showCustomSnackBar(
+      context: context,
+      message: l10n.passwordResetRequestSent,
+      backgroundColor: AppTheme.lightTheme.colorScheme.primary,
     );
     AppRoutes.navigateToLogin(context);
   }
@@ -113,11 +111,10 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleAuthFailure(BuildContext context, String Function(BuildContext) error) {
     final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
     Navigator.of(context, rootNavigator: true).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${l10n.error}: ${error(context)}'), // Gọi error(context) để lấy chuỗi
-        backgroundColor: AppTheme.lightTheme.colorScheme.error,
-      ),
+    UtilityWidgets.showCustomSnackBar(
+      context: context,
+      message: '${l10n.error}: ${error(context)}',
+      backgroundColor: AppTheme.lightTheme.colorScheme.error,
     );
   }
 }

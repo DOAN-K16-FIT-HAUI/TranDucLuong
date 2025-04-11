@@ -145,7 +145,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     final groupKeys = groupedData.keys.toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0).copyWith(bottom: 80),
       itemCount: groupKeys.length,
       itemBuilder: (context, index) {
         final groupKey = groupKeys[index];
@@ -501,7 +501,8 @@ class _TransactionListScreenState extends State<TransactionListScreen>
         }
 
         if (dateError != null || repaymentDateError != null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.checkDateError)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.checkDateError),behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),),);
           return;
         }
 
@@ -509,18 +510,21 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           if (selectedType == l10n.transactionTypeTransfer) {
             if (selectedFromWallet.isEmpty || selectedToWallet.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.selectSourceAndDestinationWalletError)));
+                  SnackBar(content: Text(l10n.selectSourceAndDestinationWalletError),behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
               return;
             }
             if (walletNames.length > 1 && selectedFromWallet == selectedToWallet) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.sourceAndDestinationWalletCannotBeSameError)));
+                  SnackBar(content: Text(l10n.sourceAndDestinationWalletCannotBeSameError),behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
               return;
             }
           } else if (selectedType != l10n.transactionTypeIncome) {
             if (selectedWallet.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.selectWalletForTransactionError(selectedType))));
+                  SnackBar(content: Text(l10n.selectWalletForTransactionError(selectedType)),behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
               return;
             }
           }
@@ -550,7 +554,8 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(l10n.insufficientBalanceError(
-                        sourceWalletName, formattedSourceBalance, formattedAmount))),
+                        sourceWalletName, formattedSourceBalance, formattedAmount)),behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),),
               );
               return;
             }
@@ -588,10 +593,15 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               ),
             ),
           );
-          Navigator.of(context).pop();
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              Navigator.of(context).pop(); // Quay lại TransactionListScreen
+            }
+          });;
         } else {
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.checkInputError)));
+              .showSnackBar(SnackBar(content: Text(l10n.checkInputError),behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
         }
       },
     );
@@ -621,20 +631,19 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           body: BlocConsumer<TransactionBloc, TransactionState>(
             listener: (context, state) {
               if (state is TransactionSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message(context))),
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: state.message(context),
+                  backgroundColor: AppTheme.lightTheme.colorScheme.error,
                 );
                 if (_isInitialized && _userId != null) {
                   context.read<WalletBloc>().add(LoadWallets());
                 }
               } else if (state is TransactionError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("${l10n.genericError}: ${state.message(context)}",
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: Theme.of(context).colorScheme.surface)),
-                    backgroundColor: AppTheme.expenseColor,
-                  ),
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: "${l10n.genericError}: ${state.message(context)}",
+                  backgroundColor: AppTheme.expenseColor,
                 );
               }
             },
