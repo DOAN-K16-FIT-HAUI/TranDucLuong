@@ -1,15 +1,25 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class ThemeState extends Equatable {
+class ThemeState {
   final ThemeData themeData;
   final bool isDarkMode;
+  final String Function(BuildContext)? error;
 
-  const ThemeState({
+  ThemeState({
     required this.themeData,
     required this.isDarkMode,
+    this.error,
   });
 
-  @override
-  List<Object?> get props => [themeData, isDarkMode];
+  ThemeState copyWith({
+    ThemeData? themeData,
+    bool? isDarkMode,
+    String Function(BuildContext)? error,
+  }) {
+    return ThemeState(
+      themeData: themeData ?? this.themeData,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
+      error: error ?? this.error,
+    );
+  }
 }

@@ -3,9 +3,12 @@ import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/buttons.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm import l10n
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -34,11 +37,12 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; // Lấy l10n
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: CommonWidgets.buildAppBar(
+      appBar: AppBarTabBar.buildAppBar(
         context: context,
-        title: 'Quên mật khẩu',
+        title: l10n.forgotPasswordTitle, // Sử dụng l10n
         showBackButton: true,
         onBackPressed: () => AppRoutes.navigateToLogin(context),
       ),
@@ -62,18 +66,18 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'Nhập email để khôi phục mật khẩu',
+                  l10n.enterEmailToResetPassword, // Sử dụng l10n
                   style: TextStyle(
                     fontSize: 16,
                     color: AppTheme.lightTheme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 20),
-                CommonWidgets.buildEmailField(controller: _emailController),
+                InputFields.buildEmailField(controller: _emailController),
                 const SizedBox(height: 20),
-                CommonWidgets.buildSubmitButton(
+                Buttons.buildSubmitButton(
                   context,
-                  'Xác nhận',
+                  l10n.confirm, // Sử dụng l10n
                   _resetPassword,
                 ),
               ],
@@ -93,11 +97,12 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void _handleAuthInitial(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
     Navigator.of(context, rootNavigator: true).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text(
-          'Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!',
+        content: Text(
+          l10n.passwordResetRequestSent, // Sử dụng l10n
         ),
         backgroundColor: AppTheme.lightTheme.colorScheme.primary,
       ),
@@ -105,11 +110,12 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     AppRoutes.navigateToLogin(context);
   }
 
-  void _handleAuthFailure(BuildContext context, String error) {
+  void _handleAuthFailure(BuildContext context, String Function(BuildContext) error) {
+    final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
     Navigator.of(context, rootNavigator: true).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Lỗi: $error'),
+        content: Text('${l10n.error}: ${error(context)}'), // Gọi error(context) để lấy chuỗi
         backgroundColor: AppTheme.lightTheme.colorScheme.error,
       ),
     );

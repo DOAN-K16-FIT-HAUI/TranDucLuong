@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:finance_app/data/models/user.dart';
+import 'package:flutter/material.dart';
 
 abstract class AccountState extends Equatable {
   const AccountState();
@@ -20,12 +21,8 @@ class AccountLoaded extends AccountState {
 }
 
 class AccountError extends AccountState {
-  final String message;
-
+  final String Function(BuildContext context) message;
   const AccountError(this.message);
-
-  @override
-  List<Object?> get props => [message];
 }
 
 class AccountPasswordChanged extends AccountState {}

@@ -3,9 +3,12 @@ import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/buttons.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm import l10n
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,11 +37,12 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; // Lấy l10n
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: CommonWidgets.buildAppBar(
+      appBar: AppBarTabBar.buildAppBar(
         context: context,
-        title: 'Đăng nhập',
+        title: l10n.loginTitle, // Sử dụng l10n
         showBackButton: false,
       ),
       body: BlocListener<AuthBloc, AuthState>(
@@ -48,7 +52,7 @@ class LoginScreenState extends State<LoginScreen> {
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error),
+                content: Text(state.error(context)), // Gọi error(context)
                 backgroundColor: AppTheme.lightTheme.colorScheme.error,
               ),
             );
@@ -64,12 +68,12 @@ class LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
-                  CommonWidgets.buildEmailField(controller: _emailController),
+                  InputFields.buildEmailField(controller: _emailController),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildPasswordField(
+                  InputFields.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                    () => setState(() {
+                        () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
                   ),
@@ -78,14 +82,13 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       Checkbox(
                         value: _rememberPassword,
-                        onChanged:
-                            (value) => setState(() {
-                              _rememberPassword = value ?? false;
-                            }),
+                        onChanged: (value) => setState(() {
+                          _rememberPassword = value ?? false;
+                        }),
                         activeColor: AppTheme.lightTheme.colorScheme.primary,
                       ),
                       Text(
-                        'Ghi nhớ mật khẩu?',
+                        l10n.rememberPassword, // Sử dụng l10n
                         style: TextStyle(
                           color: AppTheme.lightTheme.colorScheme.onSurface,
                         ),
@@ -93,16 +96,15 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildSubmitButton(context, 'Đăng nhập', _login),
+                  Buttons.buildSubmitButton(context, l10n.loginButton, _login), // Sử dụng l10n
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed:
-                            () => AppRoutes.navigateToForgotPassword(context),
+                        onPressed: () => AppRoutes.navigateToForgotPassword(context),
                         child: Text(
-                          'Quên mật khẩu?',
+                          l10n.forgotPasswordQuestion, // Sử dụng l10n
                           style: TextStyle(
                             color: AppTheme.lightTheme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -112,7 +114,7 @@ class LoginScreenState extends State<LoginScreen> {
                       TextButton(
                         onPressed: () => AppRoutes.navigateToRegister(context),
                         child: Text(
-                          'Đăng ký',
+                          l10n.registerButton, // Sử dụng l10n
                           style: TextStyle(
                             color: AppTheme.lightTheme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -128,7 +130,7 @@ class LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          'Hoặc',
+                          l10n.or, // Sử dụng l10n
                           style: TextStyle(
                             color: AppTheme.lightTheme.colorScheme.onSurface,
                           ),
@@ -141,21 +143,19 @@ class LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      CommonWidgets.buildSocialLoginButton(
+                      Buttons.buildSocialLoginButton(
                         context: context,
-                        onPressed:
-                            () => context.read<AuthBloc>().add(
-                              const SignInWithFacebookRequested(),
-                            ),
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithFacebookRequested(),
+                        ),
                         color: AppTheme.lightTheme.colorScheme.surface,
                         text: 'f',
                       ),
-                      CommonWidgets.buildSocialLoginButton(
+                      Buttons.buildSocialLoginButton(
                         context: context,
-                        onPressed:
-                            () => context.read<AuthBloc>().add(
-                              const SignInWithGoogleRequested(),
-                            ),
+                        onPressed: () => context.read<AuthBloc>().add(
+                          const SignInWithGoogleRequested(),
+                        ),
                         color: Colors.white,
                         text: 'G',
                         textColor: Colors.black,

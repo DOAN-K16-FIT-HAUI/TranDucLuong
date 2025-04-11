@@ -12,8 +12,8 @@ class Constants {
 
   static List<String> getTransactionTypes(AppLocalizations l10n) {
     return [
-      l10n.transactionTypeIncome,
       l10n.transactionTypeExpense,
+      l10n.transactionTypeIncome,
       l10n.transactionTypeTransfer,
       l10n.transactionTypeBorrow,
       l10n.transactionTypeLend,
