@@ -6,6 +6,7 @@ import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
 import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,11 +52,10 @@ class RegisterScreenState extends State<RegisterScreen> {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error(context)), // Gọi error(context)
-                backgroundColor: AppTheme.lightTheme.colorScheme.error,
-              ),
+            UtilityWidgets.showCustomSnackBar(
+              context: context,
+              message: state.error(context),
+              backgroundColor: AppTheme.lightTheme.colorScheme.error,
             );
           }
         },

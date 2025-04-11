@@ -2,10 +2,11 @@ import 'package:finance_app/blocs/account/account_bloc.dart';
 import 'package:finance_app/blocs/account/account_event.dart';
 import 'package:finance_app/blocs/account/account_state.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
+import 'package:finance_app/blocs/localization/localization_bloc.dart';
+import 'package:finance_app/blocs/localization/localization_event.dart'
+    as localization;
 import 'package:finance_app/blocs/theme/theme_bloc.dart';
 import 'package:finance_app/blocs/theme/theme_event.dart';
-import 'package:finance_app/blocs/localization/localization_bloc.dart';
-import 'package:finance_app/blocs/localization/localization_event.dart' as localization;
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/decorations.dart';
@@ -14,7 +15,6 @@ import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountScreen extends StatelessWidget {
@@ -24,7 +24,10 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
-      create: (context) => AccountBloc(authBloc: context.read<AuthBloc>())..add(LoadAccountDataEvent()),
+      create:
+          (context) =>
+              AccountBloc(authBloc: context.read<AuthBloc>())
+                ..add(LoadAccountDataEvent()),
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBarTabBar.buildAppBar(
@@ -35,20 +38,15 @@ class AccountScreen extends StatelessWidget {
         body: BlocListener<AccountBloc, AccountState>(
           listener: (context, state) {
             if (state is AccountError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message(context))),
+              UtilityWidgets.showCustomSnackBar(
+                context: context,
+                message: state.message(context),
               );
             } else if (state is AccountPasswordChanged) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    l10n.passwordChangedSuccess,
-                    style: GoogleFonts.poppins(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                ),
+              UtilityWidgets.showCustomSnackBar(
+                context: context,
+                message: l10n.passwordChangedSuccess,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               );
             } else if (state is AccountLoggedOut) {
               AppRoutes.navigateToLogin(context);
@@ -75,8 +73,12 @@ class AccountScreen extends StatelessWidget {
                         title: l10n.darkMode,
                         value: state.user.isDarkMode ?? false,
                         onChanged: (value) {
-                          context.read<AccountBloc>().add(ToggleDarkModeEvent(value));
-                          context.read<ThemeBloc>().add(ToggleThemeEvent(value));
+                          context.read<AccountBloc>().add(
+                            ToggleDarkModeEvent(value),
+                          );
+                          context.read<ThemeBloc>().add(
+                            ToggleThemeEvent(value),
+                          );
                         },
                       ),
                       const SizedBox(height: 16),
@@ -89,12 +91,16 @@ class AccountScreen extends StatelessWidget {
                         context: context,
                         title: l10n.changePassword,
                         icon: Icons.key_outlined,
-                        onTap: isEmailLogin
-                            ? () => _showChangePasswordDialog(context)
-                            : null,
-                        textColor: isEmailLogin
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                        onTap:
+                            isEmailLogin
+                                ? () => _showChangePasswordDialog(context)
+                                : null,
+                        textColor:
+                            isEmailLogin
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       const SizedBox(height: 8),
                       _buildActionTile(
@@ -114,7 +120,9 @@ class AccountScreen extends StatelessWidget {
                             title: l10n.deleteAccountConfirm,
                             content: l10n.actionCannotBeUndone,
                             onDeletePressed: () {
-                              context.read<AccountBloc>().add(DeleteAccountEvent());
+                              context.read<AccountBloc>().add(
+                                DeleteAccountEvent(),
+                              );
                             },
                           );
                         },
@@ -212,7 +220,9 @@ class AccountScreen extends StatelessWidget {
   void _showEditUserInfoDialog(BuildContext context, AccountLoaded state) {
     final l10n = AppLocalizations.of(context)!;
     final formKey = GlobalKey<FormState>();
-    final displayNameController = TextEditingController(text: state.user.displayName);
+    final displayNameController = TextEditingController(
+      text: state.user.displayName,
+    );
     final photoUrlController = TextEditingController(text: state.user.photoUrl);
     final emailController = TextEditingController(text: state.user.email);
     final currentPasswordController = TextEditingController();
@@ -272,7 +282,7 @@ class AccountScreen extends StatelessWidget {
                     InputFields.buildPasswordField(
                       currentPasswordController,
                       isPasswordVisible,
-                          () {
+                      () {
                         setState(() {
                           isPasswordVisible = !isPasswordVisible;
                         });
@@ -290,12 +300,15 @@ class AccountScreen extends StatelessWidget {
           context.read<AccountBloc>().add(
             UpdateUserInfoEvent(
               displayName: displayNameController.text,
-              photoUrl: photoUrlController.text.isEmpty
-                  ? null
-                  : photoUrlController.text,
+              photoUrl:
+                  photoUrlController.text.isEmpty
+                      ? null
+                      : photoUrlController.text,
               email: isEmailLogin ? emailController.text : null,
               currentPassword:
-              emailChanged && isEmailLogin ? currentPasswordController.text : null,
+                  emailChanged && isEmailLogin
+                      ? currentPasswordController.text
+                      : null,
             ),
           );
         }
@@ -314,15 +327,17 @@ class AccountScreen extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           radius: 30,
-          backgroundImage: state.user.photoUrl != null
-              ? NetworkImage(state.user.photoUrl!)
-              : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+          backgroundImage:
+              state.user.photoUrl != null
+                  ? NetworkImage(state.user.photoUrl!)
+                  : const AssetImage('assets/images/default_avatar.png')
+                      as ImageProvider,
         ),
         title: Text(
           state.user.displayName ?? 'Người dùng',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           state.user.email,
@@ -353,7 +368,9 @@ class AccountScreen extends StatelessWidget {
           value: value,
           onChanged: onChanged,
           activeColor: Theme.of(context).colorScheme.primary,
-          inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+          inactiveTrackColor: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.2),
         ),
       ),
     );
@@ -363,17 +380,17 @@ class AccountScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final languages = ['Tiếng Việt', 'English', '日本語'];
 
-    final List<DropdownMenuItem<String>> languageDropdownItems = languages
-        .map<DropdownMenuItem<String>>((String languageValue) {
-      return DropdownMenuItem<String>(
-        value: languageValue, // Giá trị sẽ được trả về khi chọn
-        child: Text(
-          languageValue,
-          // Có thể thêm style nếu muốn
-          // style: GoogleFonts.poppins(color: theme.colorScheme.onSurface),
-        ),
-      );
-    }).toList();
+    final List<DropdownMenuItem<String>> languageDropdownItems =
+        languages.map<DropdownMenuItem<String>>((String languageValue) {
+          return DropdownMenuItem<String>(
+            value: languageValue, // Giá trị sẽ được trả về khi chọn
+            child: Text(
+              languageValue,
+              // Có thể thêm style nếu muốn
+              // style: GoogleFonts.poppins(color: theme.colorScheme.onSurface),
+            ),
+          );
+        }).toList();
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -384,7 +401,9 @@ class AccountScreen extends StatelessWidget {
         onChanged: (newLanguage) {
           if (newLanguage != null) {
             context.read<AccountBloc>().add(ChangeLanguageEvent(newLanguage));
-            context.read<LocalizationBloc>().add(localization.ChangeLanguageEvent(newLanguage)); // Sử dụng alias
+            context.read<LocalizationBloc>().add(
+              localization.ChangeLanguageEvent(newLanguage),
+            ); // Sử dụng alias
           }
         },
         validator: (value) {
@@ -410,7 +429,8 @@ class AccountScreen extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           icon,
-          color: textColor ??
+          color:
+              textColor ??
               Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         title: Text(
@@ -452,10 +472,7 @@ class AccountScreen extends StatelessWidget {
           ),
           child: Text(
             l10n.logout,
-            style: Theme.of(context)
-                .elevatedButtonTheme
-                .style
-                ?.textStyle
+            style: Theme.of(context).elevatedButtonTheme.style?.textStyle
                 ?.resolve({})
                 ?.copyWith(color: Theme.of(context).colorScheme.onError),
           ),

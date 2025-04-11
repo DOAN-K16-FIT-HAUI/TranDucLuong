@@ -269,4 +269,29 @@ class UtilityWidgets {
       ),
     );
   }
+
+  static void showCustomSnackBar({
+    required BuildContext context,
+    required String message,
+    Duration duration = const Duration(seconds: 2),
+    SnackBarBehavior behavior = SnackBarBehavior.fixed,
+    Color? backgroundColor,
+    TextStyle? textStyle,
+    SnackBarAction? action,
+  }) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: textStyle ?? Theme.of(context).textTheme.bodyMedium,
+        ),
+        duration: duration,
+        behavior: behavior,
+        // margin: margin,
+        backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
+        action: action,
+      ),
+    );
+  }
 }

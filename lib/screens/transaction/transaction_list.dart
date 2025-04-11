@@ -7,6 +7,7 @@ import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/blocs/wallet/wallet_state.dart';
 import 'package:finance_app/core/app_routes.dart';
+import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
@@ -111,8 +112,11 @@ class TransactionScreenState extends State<TransactionScreen> {
   void _showLoginRequiredSnackbar(BuildContext context) {
     if (!context.mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(l10n.loginToAddTransaction)));
+    UtilityWidgets.showCustomSnackBar(
+      context: context,
+      message: l10n.loginToAddTransaction,
+      backgroundColor: AppTheme.lightTheme.colorScheme.error,
+    );
   }
 
   String _mapLocalizedTypeToKey(String localizedType, AppLocalizations l10n) {
@@ -123,10 +127,6 @@ class TransactionScreenState extends State<TransactionScreen> {
     if (localizedType == l10n.transactionTypeLend) return "lend";
     if (localizedType == l10n.transactionTypeAdjustment) return "adjustment";
     return localizedType; // Fallback
-  }
-
-  String _mapCategoryKeyToLocalized(String key, AppLocalizations l10n) {
-    return _categoryMap[key] ?? key;
   }
 
   void _saveTransaction() {
@@ -149,42 +149,49 @@ class TransactionScreenState extends State<TransactionScreen> {
       });
     }
     if (_dateError != null || _repaymentDateError != null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.checkDateError)));
-      return;
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.checkDateError,
+        backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      );
     }
 
     if (_formKey.currentState?.validate() ?? false) {
       final authState = context.read<AuthBloc>().state;
       if (authState is! AuthAuthenticated) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.userNotLoggedInError)));
+        UtilityWidgets.showCustomSnackBar(
+          context: context,
+          message: l10n.userNotLoggedInError,
+          backgroundColor: AppTheme.lightTheme.colorScheme.error,
+        );
         return;
       }
       final userId = authState.user.id;
 
       if (_selectedType == l10n.transactionTypeTransfer) {
         if (_selectedFromWallet.isEmpty || _selectedToWallet.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.selectSourceAndDestinationWalletError)),
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.selectSourceAndDestinationWalletError,
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
           );
           return;
         }
         if (_allWallets.length > 1 && _selectedFromWallet == _selectedToWallet) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.sourceAndDestinationWalletCannotBeSameError),
-            ),
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.sourceAndDestinationWalletCannotBeSameError,
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
           );
           return;
         }
       } else if (_selectedType != l10n.transactionTypeIncome) {
         if (_selectedWallet.isEmpty) {
           String displayType = _selectedType;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.selectWalletForTransactionError(displayType)),
-            ),
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.selectWalletForTransactionError(displayType),
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
           );
           return;
         }
@@ -223,16 +230,14 @@ class TransactionScreenState extends State<TransactionScreen> {
             symbol: '',
             decimalDigits: 0,
           ).format(amount);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                l10n.insufficientBalanceError(
-                  sourceWalletName,
-                  formattedSourceBalance,
-                  formattedAmount,
-                ),
-              ),
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.insufficientBalanceError(
+              sourceWalletName,
+              formattedSourceBalance,
+              formattedAmount,
             ),
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
           );
           return;
         }
@@ -264,12 +269,16 @@ class TransactionScreenState extends State<TransactionScreen> {
       }
       context.read<TransactionBloc>().add(AddTransaction(transaction));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.checkInputError)));
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.checkInputError,
+        backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      );
     }
   }
 
   void _resetForm() {
+    if (!mounted) return;
     _formKey.currentState?.reset();
     final l10n = AppLocalizations.of(context)!;
     _updateCategoryMap(l10n);
@@ -344,8 +353,11 @@ class TransactionScreenState extends State<TransactionScreen> {
             }
             if (state is TransactionSuccess) {
               if (mounted) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.message(context))));
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: state.message(context),
+                  backgroundColor: AppTheme.incomeColor,
+                );
                 final authState = context.read<AuthBloc>().state;
                 if (authState is AuthAuthenticated) {
                   context.read<WalletBloc>().add(LoadWallets());
@@ -354,8 +366,11 @@ class TransactionScreenState extends State<TransactionScreen> {
               }
             } else if (state is TransactionError) {
               if (mounted) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.message(context))));
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: state.message(context),
+                  backgroundColor: AppTheme.lightTheme.colorScheme.error,
+                );
               }
             }
           },

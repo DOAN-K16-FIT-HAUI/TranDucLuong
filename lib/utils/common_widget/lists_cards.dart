@@ -229,14 +229,10 @@ class ListsCards {
     final amountColor = ListsCards.getAmountColor(context, transaction.typeKey);
     final amountPrefix = ListsCards.getAmountPrefix(context, transaction.typeKey);
 
-    final formattedAmount = Formatter.formatCurrency(
-      transaction.amount,
-      locale: Localizations.localeOf(context),
-    );
-    final formattedTime = Formatter.formatTime(
-      transaction.date,
-      locale: Localizations.localeOf(context),
-    );
+    final formattedAmount = transaction.typeKey == "adjustment" && transaction.balanceAfter != null
+        ? Formatter.formatCurrency(transaction.balanceAfter!, locale: Localizations.localeOf(context))
+        : Formatter.formatCurrency(transaction.amount, locale: Localizations.localeOf(context));
+    final formattedTime = Formatter.formatTime(transaction.date, locale: Localizations.localeOf(context));
 
     String subtitleText = '$formattedTime • ${transaction.wallet ?? ''}';
     if (transaction.typeKey == "expense" && transaction.categoryKey.isNotEmpty) {
@@ -245,19 +241,16 @@ class ListsCards {
       subtitleText = '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
     } else if (transaction.typeKey == "transfer") {
       subtitleText =
-      '$formattedTime • ${l10n.from}: ${transaction.fromWallet ?? '?'} → ${l10n.to}: ${transaction.toWallet ?? '?'}';
+      '$formattedTime • ${transaction.fromWallet ?? '?'} → ${transaction.toWallet ?? '?'}';
     } else if (transaction.typeKey == "borrow" && transaction.lender != null) {
       subtitleText = '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}';
     } else if (transaction.typeKey == "lend" && transaction.borrower != null) {
       subtitleText = '$formattedTime • ${l10n.lendTo}: ${transaction.borrower}';
     } else if (transaction.typeKey == "adjustment" && transaction.wallet != null) {
-      final formattedBalanceAfter = transaction.balanceAfter != null
-          ? Formatter.formatCurrency(
-        transaction.balanceAfter!,
-        locale: Localizations.localeOf(context),
-      )
+      transaction.balanceAfter != null
+          ? Formatter.formatCurrency(transaction.balanceAfter!, locale: Localizations.localeOf(context))
           : '';
-      subtitleText = '$formattedTime • ${transaction.wallet}${transaction.balanceAfter != null ? ' ($formattedBalanceAfter)' : ''}';
+      subtitleText = '$formattedTime • ${transaction.wallet}';
     }
 
     return Card(
@@ -420,13 +413,16 @@ class ListsCards {
   static String getAmountPrefix(BuildContext context, String typeKey) {
     switch (typeKey) {
       case "income":
-      case "borrow":
-      case "adjustment":
-        return '';
+        return '+'; // Thu nhập thực sự
       case "expense":
-      case "lend":
       case "transfer":
-        return '-';
+        return '-'; // Chi tiêu hoặc chuyển khoản ra
+      case "borrow":
+        return '+'; // Nhận tiền từ vay, nhưng là nợ
+      case "lend":
+        return '-'; // Cho vay, giảm tiền nhưng là khoản phải thu
+      case "adjustment":
+        return ''; // Không có dấu, vì không phải dòng tiền
       default:
         return '';
     }
