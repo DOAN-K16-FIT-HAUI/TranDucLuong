@@ -1,7 +1,5 @@
-// file: data/repositories/transaction_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_app/data/models/transaction.dart';
-// import 'package:finance_app/data/models/wallet.dart'; // Không cần import Wallet ở đây nữa
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'; // For debugPrint
@@ -136,7 +134,7 @@ class TransactionRepository {
       batch.set(newTransactionRef, transactionToSave.toJson());
 
       // 2. Cập nhật số dư ví dựa trên loại giao dịch
-      switch (transactionToSave.type) {
+      switch (transactionToSave.typeKey) {
         case 'Thu nhập':
           if (transactionToSave.wallet != null) {
             await _updateWalletBalance(
@@ -201,9 +199,9 @@ class TransactionRepository {
           } else { throw Exception("Wallet and BalanceAfter are required for Balance Adjustment transaction."); }
           break;
         default:
-          debugPrint("Warning: Unknown transaction type '${transactionToSave.type}'. Wallet balance not updated.");
+          debugPrint("Warning: Unknown transaction type '${transactionToSave.typeKey}'. Wallet balance not updated.");
       // Hoặc throw lỗi nếu type không hợp lệ là nghiêm trọng
-      // throw Exception("Invalid transaction type: ${transactionToSave.type}");
+      // throw Exception("Invalid transaction typeKey: ${transactionToSave.typeKey}");
       }
 
       // 3. Commit batch
@@ -221,7 +219,7 @@ class TransactionRepository {
   Future<void> _reverseTransactionEffect(
       FirebaseFirestore firestore, Transaction transaction, String userId, TransactionModel oldTransaction) async {
     double amountChange = 0;
-    switch (oldTransaction.type) {
+    switch (oldTransaction.typeKey) {
       case 'Thu nhập':
         amountChange = -oldTransaction.amount; // Hoàn tác thu nhập là trừ đi
         if (oldTransaction.wallet != null) {
@@ -262,14 +260,14 @@ class TransactionRepository {
         // throw UnsupportedError("Updating or deleting 'Balance Adjustment' transactions is not recommended.");
         break;
       default:
-        debugPrint("Warning: Unknown transaction type '${oldTransaction.type}' during reverse effect. Balance not adjusted.");
+        debugPrint("Warning: Unknown transaction type '${oldTransaction.typeKey}' during reverse effect. Balance not adjusted.");
     }
   }
 
   Future<void> _applyTransactionEffect(
       FirebaseFirestore firestore, Transaction transaction, String userId, TransactionModel newTransaction) async {
     double amountChange = 0;
-    switch (newTransaction.type) {
+    switch (newTransaction.typeKey) {
       case 'Thu nhập':
         amountChange = newTransaction.amount;
         if (newTransaction.wallet != null) {
@@ -312,7 +310,7 @@ class TransactionRepository {
         } else { throw Exception("Wallet and BalanceAfter are required for Balance Adjustment transaction."); }
         break;
       default:
-        debugPrint("Warning: Unknown transaction type '${newTransaction.type}' during apply effect. Balance not adjusted.");
+        debugPrint("Warning: Unknown transaction type '${newTransaction.typeKey}' during apply effect. Balance not adjusted.");
     }
   }
 
@@ -346,7 +344,7 @@ class TransactionRepository {
             oldTransactionSnapshot.data()!, oldTransactionSnapshot.id);
 
         // --- Cảnh báo về sửa/xóa Điều chỉnh số dư ---
-        if (oldTransaction.type == 'Điều chỉnh số dư' || newTransaction.type == 'Điều chỉnh số dư') {
+        if (oldTransaction.typeKey == 'Điều chỉnh số dư' || newTransaction.typeKey == 'Điều chỉnh số dư') {
           debugPrint("Warning: Updating a 'Balance Adjustment' transaction or changing a transaction to/from this type can lead to incorrect balances due to the complexity of reversal.");
           // Cân nhắc throw lỗi ở đây để ngăn chặn:
           // throw UnsupportedError("Updating 'Balance Adjustment' transactions is not recommended. Create a new adjustment instead.");
@@ -397,7 +395,7 @@ class TransactionRepository {
             transactionSnapshot.data()!, transactionSnapshot.id);
 
         // --- Cảnh báo về sửa/xóa Điều chỉnh số dư ---
-        if (transactionToDelete.type == 'Điều chỉnh số dư') {
+        if (transactionToDelete.typeKey == 'Điều chỉnh số dư') {
           debugPrint("Warning: Deleting a 'Balance Adjustment' transaction can lead to incorrect balances due to the complexity of reversal.");
           // Cân nhắc throw lỗi ở đây để ngăn chặn:
           // throw UnsupportedError("Deleting 'Balance Adjustment' transactions is not recommended. Create a new adjustment instead.");
@@ -482,7 +480,7 @@ class TransactionRepository {
       description: transaction.description,
       amount: transaction.amount,
       date: transaction.date,
-      type: transaction.type,
+      typeKey: transaction.typeKey,
       category: transaction.category,
       wallet: transaction.wallet,
       fromWallet: transaction.fromWallet,
@@ -501,7 +499,7 @@ class TransactionRepository {
       description: transaction.description,
       amount: transaction.amount,
       date: transaction.date,
-      type: transaction.type,
+      typeKey: transaction.typeKey,
       category: transaction.category,
       wallet: transaction.wallet,
       fromWallet: transaction.fromWallet,
@@ -512,7 +510,4 @@ class TransactionRepository {
       balanceAfter: transaction.balanceAfter,
     );
   }
-
-// --- Get a stream of wallets for a user (XÓA KHỎI ĐÂY) ---
-// Stream<Map<String, double>> getUserWallets(String userId) { ... } // Đã xóa
 }

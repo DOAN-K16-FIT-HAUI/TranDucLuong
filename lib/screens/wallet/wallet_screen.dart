@@ -6,7 +6,12 @@ import 'package:finance_app/blocs/wallet/wallet_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/wallet.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/dialogs.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/lists_cards.dart';
+import 'package:finance_app/utils/common_widget/menu_actions.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/formatter.dart';
 import 'package:finance_app/utils/validators.dart';
@@ -93,7 +98,7 @@ class WalletScreen extends StatelessWidget {
 
                 return Column(
                   children: [
-                    CommonWidgets.buildAppBar(
+                    AppBarTabBar.buildAppBar(
                       context: context,
                       title: l10n.myWalletsTitle,
                       showBackButton: true,
@@ -112,9 +117,10 @@ class WalletScreen extends StatelessWidget {
                             state.isSearching ? Icons.close : Icons.search,
                             color: theme.colorScheme.onPrimary,
                           ),
-                          tooltip: state.isSearching
-                              ? l10n.closeSearchTooltip
-                              : l10n.searchTooltip,
+                          tooltip:
+                              state.isSearching
+                                  ? l10n.closeSearchTooltip
+                                  : l10n.searchTooltip,
                           onPressed: () {
                             final bloc = context.read<WalletBloc>();
                             bloc.add(ToggleSearch(!state.isSearching));
@@ -128,11 +134,13 @@ class WalletScreen extends StatelessWidget {
                     if (state.isSearching)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                        child: CommonWidgets.buildSearchField(
+                        child: UtilityWidgets.buildSearchField(
                           context: context,
                           hintText: l10n.searchWalletsHint,
                           onChanged: (value) {
-                            context.read<WalletBloc>().add(SearchWallets(value));
+                            context.read<WalletBloc>().add(
+                              SearchWallets(value),
+                            );
                           },
                         ),
                       ),
@@ -146,7 +154,7 @@ class WalletScreen extends StatelessWidget {
                       locale,
                     ),
                     const SizedBox(height: 16),
-                    CommonWidgets.buildTabBar(
+                    AppBarTabBar.buildTabBar(
                       context: context,
                       tabTitles: [
                         l10n.tabAccounts,
@@ -154,16 +162,35 @@ class WalletScreen extends StatelessWidget {
                         l10n.tabInvestments,
                       ],
                       controller: tabController,
-                      onTabChanged: (index) =>
-                          context.read<WalletBloc>().add(TabChanged(index)),
+                      onTabChanged:
+                          (index) =>
+                              context.read<WalletBloc>().add(TabChanged(index)),
                     ),
                     Expanded(
                       child: TabBarView(
                         controller: tabController,
                         children: [
-                          _buildTabContent(context, state, filteredWalletsTab0, 0, locale),
-                          _buildTabContent(context, state, filteredWalletsTab1, 1, locale),
-                          _buildTabContent(context, state, filteredWalletsTab2, 2, locale),
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab0,
+                            0,
+                            locale,
+                          ),
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab1,
+                            1,
+                            locale,
+                          ),
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab2,
+                            2,
+                            locale,
+                          ),
                         ],
                       ),
                     ),
@@ -172,13 +199,14 @@ class WalletScreen extends StatelessWidget {
               },
             ),
             floatingActionButton: Builder(
-              builder: (fabContext) => FloatingActionButton(
-                onPressed: () => _showAddWalletDialog(fabContext),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                tooltip: l10n.addWalletTooltip,
-                child: const Icon(Icons.add),
-              ),
+              builder:
+                  (fabContext) => FloatingActionButton(
+                    onPressed: () => _showAddWalletDialog(fabContext),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    tooltip: l10n.addWalletTooltip,
+                    child: const Icon(Icons.add),
+                  ),
             ),
           ),
         );
@@ -198,9 +226,10 @@ class WalletScreen extends StatelessWidget {
   void _showAddWalletDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => _AddWalletDialog(
-        walletType: context.read<WalletBloc>().state.selectedTab,
-      ),
+      builder:
+          (dialogContext) => _AddWalletDialog(
+            walletType: context.read<WalletBloc>().state.selectedTab,
+          ),
     );
   }
 
@@ -212,13 +241,13 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget _buildTotalBalance(
-      BuildContext context,
-      WalletState state,
-      List<Wallet> filteredTab0,
-      List<Wallet> filteredTab1,
-      List<Wallet> filteredTab2,
-      Locale locale,
-      ) {
+    BuildContext context,
+    WalletState state,
+    List<Wallet> filteredTab0,
+    List<Wallet> filteredTab1,
+    List<Wallet> filteredTab2,
+    Locale locale,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
@@ -237,8 +266,10 @@ class WalletScreen extends StatelessWidget {
         currentTabWallets = [];
     }
 
-    int tabTotalBalance =
-    currentTabWallets.fold(0, (sum, wallet) => sum + wallet.balance);
+    int tabTotalBalance = currentTabWallets.fold(
+      0,
+      (sum, wallet) => sum + wallet.balance,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -260,7 +291,10 @@ class WalletScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 30,
               fontWeight: FontWeight.bold,
-              color: tabTotalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+              color:
+                  tabTotalBalance >= 0
+                      ? AppTheme.incomeColor
+                      : AppTheme.expenseColor,
             ),
           ),
         ],
@@ -269,14 +303,14 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget _buildWalletCard(
-      BuildContext context,
-      Wallet wallet,
-      int type,
-      int index,
-      Locale locale,
-      ) {
+    BuildContext context,
+    Wallet wallet,
+    int type,
+    int index,
+    Locale locale,
+  ) {
     final l10n = AppLocalizations.of(context)!;
-    return CommonWidgets.buildItemCard(
+    return ListsCards.buildItemCard(
       context: context,
       item: wallet,
       itemKey: ValueKey(wallet.id),
@@ -285,17 +319,19 @@ class WalletScreen extends StatelessWidget {
       icon: wallet.icon,
       valueLocale: locale.toString(),
       valuePrefix: '',
-      menuItems: CommonWidgets.buildEditDeleteMenuItems(context: context),
+      menuItems: MenuActions.buildEditDeleteMenuItems(context: context),
       onMenuSelected: (result) {
         if (result == 'edit') {
           _showEditDialog(context, wallet);
         } else if (result == 'delete') {
-          CommonWidgets.showDeleteDialog(
+          Dialogs.showDeleteDialog(
             context: context,
             title: l10n.confirmDeleteTitle,
             content: l10n.confirmDeleteWalletContent(wallet.name),
-            onDeletePressed: () =>
-                context.read<WalletBloc>().add(DeleteWallet(wallet.id, wallet.type)),
+            onDeletePressed:
+                () => context.read<WalletBloc>().add(
+                  DeleteWallet(wallet.id, wallet.type),
+                ),
           );
         }
       },
@@ -303,30 +339,35 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget _buildTabContent(
-      BuildContext context,
-      WalletState state,
-      List<Wallet> items,
-      int type,
-      Locale locale,
-      ) {
+    BuildContext context,
+    WalletState state,
+    List<Wallet> items,
+    int type,
+    Locale locale,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     if (items.isEmpty) {
-      return CommonWidgets.buildEmptyState(
+      return UtilityWidgets.buildEmptyState(
         context: context,
         message:
-        state.isSearching ? l10n.noWalletsFoundSearch : l10n.noWalletsInThisCategory,
+            state.isSearching
+                ? l10n.noWalletsFoundSearch
+                : l10n.noWalletsInThisCategory,
         suggestion: state.isSearching ? null : l10n.addWalletSuggestion,
         icon: Icons.account_balance_wallet_outlined,
       );
     } else {
-      return CommonWidgets.buildTabContent<Wallet>(
+      return ListsCards.buildTabContent<Wallet>(
         context: context,
         items: items,
-        itemBuilder: (ctx, wallet, index) =>
-            _buildWalletCard(ctx, wallet, type, index, locale),
-        onReorder: (oldIndex, newIndex) =>
-            context.read<WalletBloc>().add(ReorderWallets(type, oldIndex, newIndex)),
+        itemBuilder:
+            (ctx, wallet, index) =>
+                _buildWalletCard(ctx, wallet, type, index, locale),
+        onReorder:
+            (oldIndex, newIndex) => context.read<WalletBloc>().add(
+              ReorderWallets(type, oldIndex, newIndex),
+            ),
       );
     }
   }
@@ -353,9 +394,10 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
     nameController = TextEditingController();
     balanceController = TextEditingController();
     formKey = GlobalKey<FormState>();
-    selectedIcon = Constants.availableIcons.isNotEmpty
-        ? Constants.availableIcons[0]['icon']
-        : Icons.wallet;
+    selectedIcon =
+        Constants.availableIcons.isNotEmpty
+            ? Constants.availableIcons[0]['icon']
+            : Icons.wallet;
   }
 
   @override
@@ -377,26 +419,30 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CommonWidgets.buildTextField(
+              InputFields.buildTextField(
                 controller: nameController,
                 label: l10n.walletNameLabel,
                 hint: l10n.walletNameHint,
-                validator: (value) => Validators.validateNotEmpty(
-                  value,
-                  fieldName: l10n.walletNameLabel,
-                ),
+                validator:
+                    (value) => Validators.validateNotEmpty(
+                      value,
+                      fieldName: l10n.walletNameLabel,
+                    ),
                 isRequired: true,
               ),
               const SizedBox(height: 16),
-              CommonWidgets.buildBalanceInputField(
+              InputFields.buildBalanceInputField(
                 balanceController,
-                validator: (value) => Validators.validateBalance(value, currentBalance: 0),
+                validator:
+                    (value) =>
+                        Validators.validateBalance(value, currentBalance: 0),
               ),
               const SizedBox(height: 16),
               _buildIconSelection(
                 context: context,
                 selectedIconGetter: () => selectedIcon,
-                onIconSelected: (newIcon) => setState(() => selectedIcon = newIcon),
+                onIconSelected:
+                    (newIcon) => setState(() => selectedIcon = newIcon),
               ),
             ],
           ),
@@ -415,7 +461,9 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
                   Wallet(
                     id: '',
                     name: nameController.text.trim(),
-                    balance: Formatter.getRawCurrencyValue(balanceController.text),
+                    balance: Formatter.getRawCurrencyValue(
+                      balanceController.text,
+                    ),
                     icon: selectedIcon,
                     type: widget.walletType,
                     orderIndex: 0,
@@ -452,7 +500,7 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
           ),
           trailing: Icon(currentIcon, color: theme.colorScheme.primary),
           onTap: () async {
-            final newIcon = await CommonWidgets.showIconSelectionDialog(
+            final newIcon = await Dialogs.showIconSelectionDialog(
               context: dialogContext,
               currentIcon: currentIcon,
               availableIcons: Constants.availableIcons,
@@ -489,7 +537,10 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
     super.initState();
     nameController = TextEditingController(text: widget.wallet.name);
     balanceController = TextEditingController(
-      text: Formatter.formatCurrency(widget.wallet.balance.toDouble()),
+      text: Formatter.formatCurrency(
+        widget.wallet.balance.toDouble(),
+        locale: Localizations.localeOf(context),
+      ),
     );
     formKey = GlobalKey<FormState>();
     selectedIcon = widget.wallet.icon;
@@ -514,29 +565,32 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CommonWidgets.buildTextField(
+              InputFields.buildTextField(
                 controller: nameController,
                 label: l10n.walletNameLabel,
                 hint: l10n.walletNameHint,
-                validator: (value) => Validators.validateNotEmpty(
-                  value,
-                  fieldName: l10n.walletNameLabel,
-                ),
+                validator:
+                    (value) => Validators.validateNotEmpty(
+                      value,
+                      fieldName: l10n.walletNameLabel,
+                    ),
                 isRequired: true,
               ),
               const SizedBox(height: 16),
-              CommonWidgets.buildBalanceInputField(
+              InputFields.buildBalanceInputField(
                 balanceController,
-                validator: (value) => Validators.validateBalance(
-                  value,
-                  currentBalance: widget.wallet.balance.toDouble(),
-                ),
+                validator:
+                    (value) => Validators.validateBalance(
+                      value,
+                      currentBalance: widget.wallet.balance.toDouble(),
+                    ),
               ),
               const SizedBox(height: 16),
               _buildIconSelection(
                 context: context,
                 selectedIconGetter: () => selectedIcon,
-                onIconSelected: (newIcon) => setState(() => selectedIcon = newIcon),
+                onIconSelected:
+                    (newIcon) => setState(() => selectedIcon = newIcon),
               ),
             ],
           ),
@@ -555,7 +609,9 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
                   Wallet(
                     id: widget.wallet.id,
                     name: nameController.text.trim(),
-                    balance: Formatter.getRawCurrencyValue(balanceController.text),
+                    balance: Formatter.getRawCurrencyValue(
+                      balanceController.text,
+                    ),
                     icon: selectedIcon,
                     type: widget.wallet.type,
                     orderIndex: widget.wallet.orderIndex,
@@ -592,7 +648,7 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
           ),
           trailing: Icon(currentIcon, color: theme.colorScheme.primary),
           onTap: () async {
-            final newIcon = await CommonWidgets.showIconSelectionDialog(
+            final newIcon = await Dialogs.showIconSelectionDialog(
               context: dialogContext,
               currentIcon: currentIcon,
               availableIcons: Constants.availableIcons,

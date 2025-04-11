@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -13,64 +15,75 @@ class Formatter {
   }
 
   // Format số nguyên sang chuỗi có dấu phân cách ngàn
-  static String formatCurrency(double value) {
-    final formatter = NumberFormat('#,###');
+  static String formatCurrency(double value, {required Locale locale}) {
+    final formatter = NumberFormat('#,###', locale.toString());
     return formatter.format(value);
   }
 
-  // Format DateTime sang chuỗi ngày (EEEE, dd/MM/yyyy)
-  static String formatDay(DateTime day) {
-    final formatter = DateFormat('EEEE, dd/MM/yyyy');
+  // Format DateTime sang chuỗi ngày (ví dụ: "Thứ Tư, 10 tháng Tư 2025" hoặc "Wednesday, April 10, 2025")
+  static String formatDay(DateTime day, {required Locale locale}) {
+    final formatter = DateFormat.yMMMMEEEEd(locale.toString());
     return formatter.format(day);
   }
 
-  // Format DateTime sang chuỗi tháng (MMMM, yyyy)
-  static String formatMonth(DateTime month) {
-    final formatter = DateFormat('MMMM, yyyy');
+  // Format DateTime sang chuỗi tháng (ví dụ: "Tháng Tư 2025" hoặc "April 2025")
+  static String formatMonth(DateTime month, {required Locale locale}) {
+    final formatter = DateFormat.yMMMM(locale.toString());
     return formatter.format(month);
   }
 
-  // Format DateTime sang chuỗi năm (yyyy)
-  static String formatYear(DateTime year) {
-    final formatter = DateFormat('yyyy');
+  // Format DateTime sang chuỗi năm (ví dụ: "2025")
+  static String formatYear(DateTime year, {required Locale locale}) {
+    final formatter = DateFormat.y(locale.toString());
     return formatter.format(year);
   }
 
-  // Format DateTime sang chuỗi ngày tháng năm (dd/MM/yyyy)
-  static String formatDate(DateTime date) {
-    final formatter = DateFormat('dd/MM/yyyy');
+  // Format DateTime sang chuỗi ngày tháng năm (ví dụ: "10 tháng Tư 2025" hoặc "April 10, 2025")
+  static String formatDate(DateTime date, {required Locale locale}) {
+    final formatter = DateFormat.yMMMMd(locale.toString());
     return formatter.format(date);
   }
 
-  // Format DateTime sang chuỗi giờ phút (HH:mm)
-  static String formatTime(DateTime date) {
-    final formatter = DateFormat('HH:mm');
+  // Format DateTime sang chuỗi giờ phút (ví dụ: "14:30")
+  static String formatTime(DateTime date, {required Locale locale}) {
+    final formatter = DateFormat.Hm(locale.toString());
     return formatter.format(date);
   }
 
-  // Format DateTime đầy đủ: dd/MM/yyyy HH:mm
-  static String formatDateTime(DateTime date) {
-    final formatter = DateFormat('dd/MM/yyyy HH:mm');
+  // Format DateTime đầy đủ: ngày tháng năm giờ phút (ví dụ: "10 tháng Tư 2025 14:30" hoặc "April 10, 2025 2:30 PM")
+  static String formatDateTime(DateTime date, {required Locale locale}) {
+    final formatter = DateFormat.yMMMMd(locale.toString()).add_Hm();
     return formatter.format(date);
   }
 
-  // Parse từ chuỗi "dd/MM/yyyy" về DateTime (nullable)
-  static DateTime? parseDate(String input) {
+  // Parse từ chuỗi ngày tháng về DateTime (nullable, dùng định dạng linh hoạt theo locale)
+  static DateTime? parseDate(String input, {required Locale locale}) {
     try {
-      return DateFormat('dd/MM/yyyy').parseStrict(input);
+      return DateFormat.yMMMMd(locale.toString()).parseStrict(input);
     } catch (_) {
-      return null;
+      // Thử định dạng khác nếu thất bại
+      try {
+        return DateFormat('dd/MM/yyyy').parseStrict(input); // Định dạng mặc định
+      } catch (_) {
+        return null;
+      }
     }
   }
 
-  // Parse từ chuỗi "HH:mm" về DateTime (nullable, mặc định ngày là hôm nay)
-  static DateTime? parseTime(String input) {
+  // Parse từ chuỗi giờ phút về DateTime (nullable, mặc định ngày là hôm nay)
+  static DateTime? parseTime(String input, {required Locale locale}) {
     try {
       final now = DateTime.now();
-      final time = DateFormat('HH:mm').parseStrict(input);
+      final time = DateFormat.Hm(locale.toString()).parseStrict(input);
       return DateTime(now.year, now.month, now.day, time.hour, time.minute);
     } catch (_) {
-      return null;
+      try {
+        final time = DateFormat('HH:mm').parseStrict(input); // Định dạng mặc định
+        final now = DateTime.now();
+        return DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      } catch (_) {
+        return null;
+      }
     }
   }
 }

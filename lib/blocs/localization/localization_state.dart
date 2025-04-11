@@ -1,16 +1,13 @@
-// lib/blocs/localization/localization_state.dart
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class LocalizationState extends Equatable {
+class LocalizationState {
   final Locale locale;
   final String language;
+  final String Function(BuildContext)? error;
 
   const LocalizationState({
     required this.locale,
     required this.language,
+    this.error,
   });
-
-  @override
-  List<Object?> get props => [locale, language];
 }

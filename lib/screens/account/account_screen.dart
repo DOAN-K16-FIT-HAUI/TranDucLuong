@@ -5,9 +5,13 @@ import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/theme/theme_bloc.dart';
 import 'package:finance_app/blocs/theme/theme_event.dart';
 import 'package:finance_app/blocs/localization/localization_bloc.dart';
-import 'package:finance_app/blocs/localization/localization_event.dart' as localization; // Sử dụng alias
+import 'package:finance_app/blocs/localization/localization_event.dart' as localization;
 import 'package:finance_app/core/app_routes.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/decorations.dart';
+import 'package:finance_app/utils/common_widget/dialogs.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,33 +27,16 @@ class AccountScreen extends StatelessWidget {
       create: (context) => AccountBloc(authBloc: context.read<AuthBloc>())..add(LoadAccountDataEvent()),
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: CommonWidgets.buildAppBar(
+        appBar: AppBarTabBar.buildAppBar(
           context: context,
           title: l10n.appTitle,
           showBackButton: false,
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications_outlined,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-              onPressed: () => AppRoutes.appNotificationRoute,
-            ),
-          ],
         ),
         body: BlocListener<AccountBloc, AccountState>(
           listener: (context, state) {
             if (state is AccountError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    state.message,
-                    style: GoogleFonts.poppins(
-                      color: Theme.of(context).colorScheme.onError,
-                    ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
+                SnackBar(content: Text(state.message(context))),
               );
             } else if (state is AccountPasswordChanged) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -70,7 +57,7 @@ class AccountScreen extends StatelessWidget {
           child: BlocBuilder<AccountBloc, AccountState>(
             builder: (context, state) {
               if (state is AccountLoading) {
-                return CommonWidgets.buildLoadingIndicator(context: context);
+                return UtilityWidgets.buildLoadingIndicator(context: context);
               } else if (state is AccountLoaded) {
                 final isEmailLogin = state.user.loginMethod == 'email';
                 return SingleChildScrollView(
@@ -122,7 +109,7 @@ class AccountScreen extends StatelessWidget {
                         title: l10n.deleteAccount,
                         icon: Icons.delete_outline,
                         onTap: () {
-                          CommonWidgets.showDeleteDialog(
+                          Dialogs.showDeleteDialog(
                             context: context,
                             title: l10n.deleteAccountConfirm,
                             content: l10n.actionCannotBeUndone,
@@ -140,7 +127,7 @@ class AccountScreen extends StatelessWidget {
                   ),
                 );
               } else if (state is AccountError) {
-                return CommonWidgets.buildErrorState(
+                return UtilityWidgets.buildErrorState(
                   context: context,
                   message: state.message,
                   onRetry: () {
@@ -163,13 +150,13 @@ class AccountScreen extends StatelessWidget {
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
 
-    CommonWidgets.showFormDialog(
+    Dialogs.showFormDialog(
       context: context,
       formKey: formKey,
       title: l10n.changePasswordTitle,
       actionButtonText: l10n.confirm,
       formFields: [
-        CommonWidgets.buildTextField(
+        InputFields.buildTextField(
           controller: oldPasswordController,
           label: l10n.oldPassword,
           hint: l10n.enterOldPassword,
@@ -181,7 +168,7 @@ class AccountScreen extends StatelessWidget {
           },
         ),
         const SizedBox(height: 16),
-        CommonWidgets.buildTextField(
+        InputFields.buildTextField(
           controller: newPasswordController,
           label: l10n.newPassword,
           hint: l10n.enterNewPassword,
@@ -196,7 +183,7 @@ class AccountScreen extends StatelessWidget {
           },
         ),
         const SizedBox(height: 16),
-        CommonWidgets.buildTextField(
+        InputFields.buildTextField(
           controller: confirmPasswordController,
           label: l10n.confirmNewPassword,
           hint: l10n.enterConfirmPassword,
@@ -232,13 +219,13 @@ class AccountScreen extends StatelessWidget {
 
     final isEmailLogin = state.user.loginMethod == 'email';
 
-    CommonWidgets.showFormDialog(
+    Dialogs.showFormDialog(
       context: context,
       formKey: formKey,
       title: l10n.editPersonalInfo,
       actionButtonText: l10n.save,
       formFields: [
-        CommonWidgets.buildTextField(
+        InputFields.buildTextField(
           controller: displayNameController,
           label: l10n.displayName,
           hint: l10n.enterDisplayName,
@@ -250,7 +237,7 @@ class AccountScreen extends StatelessWidget {
           },
         ),
         const SizedBox(height: 16),
-        CommonWidgets.buildTextField(
+        InputFields.buildTextField(
           controller: photoUrlController,
           label: l10n.photoUrl,
           hint: l10n.enterPhotoUrl,
@@ -272,7 +259,7 @@ class AccountScreen extends StatelessWidget {
               return Column(
                 children: [
                   const SizedBox(height: 16),
-                  CommonWidgets.buildEmailField(
+                  InputFields.buildEmailField(
                     controller: emailController,
                     onChanged: (value) {
                       setState(() {
@@ -282,7 +269,7 @@ class AccountScreen extends StatelessWidget {
                   ),
                   if (emailChanged) ...[
                     const SizedBox(height: 16),
-                    CommonWidgets.buildPasswordField(
+                    InputFields.buildPasswordField(
                       currentPasswordController,
                       isPasswordVisible,
                           () {
@@ -323,7 +310,7 @@ class AccountScreen extends StatelessWidget {
   Widget _buildUserInfo(BuildContext context, AccountLoaded state) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: CommonWidgets.boxDecoration(context),
+      decoration: Decorations.boxDecoration(context),
       child: ListTile(
         leading: CircleAvatar(
           radius: 30,
@@ -359,7 +346,7 @@ class AccountScreen extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: CommonWidgets.boxDecoration(context),
+      decoration: Decorations.boxDecoration(context),
       child: ListTile(
         title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
         trailing: Switch(
@@ -395,7 +382,7 @@ class AccountScreen extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      child: CommonWidgets.buildDropdownField(
+      child: InputFields.buildDropdownField(
         label: l10n.language,
         value: state.user.language ?? 'Tiếng Việt',
         items: languageDropdownItems,
@@ -424,7 +411,7 @@ class AccountScreen extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: CommonWidgets.boxDecoration(context),
+      decoration: Decorations.boxDecoration(context),
       child: ListTile(
         leading: Icon(
           icon,
@@ -454,7 +441,7 @@ class AccountScreen extends StatelessWidget {
       child: Center(
         child: ElevatedButton(
           onPressed: () {
-            CommonWidgets.showDeleteDialog(
+            Dialogs.showDeleteDialog(
               context: context,
               title: l10n.confirmLogout,
               content: '',

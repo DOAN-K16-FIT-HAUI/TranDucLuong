@@ -1,4 +1,5 @@
 import 'package:finance_app/data/models/transaction.dart';
+import 'package:flutter/material.dart';
 
 abstract class TransactionState {}
 
@@ -13,13 +14,11 @@ class TransactionLoaded extends TransactionState {
 }
 
 class TransactionSuccess extends TransactionState {
-  final String message;
-
+  final String Function(BuildContext) message;
   TransactionSuccess(this.message);
 }
 
 class TransactionError extends TransactionState {
-  final String message;
-
+  final String Function(BuildContext) message;
   TransactionError(this.message);
 }
