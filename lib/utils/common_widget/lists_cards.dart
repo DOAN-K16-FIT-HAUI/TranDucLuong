@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/formatter.dart';
@@ -12,21 +11,16 @@ class ListsCards {
   static Widget buildTabContent<T>({
     required BuildContext context,
     required List<T> items,
-    required Widget Function(BuildContext context, T item, int index)
-    itemBuilder,
+    required Widget Function(BuildContext context, T item, int index) itemBuilder,
     required void Function(int oldIndex, int newIndex) onReorder,
   }) {
     return ReorderableListView.builder(
       padding: const EdgeInsets.all(16).copyWith(bottom: 80),
       itemCount: items.length,
-      itemBuilder:
-          (context, index) => itemBuilder(context, items[index], index),
+      itemBuilder: (context, index) => itemBuilder(context, items[index], index),
       onReorder: (oldIndex, newIndex) {
         if (oldIndex < newIndex) newIndex -= 1;
-        if (oldIndex >= 0 &&
-            oldIndex < items.length &&
-            newIndex >= 0 &&
-            newIndex < items.length) {
+        if (oldIndex >= 0 && oldIndex < items.length && newIndex >= 0 && newIndex < items.length) {
           onReorder(oldIndex, newIndex);
         } else {
           debugPrint(
@@ -68,20 +62,13 @@ class ListsCards {
     List<PopupMenuItem<String>>? menuItems,
     void Function(String)? onMenuSelected,
     Widget? subtitle,
-    EdgeInsetsGeometry margin = const EdgeInsets.symmetric(
-      vertical: 4.0,
-      horizontal: 0,
-    ),
-    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
-      horizontal: 12.0,
-      vertical: 10.0,
-    ),
+    EdgeInsetsGeometry margin = const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
     Color? backgroundColor,
   }) {
     final theme = Theme.of(context);
     final locale = valueLocale ?? Intl.getCurrentLocale();
-    final currencySymbol =
-        NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
 
     return Container(
       key: itemKey,
@@ -103,9 +90,7 @@ class ListsCards {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: (iconColor ?? theme.colorScheme.primary).withValues(
-                    alpha: 0.1,
-                  ),
+                  color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -149,11 +134,7 @@ class ListsCards {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color:
-                            amountColor ??
-                            (value >= 0
-                                ? AppTheme.incomeColor
-                                : AppTheme.expenseColor),
+                        color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -205,6 +186,34 @@ class ListsCards {
     }
   }
 
+  static String getLocalizedCategory(BuildContext context, String categoryKey) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (categoryKey) {
+      case "food":
+        return l10n.categoryFood;
+      case "living":
+        return l10n.categoryLiving;
+      case "transport":
+        return l10n.categoryTransport;
+      case "health":
+        return l10n.categoryHealth;
+      case "shopping":
+        return l10n.categoryShopping;
+      case "entertainment":
+        return l10n.categoryEntertainment;
+      case "education":
+        return l10n.categoryEducation;
+      case "bills":
+        return l10n.categoryBills;
+      case "gift":
+        return l10n.categoryGift;
+      case "other":
+        return l10n.categoryOther;
+      default:
+        return categoryKey;
+    }
+  }
+
   static Widget buildTransactionListItem({
     required BuildContext context,
     required TransactionModel transaction,
@@ -216,15 +225,9 @@ class ListsCards {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final iconData = ListsCards.getTransactionIcon(
-      context,
-      transaction.typeKey,
-    );
+    final iconData = ListsCards.getTransactionIcon(context, transaction.typeKey);
     final amountColor = ListsCards.getAmountColor(context, transaction.typeKey);
-    final amountPrefix = ListsCards.getAmountPrefix(
-      context,
-      transaction.typeKey,
-    );
+    final amountPrefix = ListsCards.getAmountPrefix(context, transaction.typeKey);
 
     final formattedAmount = Formatter.formatCurrency(
       transaction.amount,
@@ -236,16 +239,25 @@ class ListsCards {
     );
 
     String subtitleText = '$formattedTime • ${transaction.wallet ?? ''}';
-    if (transaction.typeKey == "expense" && transaction.category.isNotEmpty) {
-      subtitleText = '$formattedTime • ${transaction.category}';
+    if (transaction.typeKey == "expense" && transaction.categoryKey.isNotEmpty) {
+      subtitleText = '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
+    } else if (transaction.typeKey == "income" && transaction.categoryKey.isNotEmpty) {
+      subtitleText = '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
     } else if (transaction.typeKey == "transfer") {
       subtitleText =
-          '$formattedTime • ${l10n.from}: ${transaction.fromWallet ?? '?'} → ${l10n.to}: ${transaction.toWallet ?? '?'}';
+      '$formattedTime • ${l10n.from}: ${transaction.fromWallet ?? '?'} → ${l10n.to}: ${transaction.toWallet ?? '?'}';
     } else if (transaction.typeKey == "borrow" && transaction.lender != null) {
-      subtitleText =
-          '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}';
+      subtitleText = '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}';
     } else if (transaction.typeKey == "lend" && transaction.borrower != null) {
       subtitleText = '$formattedTime • ${l10n.lendTo}: ${transaction.borrower}';
+    } else if (transaction.typeKey == "adjustment" && transaction.wallet != null) {
+      final formattedBalanceAfter = transaction.balanceAfter != null
+          ? Formatter.formatCurrency(
+        transaction.balanceAfter!,
+        locale: Localizations.localeOf(context),
+      )
+          : '';
+      subtitleText = '$formattedTime • ${transaction.wallet}${transaction.balanceAfter != null ? ' ($formattedBalanceAfter)' : ''}';
     }
 
     return Card(
@@ -269,13 +281,11 @@ class ListsCards {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor:
-                    iconData['backgroundColor']?.withValues(alpha: 0.15) ??
+                backgroundColor: iconData['backgroundColor']?.withValues(alpha: 0.15) ??
                     theme.colorScheme.primary.withValues(alpha: 0.15),
                 child: Icon(
                   iconData['icon'],
-                  color:
-                      iconData['backgroundColor'] ?? theme.colorScheme.primary,
+                  color: iconData['backgroundColor'] ?? theme.colorScheme.primary,
                   size: 18,
                 ),
               ),
@@ -326,9 +336,7 @@ class ListsCards {
                     PopupMenuButton<String>(
                       icon: Icon(
                         Icons.more_vert,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         size: 22,
                       ),
                       offset: const Offset(0, 35),
@@ -350,50 +358,77 @@ class ListsCards {
     );
   }
 
-  static Map<String, dynamic> getTransactionIcon(
-    BuildContext context,
-    String typeKey,
-  ) {
-    if (typeKey == "income") {
-      return {'icon': Icons.arrow_downward, 'backgroundColor': Colors.green};
-    } else if (typeKey == "expense") {
-      return {'icon': Icons.arrow_upward, 'backgroundColor': Colors.red};
-    } else if (typeKey == "transfer") {
-      return {'icon': Icons.swap_horiz, 'backgroundColor': Colors.blue};
-    } else if (typeKey == "borrow") {
-      return {'icon': Icons.call_received, 'backgroundColor': Colors.purple};
-    } else if (typeKey == "lend") {
-      return {'icon': Icons.call_made, 'backgroundColor': Colors.orange};
-    } else if (typeKey == "adjustment") {
-      return {'icon': Icons.tune, 'backgroundColor': Colors.teal};
-    } else {
-      return {'icon': Icons.help_outline, 'backgroundColor': Colors.grey};
+  static Map<String, dynamic> getTransactionIcon(BuildContext context, String typeKey) {
+    switch (typeKey) {
+      case "income":
+        return {
+          'icon': Icons.arrow_downward,
+          'backgroundColor': AppTheme.incomeColor,
+        };
+      case "expense":
+        return {
+          'icon': Icons.arrow_upward,
+          'backgroundColor': AppTheme.expenseColor,
+        };
+      case "transfer":
+        return {
+          'icon': Icons.swap_horiz,
+          'backgroundColor': AppTheme.transferColor,
+        };
+      case "borrow":
+        return {
+          'icon': Icons.call_received,
+          'backgroundColor': AppTheme.borrowColor,
+        };
+      case "lend":
+        return {
+          'icon': Icons.call_made,
+          'backgroundColor': AppTheme.lendColor,
+        };
+      case "adjustment":
+        return {
+          'icon': Icons.tune,
+          'backgroundColor': AppTheme.adjustmentColor,
+        };
+      default:
+        return {
+          'icon': Icons.help_outline,
+          'backgroundColor': Colors.grey,
+        };
     }
   }
 
   static Color getAmountColor(BuildContext context, String typeKey) {
-    if (typeKey == "income" || typeKey == "borrow") {
-      return AppTheme.incomeColor;
-    } else if (typeKey == "expense" ||
-        typeKey == "lend" ||
-        typeKey == "transfer") {
-      return AppTheme.expenseColor;
-    } else if (typeKey == "adjustment") {
-      return Theme.of(context).colorScheme.onSurface;
-    } else {
-      return Theme.of(context).colorScheme.onSurface;
+    switch (typeKey) {
+      case "income":
+        return AppTheme.incomeColor;
+      case "expense":
+        return AppTheme.expenseColor;
+      case "transfer":
+        return AppTheme.transferColor;
+      case "borrow":
+        return AppTheme.borrowColor;
+      case "lend":
+        return AppTheme.lendColor;
+      case "adjustment":
+        return AppTheme.adjustmentColor;
+      default:
+        return Theme.of(context).colorScheme.onSurface;
     }
   }
 
   static String getAmountPrefix(BuildContext context, String typeKey) {
-    if (typeKey == "income" || typeKey == "borrow" || typeKey == "adjustment") {
-      return '';
-    } else if (typeKey == "expense" ||
-        typeKey == "lend" ||
-        typeKey == "transfer") {
-      return '-';
-    } else {
-      return '';
+    switch (typeKey) {
+      case "income":
+      case "borrow":
+      case "adjustment":
+        return '';
+      case "expense":
+      case "lend":
+      case "transfer":
+        return '-';
+      default:
+        return '';
     }
   }
 }

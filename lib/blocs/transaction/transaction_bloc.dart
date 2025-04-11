@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:finance_app/blocs/transaction/transaction_event.dart';
 import 'package:finance_app/blocs/transaction/transaction_state.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
-import 'package:flutter/material.dart'; // Thêm để dùng BuildContext
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {

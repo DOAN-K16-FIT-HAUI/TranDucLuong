@@ -24,16 +24,16 @@ class Constants {
   // Hàm lấy danh sách availableCategories từ l10n (nếu muốn dịch danh mục)
   static List<String> getAvailableCategories(AppLocalizations l10n) {
     return [
-      l10n.categoryFood,
-      l10n.categoryLiving,
-      l10n.categoryTransport,
-      l10n.categoryHealth,
-      l10n.categoryShopping,
-      l10n.categoryEntertainment,
-      l10n.categoryEducation,
-      l10n.categoryBills,
-      l10n.categoryGift,
-      l10n.categoryOther,
+      'food',
+      'living',
+      'transport',
+      'health',
+      'shopping',
+      'entertainment',
+      'education',
+      'bills',
+      'gift',
+      'other',
     ];
   }
 }

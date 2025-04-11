@@ -375,11 +375,6 @@ class AccountScreen extends StatelessWidget {
       );
     }).toList();
 
-    // Đảm bảo giá trị hiện tại nằm trong danh sách, nếu không thì dùng giá trị đầu tiên
-    final String currentValue = languages.contains(state.user.language)
-        ? state.user.language!
-        : languages.first;
-
     return Container(
       margin: const EdgeInsets.only(top: 8),
       child: InputFields.buildDropdownField(
