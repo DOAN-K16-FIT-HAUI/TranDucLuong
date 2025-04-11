@@ -36,9 +36,13 @@ class AppTheme {
   static const Color _successLight = Color(0xFF198754);
   static const Color _successDark = Color(0xFF2A9D8F);
 
-  // Income and expense colors
-  static const Color incomeColor = Color(0xFF198754);
-  static const Color expenseColor = Color(0xFFD62828);
+  // Transaction type colors
+  static const Color incomeColor = Color(0xFF198754); // Green for income
+  static const Color expenseColor = Color(0xFFD62828); // Red for expense
+  static const Color transferColor = Color(0xFF1E4B94); // Deep blue for transfer
+  static const Color borrowColor = Color(0xFF7209B7); // Purple for borrow
+  static const Color lendColor = Color(0xFFFF9F1C); // Orange for lend
+  static const Color adjustmentColor = Color(0xFF2A9D8F); // Teal for adjustment
 
   // Light theme
   static ThemeData lightTheme = ThemeData(
@@ -322,4 +326,3 @@ class AppTheme {
     ),
   );
 }
-

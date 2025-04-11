@@ -6,7 +6,8 @@ import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/app_notification.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
 import 'package:finance_app/data/services/firebase_messaging_service.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,7 +24,7 @@ class NotificationScreen extends StatelessWidget {
           )..add(InitializeNotifications()),
       child: Scaffold(
         backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-        appBar: CommonWidgets.buildAppBar(
+        appBar: AppBarTabBar.buildAppBar(
           context: context,
           title: 'Thông báo',
           onBackPressed: () => AppRoutes.navigateToDashboard(context),
@@ -92,7 +93,7 @@ class NotificationScreen extends StatelessWidget {
           );
         }
       },
-      child: CommonWidgets.buildItemCard(
+      child: ListsCards.buildItemCard(
         context: context,
         item: notification,
         itemKey: ValueKey(notification.id),

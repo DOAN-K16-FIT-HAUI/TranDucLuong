@@ -1,46 +1,30 @@
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Validators {
-  static String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập email';
-    }
-    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegExp.hasMatch(value)) {
-      return 'Email không hợp lệ';
-    }
+  static String? validateEmail(String? value, AppLocalizations l10n) {
+    if (value == null || value.isEmpty) return l10n.enterEmailHint;
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) return l10n.invalidEmail;
     return null;
   }
 
-  static String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập mật khẩu';
-    }
-    if (value.length < 6) {
-      return 'Mật khẩu phải có ít nhất 6 ký tự';
-    }
+  static String? validatePassword(String? value, AppLocalizations l10n) {
+    if (value == null || value.isEmpty) return l10n.enterPasswordHint;
+    if (value.length < 6) return l10n.passwordMinLength;
     return null;
   }
 
-  static String? validateBalance(String? value, {required double currentBalance}) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập số dư';
-    }
+  static String? validateBalance(String? value, {required double currentBalance, AppLocalizations? l10n}) { // Thêm l10n tùy chọn
+    if (value == null || value.isEmpty) return l10n?.pleaseEnterBalance; // Key mới
 
-    // Remove any non-numeric characters (e.g., commas from currency formatting)
     final cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
-    if (cleanValue.isEmpty) {
-      return 'Số dư không hợp lệ';
-    }
+    if (cleanValue.isEmpty) return l10n?.invalidBalance; // Key mới
 
     final balance = double.tryParse(cleanValue);
-    if (balance == null) {
-      return 'Số dư phải là một số hợp lệ';
-    }
+    if (balance == null) return l10n?.invalidBalance; // Key mới
 
-    if (balance < 0) {
-      return 'Số dư không thể âm';
-    }
+    if (balance < 0) return l10n?.balanceCannotBeNegative; // Key mới
 
     return null;
   }
@@ -49,112 +33,78 @@ class Validators {
     required String? value,
     required String transactionType,
     required double walletBalance,
+    required AppLocalizations l10n,
   }) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập số tiền';
-    }
+    if (value == null || value.isEmpty) return l10n.enterAmountHint;
 
-    // Remove any non-numeric characters (e.g., commas from currency formatting)
     final cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
-    if (cleanValue.isEmpty) {
-      return 'Số tiền không hợp lệ';
-    }
+    if (cleanValue.isEmpty) return l10n.invalidAmount;
 
     final amount = double.tryParse(cleanValue);
-    if (amount == null) {
-      return 'Số tiền phải là một số hợp lệ';
-    }
+    if (amount == null) return l10n.invalidAmount;
+    if (amount <= 0) return l10n.amountMustBePositive;
 
-    if (amount <= 0) {
-      return 'Số tiền phải lớn hơn 0';
-    }
-
-    // Validate against wallet balance for outflow transactions
-    if (transactionType == 'Chi tiêu' || transactionType == 'Chuyển khoản' || transactionType == 'Cho vay') {
+    // !! So sánh type gốc !!
+    if (transactionType == 'expense' || transactionType == 'transfer' || transactionType == 'lend') {
       if (amount > walletBalance) {
-        return 'Số tiền vượt quá số dư ví (${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(walletBalance)})';
+        final locale = Intl.getCurrentLocale();
+        final formattedBalance = NumberFormat.currency(locale: locale, symbol: '', decimalDigits: 0).format(walletBalance);
+        return l10n.insufficientBalanceShortError(formattedBalance);
       }
     }
-
     return null;
   }
 
-  static String? validateCategory(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng chọn danh mục';
-    }
+  static String? validateCategory(String? value, {AppLocalizations? l10n}) { // Thêm l10n tùy chọn
+    if (value == null || value.isEmpty) return l10n?.pleaseSelectCategory; // Key mới
     return null;
   }
 
-  static String? validateDate(DateTime? date) {
-    if (date == null) {
-      return 'Vui lòng chọn ngày';
-    }
-    if (date.isAfter(DateTime.now())) {
-      return 'Ngày không được trong tương lai';
-    }
+  static String? validateDate(DateTime? date, {AppLocalizations? l10n}) { // Thêm l10n tùy chọn
+    if (date == null) return l10n?.pleaseSelectDate;
+    // Bỏ kiểm tra ngày tương lai nếu bạn cho phép
+    // if (date.isAfter(DateTime.now())) return l10n.dateCannotBeInFuture;
     return null;
   }
 
-  static String? validateString(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập giá trị';
-    }
+  static String? validateString(String? value, {AppLocalizations? l10n}) { // Thêm l10n tùy chọn
+    if (value == null || value.isEmpty) return l10n?.pleaseEnterValue; // Key mới
     return null;
   }
 
-  static String? validateRepaymentDate(DateTime? repaymentDate, DateTime transactionDate) {
+  static String? validateRepaymentDate(DateTime? repaymentDate, DateTime transactionDate, {AppLocalizations? l10n}) {
     if (repaymentDate != null) {
-      // Ngày trả không được trước ngày giao dịch (cùng ngày thì OK)
       final transactionDayStart = DateTime(transactionDate.year, transactionDate.month, transactionDate.day);
       final repaymentDayStart = DateTime(repaymentDate.year, repaymentDate.month, repaymentDate.day);
       if (repaymentDayStart.isBefore(transactionDayStart)){
-        return 'Ngày hẹn trả không được trước ngày giao dịch.';
+        return l10n?.repaymentDateCannotBeBeforeTransactionDate;
       }
     }
-    return null; // Hợp lệ nếu null hoặc không trước ngày giao dịch
+    return null;
   }
 
-  static String? validateBalanceAfterAdjustment(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập số dư thực tế.';
-    }
+  static String? validateBalanceAfterAdjustment(String? value, {AppLocalizations? l10n}) {
+    if (value == null || value.isEmpty) return l10n?.pleaseEnterActualBalance;
     final amountString = value.replaceAll(RegExp(r'[^0-9.]'), '');
     final amount = double.tryParse(amountString);
-    if (amount == null) {
-      return 'Số dư không hợp lệ.';
-    }
-    // Có thể cho phép số dư âm tùy theo logic kinh doanh
-    // if (amount < 0) {
-    //   return 'Số dư không được là số âm.';
-    // }
+    if (amount == null) return l10n?.invalidBalance;
     return null;
   }
 
-  static String? validateDescription(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Vui lòng nhập diễn giải.';
-    }
-    if (value.length > 100) { // Giới hạn độ dài ví dụ
-      return 'Diễn giải quá dài (tối đa 100 ký tự).';
-    }
+  static String? validateDescription(String? value, {AppLocalizations? l10n}) { // Thêm l10n tùy chọn
+    if (value == null || value.trim().isEmpty) return l10n?.pleaseEnterDescription; // Key mới
+    if (value.length > 100) return l10n?.descriptionTooLong; // Key mới
     return null;
   }
 
-  static String? validateWallet(String? value, {String fieldName = "Ví", String? checkAgainst}) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng chọn $fieldName.';
-    }
-    if (checkAgainst != null && value == checkAgainst) {
-      return '$fieldName không được trùng với Ví nguồn.';
-    }
+  static String? validateWallet(String? value, {required String fieldName, String? checkAgainst, AppLocalizations? l10n}) {
+    if (value == null || value.isEmpty) return l10n?.pleaseSelectField(fieldName);
+    if (checkAgainst != null && value == checkAgainst) return l10n?.fieldCannotBeSameAsSource(fieldName);
     return null;
   }
 
-  static String? validateNotEmpty(String? value, {String fieldName = "Trường này"}) {
-    if (value == null || value.trim().isEmpty) {
-      return '$fieldName không được để trống.';
-    }
+  static String? validateNotEmpty(String? value, {required String fieldName, AppLocalizations? l10n}) {
+    if (value == null || value.trim().isEmpty) return l10n?.fieldCannotBeEmpty(fieldName);
     return null;
   }
 }

@@ -5,825 +5,751 @@ import 'package:finance_app/blocs/transaction/transaction_event.dart';
 import 'package:finance_app/blocs/transaction/transaction_state.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
+import 'package:finance_app/blocs/wallet/wallet_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/data/models/wallet.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:finance_app/utils/constants.dart';
-import 'package:finance_app/utils/formatter.dart';
 import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class TransactionListScreen extends StatefulWidget {
-  const TransactionListScreen({super.key});
+class TransactionScreen extends StatefulWidget {
+  const TransactionScreen({super.key});
 
   @override
-  State<TransactionListScreen> createState() => _TransactionListScreenState();
+  TransactionScreenState createState() => TransactionScreenState();
 }
 
-class _TransactionListScreenState extends State<TransactionListScreen>
-    with TickerProviderStateMixin {
-  String? _userId;
-  bool _isInitialized = false;
-  late TabController _tabController;
-  int _selectedTabIndex = 0;
-  bool _isSearching = false;
-  String _searchQuery = '';
+class TransactionScreenState extends State<TransactionScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _balanceAfterController = TextEditingController();
+  final TextEditingController _lenderController = TextEditingController();
+  final TextEditingController _borrowerController = TextEditingController();
+
+  DateTime _selectedDate = DateTime.now();
+  DateTime? _repaymentDate;
+  String _selectedCategoryKey = 'food'; // Lưu categoryKey cố định
+  String _selectedType = ''; // Chuỗi đã dịch, dùng cho UI
+  String _selectedWallet = '';
+  String _selectedFromWallet = '';
+  String _selectedToWallet = '';
+
+  String? _dateError;
+  String? _repaymentDateError;
+
+  List<Wallet> _allWallets = [];
+  Map<String, double> _walletBalances = {};
+
+  bool _isSaving = false;
+  bool _isLoadingWallets = true;
+
+  // Map ánh xạ giữa categoryKey và giá trị dịch
+  Map<String, String> _categoryMap = {};
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.index != _selectedTabIndex) {
-        setState(() {
-          _selectedTabIndex = _tabController.index;
-        });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _initializeDefaultValues();
+        _loadWallets();
       }
     });
+  }
 
+  void _initializeDefaultValues() {
+    final l10n = AppLocalizations.of(context)!;
+    final types = Constants.getTransactionTypes(l10n);
+    _updateCategoryMap(l10n);
+    if (mounted) {
+      setState(() {
+        _selectedCategoryKey = _categoryMap.keys.isNotEmpty ? _categoryMap.keys.first : 'food';
+        _selectedType = types.isNotEmpty ? types.first : '';
+        _setDefaultWallets();
+      });
+    }
+  }
+
+  void _updateCategoryMap(AppLocalizations l10n) {
+    _categoryMap = {
+      'food': l10n.categoryFood,
+      'living': l10n.categoryLiving,
+      'transport': l10n.categoryTransport,
+      'health': l10n.categoryHealth,
+      'shopping': l10n.categoryShopping,
+      'entertainment': l10n.categoryEntertainment,
+      'education': l10n.categoryEducation,
+      'bills': l10n.categoryBills,
+      'gift': l10n.categoryGift,
+      'other': l10n.categoryOther,
+    };
+  }
+
+  void _loadWallets() {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
-      _userId = authState.user.id;
-      context.read<TransactionBloc>().add(LoadTransactions(_userId!));
-      _isInitialized = true;
+      context.read<WalletBloc>().add(LoadWallets());
     } else {
-      debugPrint("TransactionListScreen: User not authenticated.");
+      if (mounted) {
+        setState(() {
+          _isLoadingWallets = false;
+        });
+        _showLoginRequiredSnackbar(context);
+      }
     }
+  }
+
+  void _showLoginRequiredSnackbar(BuildContext context) {
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    UtilityWidgets.showCustomSnackBar(
+      context: context,
+      message: l10n.loginToAddTransaction,
+      backgroundColor: AppTheme.lightTheme.colorScheme.error,
+    );
+  }
+
+  String _mapLocalizedTypeToKey(String localizedType, AppLocalizations l10n) {
+    if (localizedType == l10n.transactionTypeExpense) return "expense";
+    if (localizedType == l10n.transactionTypeIncome) return "income";
+    if (localizedType == l10n.transactionTypeTransfer) return "transfer";
+    if (localizedType == l10n.transactionTypeBorrow) return "borrow";
+    if (localizedType == l10n.transactionTypeLend) return "lend";
+    if (localizedType == l10n.transactionTypeAdjustment) return "adjustment";
+    return localizedType; // Fallback
+  }
+
+  void _saveTransaction() {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_isSaving || _isLoadingWallets) return;
+
+    if (mounted) {
+      setState(() {
+        _dateError = Validators.validateDate(_selectedDate);
+        if (_selectedType == l10n.transactionTypeBorrow ||
+            _selectedType == l10n.transactionTypeLend) {
+          _repaymentDateError = Validators.validateRepaymentDate(
+            _repaymentDate,
+            _selectedDate,
+          );
+        } else {
+          _repaymentDateError = null;
+        }
+      });
+    }
+    if (_dateError != null || _repaymentDateError != null) {
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.checkDateError,
+        backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      );
+    }
+
+    if (_formKey.currentState?.validate() ?? false) {
+      final authState = context.read<AuthBloc>().state;
+      if (authState is! AuthAuthenticated) {
+        UtilityWidgets.showCustomSnackBar(
+          context: context,
+          message: l10n.userNotLoggedInError,
+          backgroundColor: AppTheme.lightTheme.colorScheme.error,
+        );
+        return;
+      }
+      final userId = authState.user.id;
+
+      if (_selectedType == l10n.transactionTypeTransfer) {
+        if (_selectedFromWallet.isEmpty || _selectedToWallet.isEmpty) {
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.selectSourceAndDestinationWalletError,
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
+          );
+          return;
+        }
+        if (_allWallets.length > 1 && _selectedFromWallet == _selectedToWallet) {
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.sourceAndDestinationWalletCannotBeSameError,
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
+          );
+          return;
+        }
+      } else if (_selectedType != l10n.transactionTypeIncome) {
+        if (_selectedWallet.isEmpty) {
+          String displayType = _selectedType;
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.selectWalletForTransactionError(displayType),
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
+          );
+          return;
+        }
+      }
+
+      final amount = double.tryParse(
+        _amountController.text.replaceAll(RegExp(r'[^0-9.]'), ''),
+      ) ??
+          0.0;
+      final balanceAfter = _selectedType == l10n.transactionTypeAdjustment
+          ? (double.tryParse(
+        _balanceAfterController.text.replaceAll(RegExp(r'[^0-9.]'), ''),
+      ) ??
+          0.0)
+          : null;
+
+      String sourceWalletName = '';
+      if (_selectedType == l10n.transactionTypeExpense ||
+          _selectedType == l10n.transactionTypeLend) {
+        sourceWalletName = _selectedWallet;
+      } else if (_selectedType == l10n.transactionTypeTransfer) {
+        sourceWalletName = _selectedFromWallet;
+      }
+
+      if (sourceWalletName.isNotEmpty) {
+        final sourceBalance = _walletBalances[sourceWalletName] ?? 0.0;
+        if (amount > sourceBalance) {
+          final locale = Intl.getCurrentLocale();
+          final formattedSourceBalance = NumberFormat.currency(
+            locale: locale,
+            symbol: '',
+            decimalDigits: 0,
+          ).format(sourceBalance);
+          final formattedAmount = NumberFormat.currency(
+            locale: locale,
+            symbol: '',
+            decimalDigits: 0,
+          ).format(amount);
+          UtilityWidgets.showCustomSnackBar(
+            context: context,
+            message: l10n.insufficientBalanceError(
+              sourceWalletName,
+              formattedSourceBalance,
+              formattedAmount,
+            ),
+            backgroundColor: AppTheme.lightTheme.colorScheme.error,
+          );
+          return;
+        }
+      }
+
+      final transaction = TransactionModel(
+        id: '',
+        userId: userId,
+        description: _descriptionController.text.trim(),
+        amount: amount,
+        date: _selectedDate,
+        typeKey: _mapLocalizedTypeToKey(_selectedType, l10n),
+        categoryKey: _selectedType == l10n.transactionTypeExpense ? _selectedCategoryKey : '',
+        wallet: (_selectedType != l10n.transactionTypeTransfer) ? _selectedWallet : null,
+        fromWallet: (_selectedType == l10n.transactionTypeTransfer) ? _selectedFromWallet : null,
+        toWallet: (_selectedType == l10n.transactionTypeTransfer) ? _selectedToWallet : null,
+        lender: (_selectedType == l10n.transactionTypeBorrow) ? _lenderController.text.trim() : null,
+        borrower: (_selectedType == l10n.transactionTypeLend) ? _borrowerController.text.trim() : null,
+        repaymentDate: (_selectedType == l10n.transactionTypeBorrow || _selectedType == l10n.transactionTypeLend)
+            ? _repaymentDate
+            : null,
+        balanceAfter: balanceAfter,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isSaving = true;
+        });
+      }
+      context.read<TransactionBloc>().add(AddTransaction(transaction));
+    } else {
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.checkInputError,
+        backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      );
+    }
+  }
+
+  void _resetForm() {
+    if (!mounted) return;
+    _formKey.currentState?.reset();
+    final l10n = AppLocalizations.of(context)!;
+    _updateCategoryMap(l10n);
+    final types = Constants.getTransactionTypes(l10n);
+    if (mounted) {
+      setState(() {
+        _descriptionController.clear();
+        _amountController.clear();
+        _balanceAfterController.clear();
+        _lenderController.clear();
+        _borrowerController.clear();
+        _selectedDate = DateTime.now();
+        _repaymentDate = null;
+        _selectedCategoryKey = _categoryMap.keys.isNotEmpty ? _categoryMap.keys.first : 'food';
+        _selectedType = types.isNotEmpty ? types.first : '';
+        _dateError = null;
+        _repaymentDateError = null;
+        _setDefaultWallets();
+      });
+    }
+  }
+
+  void _setDefaultWallets() {
+    if (!mounted) return;
+    setState(() {
+      if (_allWallets.isNotEmpty) {
+        _selectedWallet = _allWallets.any((w) => w.name == _selectedWallet)
+            ? _selectedWallet
+            : _allWallets.first.name;
+        _selectedFromWallet = _allWallets.any((w) => w.name == _selectedFromWallet)
+            ? _selectedFromWallet
+            : _allWallets.first.name;
+        final availableToWallets = _allWallets.where((w) => w.name != _selectedFromWallet).toList();
+        _selectedToWallet = _allWallets.any((w) => w.name == _selectedToWallet && w.name != _selectedFromWallet)
+            ? _selectedToWallet
+            : (availableToWallets.isNotEmpty ? availableToWallets.first.name : _allWallets.first.name);
+      } else {
+        _selectedWallet = '';
+        _selectedFromWallet = '';
+        _selectedToWallet = '';
+      }
+    });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _descriptionController.dispose();
+    _amountController.dispose();
+    _balanceAfterController.dispose();
+    _lenderController.dispose();
+    _borrowerController.dispose();
     super.dispose();
-  }
-
-  Map<String, List<TransactionModel>> _groupTransactionsByDay(
-    List<TransactionModel> transactions,
-  ) {
-    final grouped = <String, List<TransactionModel>>{};
-    for (final transaction in transactions) {
-      final dayKey = Formatter.formatDay(transaction.date);
-      (grouped[dayKey] ??= []).add(transaction);
-    }
-    return grouped;
-  }
-
-  Map<String, List<TransactionModel>> _groupTransactionsByMonth(
-    List<TransactionModel> transactions,
-  ) {
-    final grouped = <String, List<TransactionModel>>{};
-    for (final transaction in transactions) {
-      final monthKey = Formatter.formatMonth(transaction.date);
-      (grouped[monthKey] ??= []).add(transaction);
-    }
-    return grouped;
-  }
-
-  Map<String, List<TransactionModel>> _groupTransactionsByYear(
-    List<TransactionModel> transactions,
-  ) {
-    final grouped = <String, List<TransactionModel>>{};
-    for (final transaction in transactions) {
-      final yearKey = Formatter.formatYear(transaction.date);
-      (grouped[yearKey] ??= []).add(transaction);
-    }
-    return grouped;
-  }
-
-  List<TransactionModel> _filterTransactions(
-    String query,
-    List<TransactionModel> transactions,
-  ) {
-    if (query.isEmpty) return transactions;
-    return transactions.where((transaction) {
-      return transaction.description.toLowerCase().contains(
-            query.toLowerCase(),
-          ) ||
-          transaction.type.toLowerCase().contains(query.toLowerCase()) ||
-          (transaction.category.isNotEmpty &&
-              transaction.category.toLowerCase().contains(
-                query.toLowerCase(),
-              )) ||
-          (transaction.wallet != null &&
-              transaction.wallet!.toLowerCase().contains(query.toLowerCase()));
-    }).toList();
-  }
-
-  Widget _buildGroupedListView(
-    Map<String, List<TransactionModel>> groupedData,
-  ) {
-    if (groupedData.isEmpty) {
-      return Center(
-        child: Text(
-          _isSearching
-              ? 'Không tìm thấy giao dịch phù hợp'
-              : 'Không có giao dịch nào',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
-              alpha: 204,
-            ),
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    final groupKeys = groupedData.keys.toList();
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8.0).copyWith(bottom: 80),
-      itemCount: groupKeys.length,
-      itemBuilder: (context, index) {
-        final groupKey = groupKeys[index];
-        final groupTransactions = groupedData[groupKey]!;
-
-        double groupIncome = groupTransactions
-            .where((t) => t.type == 'Thu nhập' || t.type == 'Đi vay')
-            .fold(0.0, (sum, t) => sum + t.amount);
-        double groupExpense = groupTransactions
-            .where((t) => t.type == 'Chi tiêu' || t.type == 'Cho vay')
-            .fold(0.0, (sum, t) => sum + t.amount);
-        double groupNet = groupIncome - groupExpense;
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    groupKey,
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: AppTheme.lightTheme.colorScheme.primary.withValues(
-                        alpha: 0.9,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    Formatter.formatCurrency(groupNet),
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color:
-                          groupNet >= 0
-                              ? AppTheme.incomeColor
-                              : AppTheme.expenseColor,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children:
-                    groupTransactions
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => _buildTransactionCard(
-                            context: context,
-                            transaction: entry.value,
-                            type: _selectedTabIndex,
-                            index: entry.key,
-                          ),
-                        )
-                        .toList(),
-              ),
-              if (index < groupKeys.length - 1)
-                Divider(
-                  height: 16,
-                  thickness: 0.5,
-                  indent: 16,
-                  endIndent: 16,
-                  color: AppTheme.lightTheme.colorScheme.onSurface.withValues(
-                    alpha: 0.2,
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTransactionCard({
-    required BuildContext context,
-    required TransactionModel transaction,
-    required int type,
-    required int index,
-  }) {
-    return CommonWidgets.buildItemCard(
-      context: context,
-      item: transaction,
-      itemKey: ValueKey(transaction.id),
-      title:
-          transaction.description.isNotEmpty
-              ? transaction.description
-              : 'Không có mô tả',
-      value: transaction.amount,
-      icon:
-          transaction.type == 'Thu nhập' || transaction.type == 'Đi vay'
-              ? Icons.arrow_downward
-              : Icons.arrow_upward,
-      menuItems: CommonWidgets.buildEditDeleteMenuItems(),
-      onMenuSelected: (result) {
-        CommonWidgets.handleEditDeleteActions(
-          context: context,
-          action: result,
-          item: transaction,
-          itemName:
-              transaction.description.isNotEmpty
-                  ? transaction.description
-                  : 'giao dịch này',
-          onEdit:
-              (context, transaction) => _showEditDialog(context, transaction),
-          onDelete:
-              (context, transaction) => context.read<TransactionBloc>().add(
-                DeleteTransaction(transaction.id),
-              ),
-        );
-      },
-    );
-  }
-
-  void _showEditDialog(BuildContext context, TransactionModel transaction) {
-    final formKey = GlobalKey<FormState>();
-    final descriptionController = TextEditingController(
-      text: transaction.description,
-    );
-    final amountController = TextEditingController(
-      text:
-          Formatter.currencyInputFormatter
-              .formatEditUpdate(
-                TextEditingValue.empty,
-                TextEditingValue(text: transaction.amount.toString()),
-              )
-              .text,
-    );
-    DateTime selectedDate = transaction.date;
-    String selectedType = transaction.type;
-    String selectedCategory = transaction.category;
-    String? selectedWallet = transaction.wallet;
-    String? selectedFromWallet = transaction.fromWallet;
-    String? selectedToWallet = transaction.toWallet;
-    final lenderController = TextEditingController(
-      text: transaction.lender ?? '',
-    );
-    final borrowerController = TextEditingController(
-      text: transaction.borrower ?? '',
-    );
-    DateTime? selectedRepaymentDate = transaction.repaymentDate;
-
-    // Danh sách cho dropdown (tương tự TransactionScreen)
-    final List<String> transactionTypes = Constants.transactionTypes;
-    final List<String> categories = Constants.availableCategories;
-
-    // Lấy danh sách ví từ WalletBloc
-    List<String> walletNames = [];
-    final walletState = context.read<WalletBloc>().state;
-    final allWallets =
-        [
-          ...walletState.wallets,
-          ...walletState.savingsWallets,
-          ...walletState.investmentWallets,
-        ].where((w) => w.id.isNotEmpty).toList();
-    allWallets.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
-    walletNames = allWallets.map((wallet) => wallet.name).toList();
-
-    // Nếu ví hiện tại không có trong danh sách, đặt về giá trị mặc định
-    if (!walletNames.contains(selectedWallet) && walletNames.isNotEmpty) {
-      selectedWallet = walletNames.first;
-    }
-    if (!walletNames.contains(selectedFromWallet) && walletNames.isNotEmpty) {
-      selectedFromWallet = walletNames.first;
-    }
-    if (!walletNames.contains(selectedToWallet) && walletNames.isNotEmpty) {
-      final availableToWallets =
-          walletNames.where((name) => name != selectedFromWallet).toList();
-      selectedToWallet =
-          availableToWallets.isNotEmpty
-              ? availableToWallets.first
-              : walletNames.first;
-    }
-
-    CommonWidgets.showFormDialog(
-      context: context,
-      formKey: formKey,
-      formFields: [
-        CommonWidgets.buildTextField(
-          controller: descriptionController,
-          label: 'Diễn giải',
-          hint: 'Nhập mô tả (vd: Ăn trưa, Tiền nhà)',
-          validator: Validators.validateDescription,
-        ),
-        const SizedBox(height: 16),
-        CommonWidgets.buildBalanceInputField(
-          amountController,
-          validator: Validators.validateBalanceAfterAdjustment,
-        ),
-        const SizedBox(height: 16),
-        CommonWidgets.buildDatePickerField(
-          context: context,
-          date: selectedDate,
-          label: 'Ngày giao dịch',
-          onTap: () async {
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: selectedDate,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2100),
-            );
-            if (pickedDate != null) {
-              setState(() => selectedDate = pickedDate);
-            }
-          },
-        ),
-        const SizedBox(height: 16),
-        StatefulBuilder(
-          builder:
-              (context, setState) => CommonWidgets.buildDropdownField(
-                label: 'Loại giao dịch',
-                value: selectedType,
-                items: transactionTypes,
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      selectedType = newValue;
-                      // Reset các trường không liên quan khi đổi loại giao dịch
-                      if (selectedType != 'Chi tiêu') {
-                        selectedCategory = categories.first;
-                      }
-                      if (selectedType != 'Chuyển khoản') {
-                        selectedFromWallet =
-                            walletNames.isNotEmpty ? walletNames.first : null;
-                        selectedToWallet =
-                            walletNames.isNotEmpty
-                                ? (walletNames.length > 1
-                                    ? walletNames
-                                        .where(
-                                          (name) => name != selectedFromWallet,
-                                        )
-                                        .first
-                                    : walletNames.first)
-                                : null;
-                      }
-                      if (selectedType != 'Đi vay') {
-                        lenderController.clear();
-                      }
-                      if (selectedType != 'Cho vay') {
-                        borrowerController.clear();
-                      }
-                      if (selectedType != 'Đi vay' &&
-                          selectedType != 'Cho vay') {
-                        selectedRepaymentDate = null;
-                      }
-                    });
-                  }
-                },
-                validator: Validators.validateNotEmpty,
-              ),
-        ),
-        const SizedBox(height: 16),
-        if (selectedType == 'Chi tiêu') ...[
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Danh mục chi tiêu',
-                  value: selectedCategory,
-                  items: categories,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedCategory = newValue);
-                    }
-                  },
-                  validator: Validators.validateCategory,
-                ),
-          ),
-          const SizedBox(height: 16),
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Từ ví',
-                  value: selectedWallet ?? '',
-                  items: walletNames,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedWallet = newValue);
-                    }
-                  },
-                  validator:
-                      (v) => Validators.validateWallet(
-                        v,
-                        fieldName: "Ví chi tiêu",
-                      ),
-                ),
-          ),
-        ],
-        if (selectedType == 'Thu nhập') ...[
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Vào ví',
-                  value: selectedWallet ?? '',
-                  items: walletNames,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedWallet = newValue);
-                    }
-                  },
-                  validator:
-                      (v) => Validators.validateWallet(
-                        v,
-                        fieldName: "Ví nhận tiền",
-                      ),
-                ),
-          ),
-        ],
-        if (selectedType == 'Chuyển khoản') ...[
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Từ ví (Nguồn)',
-                  value: selectedFromWallet ?? '',
-                  items: walletNames,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        selectedFromWallet = newValue;
-                        // Tự động chọn ví đích khác nếu trùng
-                        if (walletNames.length > 1 &&
-                            selectedToWallet == newValue) {
-                          final otherWallets =
-                              walletNames
-                                  .where((name) => name != newValue)
-                                  .toList();
-                          selectedToWallet =
-                              otherWallets.isNotEmpty ? otherWallets.first : '';
-                        }
-                      });
-                    }
-                  },
-                  validator:
-                      (v) =>
-                          Validators.validateWallet(v, fieldName: "Ví nguồn"),
-                ),
-          ),
-          const SizedBox(height: 16),
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Đến ví (Đích)',
-                  value: selectedToWallet ?? '',
-                  items:
-                      walletNames
-                          .where((name) => name != selectedFromWallet)
-                          .toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedToWallet = newValue);
-                    }
-                  },
-                  validator:
-                      (v) => Validators.validateWallet(
-                        v,
-                        fieldName: "Ví đích",
-                        checkAgainst: selectedFromWallet,
-                      ),
-                ),
-          ),
-        ],
-        if (selectedType == 'Đi vay') ...[
-          CommonWidgets.buildTextField(
-            controller: lenderController,
-            label: 'Người cho vay',
-            hint: 'Tên người hoặc tổ chức cho vay',
-            validator: Validators.validateNotEmpty,
-          ),
-          const SizedBox(height: 16),
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Vào ví',
-                  value: selectedWallet ?? '',
-                  items: walletNames,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedWallet = newValue);
-                    }
-                  },
-                  validator:
-                      (v) => Validators.validateWallet(
-                        v,
-                        fieldName: "Ví nhận tiền vay",
-                      ),
-                ),
-          ),
-          const SizedBox(height: 16),
-          CommonWidgets.buildDatePickerField(
-            context: context,
-            date: selectedRepaymentDate ?? DateTime.now(),
-            label: 'Ngày hẹn trả (tùy chọn)',
-            onTap: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: selectedRepaymentDate ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (pickedDate != null) {
-                setState(() => selectedRepaymentDate = pickedDate);
-              }
-            },
-          ),
-        ],
-        if (selectedType == 'Cho vay') ...[
-          CommonWidgets.buildTextField(
-            controller: borrowerController,
-            label: 'Người vay tiền',
-            hint: 'Tên người hoặc tổ chức vay',
-            validator: Validators.validateNotEmpty,
-          ),
-          const SizedBox(height: 16),
-          StatefulBuilder(
-            builder:
-                (context, setState) => CommonWidgets.buildDropdownField(
-                  label: 'Từ ví',
-                  value: selectedWallet ?? '',
-                  items: walletNames,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() => selectedWallet = newValue);
-                    }
-                  },
-                  validator:
-                      (v) =>
-                          Validators.validateWallet(v, fieldName: "Ví cho vay"),
-                ),
-          ),
-          const SizedBox(height: 16),
-          CommonWidgets.buildDatePickerField(
-            context: context,
-            date: selectedRepaymentDate ?? DateTime.now(),
-            label: 'Ngày hẹn trả (tùy chọn)',
-            onTap: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: selectedRepaymentDate ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (pickedDate != null) {
-                setState(() => selectedRepaymentDate = pickedDate);
-              }
-            },
-          ),
-        ],
-      ],
-      title: 'Sửa thông tin giao dịch',
-      actionButtonText: 'Lưu',
-      onActionButtonPressed: () {
-        if (formKey.currentState!.validate()) {
-          context.read<TransactionBloc>().add(
-            UpdateTransaction(
-              TransactionModel(
-                id: transaction.id,
-                userId: transaction.userId,
-                description: descriptionController.text.trim(),
-                amount:
-                    Formatter.getRawCurrencyValue(
-                      amountController.text,
-                    ).toDouble(),
-                date: selectedDate,
-                type: selectedType,
-                category: selectedType == 'Chi tiêu' ? selectedCategory : '',
-                wallet:
-                    (selectedType != 'Chuyển khoản') ? selectedWallet : null,
-                fromWallet:
-                    (selectedType == 'Chuyển khoản')
-                        ? selectedFromWallet
-                        : null,
-                toWallet:
-                    (selectedType == 'Chuyển khoản') ? selectedToWallet : null,
-                lender:
-                    (selectedType == 'Đi vay')
-                        ? lenderController.text.trim()
-                        : null,
-                borrower:
-                    (selectedType == 'Cho vay')
-                        ? borrowerController.text.trim()
-                        : null,
-                repaymentDate:
-                    (selectedType == 'Đi vay' || selectedType == 'Cho vay')
-                        ? selectedRepaymentDate
-                        : null,
-                balanceAfter: transaction.balanceAfter,
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Future<void> _refreshTransactions() async {
-    if (_isInitialized && _userId != null) {
-      debugPrint("Refreshing transactions for user $_userId");
-      context.read<TransactionBloc>().add(LoadTransactions(_userId!));
-    } else {
-      debugPrint(
-        "Cannot refresh: Screen not initialized or user not authenticated.",
-      );
-    }
-    return Future.value();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      body: BlocConsumer<TransactionBloc, TransactionState>(
-        listener: (context, state) {
-          if (state is TransactionSuccess &&
-              !ModalRoute.of(context)!.isCurrent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: AppTheme.lightTheme.colorScheme.surface,
-                  ),
-                ),
-                backgroundColor: AppTheme.incomeColor,
-              ),
-            );
-            if (_isInitialized && _userId != null) {
-              context.read<WalletBloc>().add(LoadWallets());
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    _updateCategoryMap(l10n); // Cập nhật map khi ngôn ngữ thay đổi
+
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TransactionBloc, TransactionState>(
+          listener: (context, state) {
+            if (state is! TransactionLoading) {
+              if (mounted) {
+                setState(() {
+                  _isSaving = false;
+                });
+              }
             }
-          } else if (state is TransactionError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Lỗi: ${state.message}",
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: AppTheme.lightTheme.colorScheme.surface,
-                  ),
-                ),
-                backgroundColor: AppTheme.expenseColor,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    CommonWidgets.buildAppBar(
-                      context: context,
-                      title: 'Lịch sử Giao dịch',
-                      backIcon: Icons.arrow_back,
-                      onBackPressed: () {
-                        if (_isSearching) {
-                          setState(() {
-                            _isSearching = false;
-                            _searchQuery = '';
-                          });
-                        } else {
-                          AppRoutes.navigateToDashboard(context);
-                        }
-                      },
-                      actions: [
-                        IconButton(
-                          icon: Icon(
-                            _isSearching ? Icons.close : Icons.search,
-                            color: AppTheme.lightTheme.colorScheme.surface,
-                          ),
-                          tooltip: _isSearching ? 'Đóng tìm kiếm' : 'Tìm kiếm',
-                          onPressed: () {
+            if (state is TransactionSuccess) {
+              if (mounted) {
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: state.message(context),
+                  backgroundColor: AppTheme.incomeColor,
+                );
+                final authState = context.read<AuthBloc>().state;
+                if (authState is AuthAuthenticated) {
+                  context.read<WalletBloc>().add(LoadWallets());
+                }
+                _resetForm();
+              }
+            } else if (state is TransactionError) {
+              if (mounted) {
+                UtilityWidgets.showCustomSnackBar(
+                  context: context,
+                  message: state.message(context),
+                  backgroundColor: AppTheme.lightTheme.colorScheme.error,
+                );
+              }
+            }
+          },
+        ),
+        BlocListener<WalletBloc, WalletState>(
+          listener: (context, state) {
+            if (mounted) {
+              setState(() {
+                _isLoadingWallets = false;
+                _allWallets = [
+                  ...state.wallets,
+                  ...state.savingsWallets,
+                  ...state.investmentWallets,
+                ].where((w) => w.id.isNotEmpty).toList();
+                _allWallets.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+                _walletBalances = Map.fromEntries(
+                  _allWallets.map((w) => MapEntry(w.name, w.balance.toDouble())),
+                );
+                if (_selectedWallet.isEmpty || !_allWallets.any((w) => w.name == _selectedWallet)) {
+                  _setDefaultWallets();
+                }
+              });
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: theme.colorScheme.surface,
+        body: BlocBuilder<WalletBloc, WalletState>(
+          builder: (context, walletState) {
+            final walletNames = _allWallets.map((wallet) => wallet.name).toList();
+
+            final List<DropdownMenuItem<String>> transactionTypeItems = Constants.getTransactionTypes(l10n)
+                .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                .toList();
+            final List<DropdownMenuItem<String>> categoryItems = _categoryMap.entries
+                .map((entry) => DropdownMenuItem(value: entry.key, child: Text(entry.value)))
+                .toList();
+            final List<DropdownMenuItem<String>> walletDropdownItems = walletNames
+                .map((name) => DropdownMenuItem(value: name, child: Text(name)))
+                .toList();
+            final List<DropdownMenuItem<String>> toWalletDropdownItems = walletNames
+                .where((name) => name != _selectedFromWallet)
+                .map((name) => DropdownMenuItem(value: name, child: Text(name)))
+                .toList();
+
+            Widget bodyContent;
+            if (_isLoadingWallets && _allWallets.isEmpty) {
+              bodyContent = UtilityWidgets.buildLoadingIndicator(context: context);
+            } else if (_allWallets.isEmpty && context.read<AuthBloc>().state is AuthAuthenticated) {
+              bodyContent = UtilityWidgets.buildEmptyState(
+                context: context,
+                message: l10n.noWalletsAvailable,
+                suggestion: l10n.pleaseCreateWalletFirst,
+                icon: Icons.account_balance_wallet_outlined,
+                actionText: l10n.goToWalletManagement,
+                actionIcon: Icons.arrow_forward,
+                onActionPressed: () => AppRoutes.navigateToWallet(context),
+              );
+            } else if (context.read<AuthBloc>().state is! AuthAuthenticated) {
+              bodyContent = UtilityWidgets.buildEmptyState(
+                context: context,
+                message: l10n.pleaseLoginToManageTransactions,
+                suggestion: null,
+                onActionPressed: null,
+              );
+            } else {
+              bodyContent = Column(
+                children: [
+                  AppBarTabBar.buildAppBar(
+                    context: context,
+                    titleWidget: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedType,
+                        items: transactionTypeItems,
+                        onChanged: (String? newValue) {
+                          if (newValue != null && mounted) {
                             setState(() {
-                              _isSearching = !_isSearching;
-                              if (!_isSearching) {
-                                _searchQuery = '';
-                              }
+                              _selectedType = newValue;
+                              _formKey.currentState?.reset();
+                              _balanceAfterController.clear();
+                              _lenderController.clear();
+                              _borrowerController.clear();
+                              _repaymentDate = null;
+                              _repaymentDateError = null;
+                              _setDefaultWallets();
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                _formKey.currentState?.validate();
+                              });
                             });
-                          },
+                          }
+                        },
+                        style: GoogleFonts.poppins(
+                          color: theme.colorScheme.onPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
+                        iconEnabledColor: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                        dropdownColor: theme.colorScheme.primaryContainer,
+                        selectedItemBuilder: (context) {
+                          return transactionTypeItems
+                              .map(
+                                (item) => Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                item.value ?? '',
+                                style: GoogleFonts.poppins(
+                                  color: theme.colorScheme.onPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList();
+                        },
+                      ),
                     ),
-                    if (_isSearching)
+                    showBackButton: true,
+                    backIcon: Icons.arrow_back,
+                    onBackPressed: () => AppRoutes.navigateToDashboard(context),
+                    actions: [
                       Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: CommonWidgets.buildSearchField(
-                          context: context,
-                          hintText: 'Tìm kiếm giao dịch...',
-                          onChanged: (value) {
-                            setState(() {
-                              _searchQuery = value;
-                            });
-                          },
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: IconButton(
+                          icon: _isSaving
+                              ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: theme.colorScheme.onPrimary,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                              : Icon(
+                            Icons.check,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                          onPressed: _isSaving ? null : _saveTransaction,
+                          tooltip: l10n.saveTransactionTooltip,
                         ),
                       ),
-                    const SizedBox(height: 16),
-                    CommonWidgets.buildTabBar(
-                      context: context,
-                      tabTitles: const ['Theo Ngày', 'Theo Tháng', 'Theo Năm'],
-                      onTabChanged: (index) {
-                        setState(() {
-                          _selectedTabIndex = index;
-                          _tabController.animateTo(index);
-                        });
-                      },
-                      controller: _tabController,
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InputFields.buildTextField(
+                              controller: _descriptionController,
+                              label: l10n.descriptionLabel,
+                              hint: l10n.descriptionHint,
+                              validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.descriptionLabel),
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 16),
+                            InputFields.buildDatePickerField(
+                              context: context,
+                              date: _selectedDate,
+                              label: l10n.transactionDateLabel,
+                              onTap: (picked) {
+                                if (picked != null && mounted) {
+                                  setState(() => _selectedDate = picked);
+                                }
+                              },
+                              errorText: _dateError,
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 16),
+                            if (_selectedType == l10n.transactionTypeExpense) ...[
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.expenseCategoryLabel,
+                                value: _selectedCategoryKey,
+                                items: categoryItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedCategoryKey = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.expenseCategoryLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.fromWalletLabel,
+                                value: _selectedWallet,
+                                items: walletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType == l10n.transactionTypeIncome) ...[
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.toWalletLabel,
+                                value: _selectedWallet,
+                                items: walletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType == l10n.transactionTypeTransfer) ...[
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.fromWalletSourceLabel,
+                                value: _selectedFromWallet,
+                                items: walletDropdownItems,
+                                onChanged: (newValue) {
+                                  if (newValue != null && mounted) {
+                                    setState(() {
+                                      _selectedFromWallet = newValue;
+                                      if (_allWallets.length > 1 && _selectedToWallet == newValue) {
+                                        final availableTo =
+                                        _allWallets.where((w) => w.name != newValue).toList();
+                                        _selectedToWallet = availableTo.isNotEmpty ? availableTo.first.name : '';
+                                      }
+                                    });
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletSourceLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.toWalletDestinationLabel,
+                                value: _selectedToWallet,
+                                items: toWalletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedToWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(
+                                    v, fieldName: l10n.toWalletDestinationLabel, checkAgainst: _selectedFromWallet),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType == l10n.transactionTypeBorrow) ...[
+                              InputFields.buildTextField(
+                                controller: _lenderController,
+                                label: l10n.lenderLabel,
+                                hint: l10n.lenderHint,
+                                validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.lenderLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.toWalletLabel,
+                                value: _selectedWallet,
+                                items: walletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDatePickerField(
+                                context: context,
+                                date: _repaymentDate,
+                                label: l10n.repaymentDateOptionalLabel,
+                                onTap: (picked) {
+                                  if (mounted) {
+                                    setState(() => _repaymentDate = picked);
+                                  }
+                                },
+                                errorText: _repaymentDateError,
+                                isRequired: false,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType == l10n.transactionTypeLend) ...[
+                              InputFields.buildTextField(
+                                controller: _borrowerController,
+                                label: l10n.borrowerLabel,
+                                hint: l10n.borrowerHint,
+                                validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.borrowerLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.fromWalletLabel,
+                                value: _selectedWallet,
+                                items: walletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              InputFields.buildDatePickerField(
+                                context: context,
+                                date: _repaymentDate,
+                                label: l10n.repaymentDateOptionalLabel,
+                                onTap: (picked) {
+                                  if (mounted) {
+                                    setState(() => _repaymentDate = picked);
+                                  }
+                                },
+                                errorText: _repaymentDateError,
+                                isRequired: false,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType == l10n.transactionTypeAdjustment) ...[
+                              InputFields.buildDropdownField<String>(
+                                label: l10n.walletToAdjustLabel,
+                                value: _selectedWallet,
+                                items: walletDropdownItems,
+                                onChanged: (v) {
+                                  if (v != null && mounted) {
+                                    setState(() => _selectedWallet = v);
+                                  }
+                                },
+                                validator: (v) => Validators.validateWallet(v, fieldName: l10n.walletToAdjustLabel),
+                                isRequired: true,
+                              ),
+                              const SizedBox(height: 16),
+                              UtilityWidgets.buildLabel(
+                                context: context,
+                                text: l10n.actualBalanceAfterAdjustmentLabel,
+                              ),
+                              const SizedBox(height: 8),
+                              InputFields.buildBalanceInputField(
+                                _balanceAfterController,
+                                validator: (v) => Validators.validateBalanceAfterAdjustment(v),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (_selectedType != l10n.transactionTypeAdjustment) ...[
+                              InputFields.buildBalanceInputField(
+                                _amountController,
+                                validator: (value) {
+                                  final currentBalance = _walletBalances[_selectedType == l10n.transactionTypeTransfer
+                                      ? _selectedFromWallet
+                                      : _selectedWallet] ??
+                                      0.0;
+                                  return Validators.validateTransactionAmount(
+                                    value: value,
+                                    transactionType: _selectedType,
+                                    walletBalance: currentBalance,
+                                    l10n: l10n,
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              SliverFillRemaining(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    RefreshIndicator(
-                      onRefresh: _refreshTransactions,
-                      color: AppTheme.lightTheme.indicatorColor,
-                      child: _buildTabViewContent(state, 0),
-                    ),
-                    RefreshIndicator(
-                      onRefresh: _refreshTransactions,
-                      color: AppTheme.lightTheme.indicatorColor,
-                      child: _buildTabViewContent(state, 1),
-                    ),
-                    RefreshIndicator(
-                      onRefresh: _refreshTransactions,
-                      color: AppTheme.lightTheme.indicatorColor,
-                      child: _buildTabViewContent(state, 2),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          AppRoutes.navigateToTransaction(context);
-        },
-        tooltip: 'Thêm giao dịch mới',
-        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-        child: Icon(Icons.add, color: AppTheme.lightTheme.colorScheme.surface),
+                  ),
+                ],
+              );
+            }
+            return bodyContent;
+          },
+        ),
       ),
     );
-  }
-
-  Widget _buildTabViewContent(TransactionState state, int type) {
-    if (state is TransactionInitial) {
-      return CommonWidgets.buildLoadingIndicator();
-    } else if (state is TransactionLoading) {
-      return CommonWidgets.buildLoadingIndicator();
-    } else if (state is TransactionLoaded) {
-      final transactions = _filterTransactions(
-        _searchQuery,
-        state.transactions,
-      );
-      transactions.sort((a, b) => b.date.compareTo(a.date));
-      if (transactions.isEmpty) {
-        return CommonWidgets.buildEmptyState(
-          message: 'Chưa có giao dịch nào',
-          suggestion: 'Hãy nhấn nút "+" để tạo giao dịch đầu tiên!',
-          icon: Icons.receipt_long_outlined,
-          actionText: 'Thêm giao dịch',
-          actionIcon: Icons.add,
-          onActionPressed: () {
-            AppRoutes.navigateToTransaction(context);
-          },
-        );
-      }
-      switch (type) {
-        case 0:
-          return _buildGroupedListView(_groupTransactionsByDay(transactions));
-        case 1:
-          return _buildGroupedListView(_groupTransactionsByMonth(transactions));
-        case 2:
-          return _buildGroupedListView(_groupTransactionsByYear(transactions));
-        default:
-          return const SizedBox.shrink();
-      }
-    } else if (state is TransactionError) {
-      return CommonWidgets.buildErrorState(
-        message: state.message,
-        onRetry: _refreshTransactions,
-      );
-    } else {
-      return CommonWidgets.buildLoadingIndicator();
-    }
   }
 }

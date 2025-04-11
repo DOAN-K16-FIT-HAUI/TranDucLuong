@@ -1,6 +1,13 @@
+import 'package:finance_app/blocs/account/account_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_event.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
+import 'package:finance_app/blocs/theme/theme_bloc.dart';
+import 'package:finance_app/blocs/theme/theme_event.dart';
+import 'package:finance_app/blocs/theme/theme_state.dart';
+import 'package:finance_app/blocs/localization/localization_bloc.dart';
+import 'package:finance_app/blocs/localization/localization_event.dart';
+import 'package:finance_app/blocs/localization/localization_state.dart';
 import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
@@ -14,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -36,6 +45,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        BlocProvider<ThemeBloc>(
+          create: (context) => sl<ThemeBloc>()..add(LoadThemeEvent()),
+        ),
+        BlocProvider<LocalizationBloc>(
+          create: (context) => sl<LocalizationBloc>()..add(LoadLocalizationEvent()),
+        ),
         BlocProvider<AuthBloc>(
           create: (context) => sl<AuthBloc>(),
         ),
@@ -48,13 +63,41 @@ class MyApp extends StatelessWidget {
         BlocProvider<TransactionBloc>(
           create: (context) => sl<TransactionBloc>(),
         ),
+        BlocProvider<AccountBloc>(
+          create: (context) => sl<AccountBloc>(),
+        ),
         Provider<TransactionRepository>(
           create: (context) => sl<TransactionRepository>(),
         ),
       ],
-      child: MaterialApp.router(
-        routerConfig: AppRoutes.router,
-        debugShowCheckedModeBanner: false,
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          return BlocBuilder<LocalizationBloc, LocalizationState>(
+            builder: (context, localizationState) {
+              final themeData = themeState.themeData;
+              final locale = localizationState.locale;
+
+              return MaterialApp.router(
+                routerConfig: AppRoutes.router,
+                debugShowCheckedModeBanner: false,
+                title: AppLocalizations.of(context)?.appTitle ?? 'Finance App',
+                theme: themeData,
+                locale: locale,
+                supportedLocales: const [
+                  Locale('en', 'US'),
+                  Locale('vi', 'VN'),
+                  Locale('ja', 'JP'),
+                ],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }

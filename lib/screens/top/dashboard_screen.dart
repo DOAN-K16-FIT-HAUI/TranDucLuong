@@ -2,7 +2,7 @@ import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,7 +64,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: CommonWidgets.buildAppBar(
+      appBar: AppBarTabBar.buildAppBar(
         context: context,
         title: 'Xin chào Lương',
         showBackButton: false,

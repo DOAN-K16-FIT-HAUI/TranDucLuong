@@ -3,10 +3,14 @@ import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/buttons.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm import l10n
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,11 +38,12 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; // Lấy l10n
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-      appBar: CommonWidgets.buildAppBar(
+      appBar: AppBarTabBar.buildAppBar(
         context: context,
-        title: 'Đăng ký',
+        title: l10n.registerTitle, // Sử dụng l10n
         showBackButton: true,
         onBackPressed: () => AppRoutes.navigateToLogin(context),
       ),
@@ -47,9 +52,11 @@ class RegisterScreenState extends State<RegisterScreen> {
           if (state is AuthAuthenticated) {
             AppRoutes.navigateToDashboard(context);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.error)));
+            UtilityWidgets.showCustomSnackBar(
+              context: context,
+              message: state.error(context),
+              backgroundColor: AppTheme.lightTheme.colorScheme.error,
+            );
           }
         },
         child: Container(
@@ -62,36 +69,38 @@ class RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
-                  CommonWidgets.buildEmailField(_emailController),
+                  InputFields.buildEmailField(controller: _emailController),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildPasswordField(
+                  InputFields.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                    () => setState(() {
+                        () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
                   ),
                   const SizedBox(height: 15),
-                  CommonWidgets.buildSubmitButton('Tạo tài khoản', _register),
+                  Buttons.buildSubmitButton(
+                    context,
+                    l10n.createAccountButton, // Sử dụng l10n
+                    _register,
+                  ),
                   const SizedBox(height: 15),
                   Center(
                     child: RichText(
                       text: TextSpan(
-                        text: 'Đã có tài khoản? ',
+                        text: l10n.alreadyHaveAccount, // Sử dụng l10n
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppTheme.lightTheme.colorScheme.onSurface,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Đăng nhập ngay',
+                            text: l10n.loginNow, // Sử dụng l10n
                             style: TextStyle(
                               color: AppTheme.lightTheme.colorScheme.primary,
                             ),
-                            recognizer:
-                                TapGestureRecognizer()
-                                  ..onTap =
-                                      () => AppRoutes.navigateToLogin(context),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => AppRoutes.navigateToLogin(context),
                           ),
                         ],
                       ),

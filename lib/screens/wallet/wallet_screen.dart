@@ -1,284 +1,666 @@
+import 'package:finance_app/blocs/localization/localization_bloc.dart';
+import 'package:finance_app/blocs/localization/localization_state.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/blocs/wallet/wallet_state.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/wallet.dart';
-import 'package:finance_app/utils/common_widget.dart';
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/dialogs.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
+import 'package:finance_app/utils/common_widget/lists_cards.dart';
+import 'package:finance_app/utils/common_widget/menu_actions.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:finance_app/utils/constants.dart';
-import 'package:finance_app/utils/dimens.dart';
 import 'package:finance_app/utils/formatter.dart';
 import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-        body: BlocBuilder<WalletBloc, WalletState>(
-          builder: (context, state) {
-            return Column(
-              children: [
-                CommonWidgets.buildAppBar(
-                  context: context,
-                  title: 'Ví của tôi',
-                  backIcon: Icons.arrow_back,
-                  onBackPressed: () {
-                    if (state.isSearching) {
-                      context.read<WalletBloc>().add(ToggleSearch(false));
-                    } else {
-                      AppRoutes.navigateToDashboard(context);
-                    }
-                  },
-                  actions: [
-                    IconButton(
-                      icon: Icon(
-                        state.isSearching ? Icons.close : Icons.search,
-                        color: AppTheme.lightTheme.colorScheme.surface,
-                      ),
-                      tooltip: state.isSearching ? 'Đóng tìm kiếm' : 'Tìm kiếm',
-                      onPressed: () {
-                        context.read<WalletBloc>().add(ToggleSearch(!state.isSearching));
-                      },
-                    ),
-                  ],
-                ),
-                if (state.isSearching)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: CommonWidgets.buildSearchField(
-                      context: context,
-                      hintText: 'Tìm kiếm ví...',
-                      onChanged: (value) {
-                        context.read<WalletBloc>().add(SearchWallets(value));
-                      },
-                    ),
-                  ),
-                if (!state.isSearching) const SizedBox(height: 16),
-                _buildTotalBalance(state),
-                const SizedBox(height: 16),
-                CommonWidgets.buildTabBar(
-                  context: context,
-                  tabTitles: const ['Tài khoản', 'Tiết kiệm', 'Đầu tư'],
-                  onTabChanged: (index) => context.read<WalletBloc>().add(TabChanged(index)),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildTabContent(context, state, state.wallets, 0),
-                      _buildTabContent(context, state, state.savingsWallets, 1),
-                      _buildTabContent(context, state, state.investmentWallets, 2),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        floatingActionButton: Builder(
-          builder: (fabContext) => FloatingActionButton(
-            onPressed: () => _showAddWalletDialog(fabContext),
-            backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-            child: Icon(Icons.add, color: AppTheme.lightTheme.colorScheme.surface),
-          ),
-        ),
-      ),
-    );
+  List<Wallet> _getFilteredListForTab(WalletState state, int tabIndex) {
+    List<Wallet> listToFilter;
+    switch (tabIndex) {
+      case 0:
+        listToFilter = state.wallets;
+        break;
+      case 1:
+        listToFilter = state.savingsWallets;
+        break;
+      case 2:
+        listToFilter = state.investmentWallets;
+        break;
+      default:
+        listToFilter = [];
+    }
+
+    if (state.searchQuery.isEmpty) {
+      return listToFilter;
+    }
+
+    final lowerCaseQuery = state.searchQuery.toLowerCase();
+    return listToFilter
+        .where((wallet) => wallet.name.toLowerCase().contains(lowerCaseQuery))
+        .toList();
   }
 
-  void _showAddWalletDialog(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController();
-    final balanceController = TextEditingController();
-    IconData selectedIcon = Constants.availableIcons[0]['icon'];
-    final currentSelectedTab = context.read<WalletBloc>().state.selectedTab;
-    int selectedType = currentSelectedTab;
+  String _getCurrencySymbol(Locale locale) {
+    switch (locale.languageCode) {
+      case 'vi':
+        return '₫';
+      case 'ja':
+        return '¥';
+      case 'en':
+      default:
+        return '\$';
+    }
+  }
 
-    CommonWidgets.showFormDialog(
-      context: context,
-      formKey: formKey,
-      formFields: [
-        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateString),
-        const SizedBox(height: 16),
-        CommonWidgets.buildBalanceInputField(balanceController),
-        const SizedBox(height: 16),
-        _buildIconSelection(context, selectedIcon, (newIcon) => selectedIcon = newIcon),
-      ],
-      title: 'Thêm ví mới',
-      actionButtonText: 'Thêm',
-      onActionButtonPressed: () {
-        if (formKey.currentState!.validate()) {
-          context.read<WalletBloc>().add(AddWallet(Wallet(
-            id: '',
-            name: nameController.text.trim(),
-            balance: Formatter.getRawCurrencyValue(balanceController.text),
-            icon: selectedIcon,
-            type: selectedType,
-          )));
-        }
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return BlocBuilder<LocalizationBloc, LocalizationState>(
+      builder: (context, localizationState) {
+        final locale = localizationState.locale;
+
+        return DefaultTabController(
+          length: 3,
+          child: Scaffold(
+            backgroundColor: theme.colorScheme.surface,
+            body: BlocBuilder<WalletBloc, WalletState>(
+              builder: (context, state) {
+                final tabController = DefaultTabController.of(context);
+                if (tabController.index != state.selectedTab) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted(context)) {
+                      try {
+                        if (tabController.index != state.selectedTab) {
+                          tabController.animateTo(state.selectedTab);
+                        }
+                      } catch (e) {
+                        debugPrint("Error animating TabController: $e");
+                      }
+                    }
+                  });
+                }
+
+                final filteredWalletsTab0 = _getFilteredListForTab(state, 0);
+                final filteredWalletsTab1 = _getFilteredListForTab(state, 1);
+                final filteredWalletsTab2 = _getFilteredListForTab(state, 2);
+
+                return Column(
+                  children: [
+                    AppBarTabBar.buildAppBar(
+                      context: context,
+                      title: l10n.myWalletsTitle,
+                      showBackButton: true,
+                      backIcon: Icons.arrow_back,
+                      onBackPressed: () {
+                        if (state.isSearching) {
+                          context.read<WalletBloc>().add(ToggleSearch(false));
+                          context.read<WalletBloc>().add(SearchWallets(''));
+                        } else {
+                          AppRoutes.navigateToDashboard(context);
+                        }
+                      },
+                      actions: [
+                        IconButton(
+                          icon: Icon(
+                            state.isSearching ? Icons.close : Icons.search,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                          tooltip:
+                              state.isSearching
+                                  ? l10n.closeSearchTooltip
+                                  : l10n.searchTooltip,
+                          onPressed: () {
+                            final bloc = context.read<WalletBloc>();
+                            bloc.add(ToggleSearch(!state.isSearching));
+                            if (state.isSearching) {
+                              bloc.add(SearchWallets(''));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    if (state.isSearching)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                        child: UtilityWidgets.buildSearchField(
+                          context: context,
+                          hintText: l10n.searchWalletsHint,
+                          onChanged: (value) {
+                            context.read<WalletBloc>().add(
+                              SearchWallets(value),
+                            );
+                          },
+                        ),
+                      ),
+                    if (!state.isSearching) const SizedBox(height: 16),
+                    _buildTotalBalance(
+                      context,
+                      state,
+                      filteredWalletsTab0,
+                      filteredWalletsTab1,
+                      filteredWalletsTab2,
+                      locale,
+                    ),
+                    const SizedBox(height: 16),
+                    AppBarTabBar.buildTabBar(
+                      context: context,
+                      tabTitles: [
+                        l10n.tabAccounts,
+                        l10n.tabSavings,
+                        l10n.tabInvestments,
+                      ],
+                      controller: tabController,
+                      onTabChanged:
+                          (index) =>
+                              context.read<WalletBloc>().add(TabChanged(index)),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: tabController,
+                        children: [
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab0,
+                            0,
+                            locale,
+                          ),
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab1,
+                            1,
+                            locale,
+                          ),
+                          _buildTabContent(
+                            context,
+                            state,
+                            filteredWalletsTab2,
+                            2,
+                            locale,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            floatingActionButton: Builder(
+              builder:
+                  (fabContext) => FloatingActionButton(
+                    onPressed: () => _showAddWalletDialog(fabContext),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    tooltip: l10n.addWalletTooltip,
+                    child: const Icon(Icons.add),
+                  ),
+            ),
+          ),
+        );
       },
     );
   }
 
-  Widget _buildTotalBalance(WalletState state) {
-    int tabTotalBalance = 0;
+  bool mounted(BuildContext context) {
+    try {
+      context.widget;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _showAddWalletDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (dialogContext) => _AddWalletDialog(
+            walletType: context.read<WalletBloc>().state.selectedTab,
+          ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, Wallet wallet) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _EditWalletDialog(wallet: wallet),
+    );
+  }
+
+  Widget _buildTotalBalance(
+    BuildContext context,
+    WalletState state,
+    List<Wallet> filteredTab0,
+    List<Wallet> filteredTab1,
+    List<Wallet> filteredTab2,
+    Locale locale,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    List<Wallet> currentTabWallets;
     switch (state.selectedTab) {
       case 0:
-        tabTotalBalance = state.wallets.fold(0, (sum, wallet) => sum + wallet.balance);
+        currentTabWallets = filteredTab0;
         break;
       case 1:
-        tabTotalBalance = state.savingsWallets.fold(0, (sum, wallet) => sum + wallet.balance);
+        currentTabWallets = filteredTab1;
         break;
       case 2:
-        tabTotalBalance = state.investmentWallets.fold(0, (sum, wallet) => sum + wallet.balance);
+        currentTabWallets = filteredTab2;
         break;
       default:
-        debugPrint("Lỗi: selectedTab không hợp lệ: ${state.selectedTab}");
+        currentTabWallets = [];
     }
+
+    int tabTotalBalance = currentTabWallets.fold(
+      0,
+      (sum, wallet) => sum + wallet.balance,
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Text(
-        NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(tabTotalBalance),
-        style: GoogleFonts.poppins(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          color: tabTotalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-        ),
+      child: Column(
+        children: [
+          Text(
+            l10n.totalBalance,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.hintColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            NumberFormat.currency(
+              locale: locale.toString(),
+              symbol: _getCurrencySymbol(locale),
+              decimalDigits: 0,
+            ).format(tabTotalBalance),
+            style: GoogleFonts.poppins(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color:
+                  tabTotalBalance >= 0
+                      ? AppTheme.incomeColor
+                      : AppTheme.expenseColor,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildWalletCard(BuildContext context, Wallet wallet, int type, int index) {
-    return CommonWidgets.buildItemCard(
+  Widget _buildWalletCard(
+    BuildContext context,
+    Wallet wallet,
+    int type,
+    int index,
+    Locale locale,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return ListsCards.buildItemCard(
       context: context,
       item: wallet,
       itemKey: ValueKey(wallet.id),
       title: wallet.name,
       value: wallet.balance.toDouble(),
       icon: wallet.icon,
-      menuItems: CommonWidgets.buildEditDeleteMenuItems(),
+      valueLocale: locale.toString(),
+      valuePrefix: '',
+      menuItems: MenuActions.buildEditDeleteMenuItems(context: context),
       onMenuSelected: (result) {
-        CommonWidgets.handleEditDeleteActions(
-          context: context,
-          action: result,
-          item: wallet,
-          itemName: wallet.name,
-          onEdit: (context, wallet) => _showEditDialog(context, wallet),
-          onDelete: (context, wallet) => context.read<WalletBloc>().add(DeleteWallet(wallet.id, wallet.type)),
-        );
-      },
-    );
-  }
-
-  Future<IconData?> _showIconSelectionPopup(BuildContext context, IconData currentIcon) async {
-    return CommonWidgets.showIconSelectionDialog(
-      context: context,
-      currentIcon: currentIcon,
-      availableIcons: Constants.availableIcons,
-    );
-  }
-
-  void _showEditDialog(BuildContext context, Wallet wallet) {
-    final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController(text: wallet.name);
-    final balanceController = TextEditingController(
-      text: Formatter.currencyInputFormatter
-          .formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: wallet.balance.toString()))
-          .text,
-    );
-    IconData selectedIcon = wallet.icon;
-
-    CommonWidgets.showFormDialog(
-      context: context,
-      formKey: formKey,
-      formFields: [
-        _buildTextField(nameController, 'Tên ví', 'Nhập tên ví', Validators.validateString),
-        const SizedBox(height: 16),
-        CommonWidgets.buildBalanceInputField(balanceController),
-        const SizedBox(height: 16),
-        _buildIconSelection(context, selectedIcon, (newIcon) => selectedIcon = newIcon),
-      ],
-      title: 'Sửa thông tin ví',
-      actionButtonText: 'Lưu',
-      onActionButtonPressed: () {
-        if (formKey.currentState!.validate()) {
-          context.read<WalletBloc>().add(EditWallet(Wallet(
-            id: wallet.id,
-            name: nameController.text.trim(),
-            balance: Formatter.getRawCurrencyValue(balanceController.text),
-            icon: selectedIcon,
-            type: wallet.type,
-          )));
+        if (result == 'edit') {
+          _showEditDialog(context, wallet);
+        } else if (result == 'delete') {
+          Dialogs.showDeleteDialog(
+            context: context,
+            title: l10n.confirmDeleteTitle,
+            content: l10n.confirmDeleteWalletContent(wallet.name),
+            onDeletePressed:
+                () => context.read<WalletBloc>().add(
+                  DeleteWallet(wallet.id, wallet.type),
+                ),
+          );
         }
       },
     );
   }
 
-  Widget _buildTabContent(BuildContext context, WalletState state, List<Wallet> items, int type) {
-    return CommonWidgets.buildTabContent<Wallet>(
-      context: context,
-      items: items,
-      emptyMessage: 'Không tìm thấy ví nào',
-      searchQuery: state.searchQuery,
-      filterItems: context.read<WalletBloc>().filterWallets,
-      isSearching: state.isSearching,
-      type: type,
-      itemBuilder: (context, wallet, type, index) => _buildWalletCard(context, wallet, type, index),
-      onReorder: (type, oldIndex, newIndex) =>
-          context.read<WalletBloc>().add(ReorderWallets(type, oldIndex, newIndex)),
-    );
+  Widget _buildTabContent(
+    BuildContext context,
+    WalletState state,
+    List<Wallet> items,
+    int type,
+    Locale locale,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (items.isEmpty) {
+      return UtilityWidgets.buildEmptyState(
+        context: context,
+        message:
+            state.isSearching
+                ? l10n.noWalletsFoundSearch
+                : l10n.noWalletsInThisCategory,
+        suggestion: state.isSearching ? null : l10n.addWalletSuggestion,
+        icon: Icons.account_balance_wallet_outlined,
+      );
+    } else {
+      return ListsCards.buildTabContent<Wallet>(
+        context: context,
+        items: items,
+        itemBuilder:
+            (ctx, wallet, index) =>
+                _buildWalletCard(ctx, wallet, type, index, locale),
+        onReorder:
+            (oldIndex, newIndex) => context.read<WalletBloc>().add(
+              ReorderWallets(type, oldIndex, newIndex),
+            ),
+      );
+    }
+  }
+}
+
+class _AddWalletDialog extends StatefulWidget {
+  final int walletType;
+
+  const _AddWalletDialog({required this.walletType});
+
+  @override
+  State<_AddWalletDialog> createState() => _AddWalletDialogState();
+}
+
+class _AddWalletDialogState extends State<_AddWalletDialog> {
+  late TextEditingController nameController;
+  late final TextEditingController balanceController;
+  late final GlobalKey<FormState> formKey;
+  late IconData selectedIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController();
+    balanceController = TextEditingController();
+    formKey = GlobalKey<FormState>();
+    selectedIcon =
+        Constants.availableIcons.isNotEmpty
+            ? Constants.availableIcons[0]['icon']
+            : Icons.wallet;
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, String hint, String? Function(String?) validator) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        label: RichText(
-          text: TextSpan(
-            text: '$label ',
-            style: GoogleFonts.poppins(
-                color: AppTheme.lightTheme.colorScheme.onSurface, fontSize: Dimens.textSizeMedium),
-            children: const [TextSpan(text: '*', style: TextStyle(color: AppTheme.expenseColor))],
+  @override
+  void dispose() {
+    nameController.dispose();
+    balanceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(l10n.addWalletDialogTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InputFields.buildTextField(
+                controller: nameController,
+                label: l10n.walletNameLabel,
+                hint: l10n.walletNameHint,
+                validator:
+                    (value) => Validators.validateNotEmpty(
+                      value,
+                      fieldName: l10n.walletNameLabel,
+                    ),
+                isRequired: true,
+              ),
+              const SizedBox(height: 16),
+              InputFields.buildBalanceInputField(
+                balanceController,
+                validator:
+                    (value) =>
+                        Validators.validateBalance(value, currentBalance: 0),
+              ),
+              const SizedBox(height: 16),
+              _buildIconSelection(
+                context: context,
+                selectedIconGetter: () => selectedIcon,
+                onIconSelected:
+                    (newIcon) => setState(() => selectedIcon = newIcon),
+              ),
+            ],
           ),
         ),
-        hintText: hint,
-        hintStyle:
-        GoogleFonts.poppins(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6)),
-        border: const OutlineInputBorder(),
-        focusedBorder:
-        OutlineInputBorder(borderSide: BorderSide(color: AppTheme.lightTheme.colorScheme.primary)),
-        errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.expenseColor)),
-        focusedErrorBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.expenseColor)),
-        errorStyle: const TextStyle(color: AppTheme.expenseColor),
       ),
-      cursorColor: AppTheme.lightTheme.colorScheme.primary,
-      style: GoogleFonts.poppins(color: AppTheme.lightTheme.colorScheme.onSurface),
-      validator: validator,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancelButton),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              context.read<WalletBloc>().add(
+                AddWallet(
+                  Wallet(
+                    id: '',
+                    name: nameController.text.trim(),
+                    balance: Formatter.getRawCurrencyValue(
+                      balanceController.text,
+                    ),
+                    icon: selectedIcon,
+                    type: widget.walletType,
+                    orderIndex: 0,
+                  ),
+                ),
+              );
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text(l10n.addWalletButton),
+        ),
+      ],
     );
   }
 
-  Widget _buildIconSelection(BuildContext context, IconData selectedIcon, Function(IconData) onIconSelected) {
+  Widget _buildIconSelection({
+    required BuildContext context,
+    required IconData Function() selectedIconGetter,
+    required Function(IconData) onIconSelected,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return StatefulBuilder(
-      builder: (dialogContext, setState) => ListTile(
-        title: Text('Biểu tượng',
-            style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.lightTheme.colorScheme.onSurface)),
-        trailing: Icon(selectedIcon, color: AppTheme.lightTheme.colorScheme.primary),
-        onTap: () async {
-          final newIcon = await _showIconSelectionPopup(context, selectedIcon);
-          if (newIcon != null) {
-            setState(() => onIconSelected(newIcon));
-          }
-        },
+      builder: (dialogContext, setStateDialog) {
+        final currentIcon = selectedIconGetter();
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            l10n.iconLabel,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+          ),
+          trailing: Icon(currentIcon, color: theme.colorScheme.primary),
+          onTap: () async {
+            final newIcon = await Dialogs.showIconSelectionDialog(
+              context: dialogContext,
+              currentIcon: currentIcon,
+              availableIcons: Constants.availableIcons,
+              title: l10n.selectIconTitle,
+            );
+            if (newIcon != null) {
+              onIconSelected(newIcon);
+              setStateDialog(() {});
+            }
+          },
+        );
+      },
+    );
+  }
+}
+
+class _EditWalletDialog extends StatefulWidget {
+  final Wallet wallet;
+
+  const _EditWalletDialog({required this.wallet});
+
+  @override
+  State<_EditWalletDialog> createState() => _EditWalletDialogState();
+}
+
+class _EditWalletDialogState extends State<_EditWalletDialog> {
+  late final TextEditingController nameController;
+  late final TextEditingController balanceController;
+  late final GlobalKey<FormState> formKey;
+  late IconData selectedIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.wallet.name);
+    balanceController = TextEditingController(
+      text: Formatter.formatCurrency(
+        widget.wallet.balance.toDouble(),
+        locale: Localizations.localeOf(context),
       ),
+    );
+    formKey = GlobalKey<FormState>();
+    selectedIcon = widget.wallet.icon;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    balanceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(l10n.editWalletDialogTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InputFields.buildTextField(
+                controller: nameController,
+                label: l10n.walletNameLabel,
+                hint: l10n.walletNameHint,
+                validator:
+                    (value) => Validators.validateNotEmpty(
+                      value,
+                      fieldName: l10n.walletNameLabel,
+                    ),
+                isRequired: true,
+              ),
+              const SizedBox(height: 16),
+              InputFields.buildBalanceInputField(
+                balanceController,
+                validator:
+                    (value) => Validators.validateBalance(
+                      value,
+                      currentBalance: widget.wallet.balance.toDouble(),
+                    ),
+              ),
+              const SizedBox(height: 16),
+              _buildIconSelection(
+                context: context,
+                selectedIconGetter: () => selectedIcon,
+                onIconSelected:
+                    (newIcon) => setState(() => selectedIcon = newIcon),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancelButton),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              context.read<WalletBloc>().add(
+                EditWallet(
+                  Wallet(
+                    id: widget.wallet.id,
+                    name: nameController.text.trim(),
+                    balance: Formatter.getRawCurrencyValue(
+                      balanceController.text,
+                    ),
+                    icon: selectedIcon,
+                    type: widget.wallet.type,
+                    orderIndex: widget.wallet.orderIndex,
+                  ),
+                ),
+              );
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text(l10n.saveButton),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIconSelection({
+    required BuildContext context,
+    required IconData Function() selectedIconGetter,
+    required Function(IconData) onIconSelected,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return StatefulBuilder(
+      builder: (dialogContext, setStateDialog) {
+        final currentIcon = selectedIconGetter();
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            l10n.iconLabel,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+          ),
+          trailing: Icon(currentIcon, color: theme.colorScheme.primary),
+          onTap: () async {
+            final newIcon = await Dialogs.showIconSelectionDialog(
+              context: dialogContext,
+              currentIcon: currentIcon,
+              availableIcons: Constants.availableIcons,
+              title: l10n.selectIconTitle,
+            );
+            if (newIcon != null) {
+              onIconSelected(newIcon);
+              setStateDialog(() {});
+            }
+          },
+        );
+      },
     );
   }
 }
