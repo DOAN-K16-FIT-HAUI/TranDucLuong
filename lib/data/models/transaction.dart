@@ -7,7 +7,7 @@ class TransactionModel {
   final double amount; // Nên là double cho tiền tệ
   final DateTime date;
   final String typeKey; // Thu nhập, Chi tiêu, Chuyển khoản, Đi vay, Cho vay, Điều chỉnh số dư
-  final String category; // Chỉ sử dụng cho 'Chi tiêu'
+  final String categoryKey; // Chỉ sử dụng cho 'Chi tiêu'
   // 'wallet' dùng cho Thu nhập, Chi tiêu, Đi vay, Cho vay, Điều chỉnh số dư
   // Sẽ là null hoặc rỗng đối với 'Chuyển khoản'
   final String? wallet;
@@ -25,7 +25,7 @@ class TransactionModel {
     required this.amount,
     required this.date,
     required this.typeKey,
-    this.category = '', // Mặc định là rỗng nếu không phải Chi tiêu
+    this.categoryKey = '', // Mặc định là rỗng nếu không phải Chi tiêu
     this.wallet,       // Có thể null
     this.fromWallet,   // Có thể null
     this.toWallet,     // Có thể null
@@ -43,7 +43,7 @@ class TransactionModel {
       'amount': amount,
       'date': Timestamp.fromDate(date), // Sử dụng Timestamp cho Firestore
       'typeKey': typeKey,
-      'category': category,
+      'categoryKey': categoryKey,
       'wallet': wallet,
       'fromWallet': fromWallet,
       'toWallet': toWallet,
@@ -89,7 +89,7 @@ class TransactionModel {
       amount: parseDouble(json['amount']),
       date: parsedDate,
       typeKey: json['typeKey'] as String? ?? 'Unknown', // Xử lý null typeKey
-      category: json['category'] as String? ?? '',
+      categoryKey: json['categoryKey'] as String? ?? '',
       wallet: json['wallet'] as String?, // Chấp nhận null
       fromWallet: json['fromWallet'] as String?,
       toWallet: json['toWallet'] as String?,

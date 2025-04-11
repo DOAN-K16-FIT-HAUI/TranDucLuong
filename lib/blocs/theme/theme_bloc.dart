@@ -1,7 +1,6 @@
 import 'package:finance_app/blocs/theme/theme_event.dart';
 import 'package:finance_app/blocs/theme/theme_state.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:flutter/material.dart'; // Thêm để dùng BuildContext
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm để dùng l10n
 import 'package:shared_preferences/shared_preferences.dart';
