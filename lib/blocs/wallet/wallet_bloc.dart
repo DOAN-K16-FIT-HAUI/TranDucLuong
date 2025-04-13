@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm để dùng l10n
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 
@@ -22,6 +22,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   }
 
   Future<void> _onLoadWallets(LoadWallets event, Emitter<WalletState> emit) async {
+    emit(state.copyWith(isLoading: true)); // Bắt đầu loading
     try {
       final allWallets = await walletRepository.getWallets();
       debugPrint("Loaded wallets: ${allWallets.length}");
@@ -31,6 +32,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         investmentWallets: allWallets.where((w) => w.type == 2).toList(),
         searchQuery: '',
         isSearching: false,
+        isLoading: false, // Kết thúc loading
+        error: null,
       ));
     } catch (e) {
       debugPrint("Error in Bloc loading wallets: $e");
@@ -38,6 +41,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         wallets: [],
         savingsWallets: [],
         investmentWallets: [],
+        isLoading: false, // Kết thúc loading ngay cả khi lỗi
         error: (context) => AppLocalizations.of(context)!.errorLoadingWallets,
       ));
     }

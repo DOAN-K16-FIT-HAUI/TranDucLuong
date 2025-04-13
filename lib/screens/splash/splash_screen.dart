@@ -1,3 +1,4 @@
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              const CircularProgressIndicator(),
+              UtilityWidgets.buildLoadingIndicator(context: context),
             ],
           ),
         ),

@@ -330,8 +330,7 @@ class AccountScreen extends StatelessWidget {
           backgroundImage:
               state.user.photoUrl != null
                   ? NetworkImage(state.user.photoUrl!)
-                  : const AssetImage('assets/images/default_avatar.png')
-                      as ImageProvider,
+                  : AssetImage('assets/images/default_avatar.jpg'),
         ),
         title: Text(
           state.user.displayName ?? 'Người dùng',
