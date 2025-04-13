@@ -294,5 +294,13 @@
   "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
   "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
   "transactionDeletedSuccess": "Giao dịch đã được xóa thành công",
-  "dashboardTitle": "Bảng điều khiển"
+  "dashboardTitle": "Bảng điều khiển",
+  "biometricsReason": "Vui lòng xác thực để kích hoạt sinh trắc học",
+  "biometricsNotAvailable": "Sinh trắc học không khả dụng trên thiết bị này",
+  "biometricsError": "Xác thực sinh trắc học thất bại",
+  "noSavedCredentials": "Không tìm thấy thông tin đăng nhập để đăng nhập bằng sinh trắc học",
+  "loginWithBiometrics": "Đăng nhập bằng sinh trắc học",
+  "biometricsEnabledSuccess": "Xác thực sinh trắc học đã được bật.",
+  "biometricsDisabledSuccess": "Xác thực sinh trắc học đã được tắt.",
+  "biometricsNotSupported": "Thiết bị không hỗ trợ sinh trắc học."
 }

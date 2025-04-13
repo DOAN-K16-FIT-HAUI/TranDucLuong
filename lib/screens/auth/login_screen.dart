@@ -9,6 +9,7 @@ import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,8 +25,32 @@ class LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _rememberPassword = false;
 
-  void _login() {
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics(); // Kiểm tra sinh trắc học khi màn hình khởi tạo
+  }
+
+  // Kiểm tra và tự động đăng nhập bằng sinh trắc học nếu được bật
+  Future<void> _checkBiometrics() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isBiometricsEnabled = prefs.getBool('isBiometricsEnabled') ?? false;
+    if (isBiometricsEnabled) {
+      context.read<AuthBloc>().add(SignInWithBiometricsRequested(context: context));
+    }
+  }
+
+  // Hàm đăng nhập bằng email/mật khẩu
+  void _login() async {
     if (_formKey.currentState!.validate()) {
+      // Lưu thông tin đăng nhập nếu người dùng chọn "Remember Password"
+      if (_rememberPassword) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('lastEmail', _emailController.text.trim());
+        await prefs.setString('lastPassword', _passwordController.text);
+      }
+
+      // Gửi sự kiện đăng nhập tới AuthBloc
       context.read<AuthBloc>().add(
         SignInRequested(
           email: _emailController.text.trim(),
@@ -87,7 +112,10 @@ class LoginScreenState extends State<LoginScreen> {
                         activeColor: Theme.of(context).colorScheme.primary,
                         checkColor: Theme.of(context).colorScheme.onPrimary,
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                       Text(
@@ -103,11 +131,35 @@ class LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 15),
                   Buttons.buildSubmitButton(context, l10n.loginButton, _login),
                   const SizedBox(height: 15),
+                  // Thêm nút đăng nhập bằng sinh trắc học
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                          SignInWithBiometricsRequested(context: context),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.fingerprint,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      label: Text(
+                        l10n.loginWithBiometrics,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () => AppRoutes.navigateToForgotPassword(context),
+                        onPressed: () =>
+                            AppRoutes.navigateToForgotPassword(context),
                         child: Text(
                           l10n.forgotPasswordQuestion,
                           style: TextStyle(
@@ -135,7 +187,10 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       Expanded(
                         child: Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.3),
                           thickness: 1,
                         ),
                       ),
@@ -144,7 +199,10 @@ class LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           l10n.or,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -152,7 +210,10 @@ class LoginScreenState extends State<LoginScreen> {
                       ),
                       Expanded(
                         child: Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.3),
                           thickness: 1,
                         ),
                       ),

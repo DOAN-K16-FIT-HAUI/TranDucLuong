@@ -47,6 +47,7 @@ class TopScreenState extends State<TopScreen> {
     int bottomNavIndex = _selectedIndex < 2 ? _selectedIndex : _selectedIndex + 1;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
@@ -67,7 +68,7 @@ class TopScreenState extends State<TopScreen> {
         onPressed: _addTransaction,
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
-        tooltip: l10n.addTransactionTooltip, // Thêm tooltip từ l10n
+        tooltip: l10n.addTransactionTooltip,
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

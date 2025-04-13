@@ -294,5 +294,13 @@
   "transactionAddedSuccess": "Transaction added successfully",
   "transactionUpdatedSuccess": "Transaction updated successfully",
   "transactionDeletedSuccess": "Transaction deleted successfully",
-  "dashboardTitle": "Dashboard"
+  "dashboardTitle": "Dashboard",
+  "biometricsReason": "Please authenticate to enable biometrics",
+  "biometricsNotAvailable": "Biometrics is not available on this device",
+  "biometricsError": "Biometric authentication failed",
+  "noSavedCredentials": "No saved credentials found for biometric login",
+  "loginWithBiometrics": "Login with Biometrics",
+  "biometricsEnabledSuccess": "Biometric authentication has been enabled.",
+  "biometricsDisabledSuccess": "Biometric authentication has been disabled.",
+  "biometricsNotSupported": "Device does not support biometrics."
 }
