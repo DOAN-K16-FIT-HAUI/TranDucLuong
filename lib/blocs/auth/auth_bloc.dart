@@ -1,10 +1,13 @@
 import 'package:finance_app/blocs/auth/auth_event.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
+import 'package:finance_app/data/models/user.dart';
 import 'package:finance_app/data/repositories/auth_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart'; // Thêm để dùng BuildContext
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm để dùng l10n
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:local_auth/local_auth.dart'; // Thêm package
+import 'package:shared_preferences/shared_preferences.dart'; // Thêm để kiểm tra trạng thái
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -18,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<PasswordResetRequested>(_onPasswordResetRequested);
+    on<SignInWithBiometricsRequested>(_onSignInWithBiometricsRequested); // Thêm
   }
 
   String _mapFirebaseAuthExceptionToMessage(BuildContext context, dynamic e) {
@@ -67,7 +71,53 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
+      // Lưu thông tin đăng nhập vào SharedPreferences để sử dụng cho biometrics
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('lastEmail', event.email);
+      await prefs.setString('lastPassword', event.password);
       emit(AuthAuthenticated(user: user));
+    } catch (e) {
+      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+    }
+  }
+
+  Future<void> _onSignInWithBiometricsRequested(
+      SignInWithBiometricsRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final localAuth = LocalAuthentication();
+      bool canCheckBiometrics = await localAuth.canCheckBiometrics;
+      if (!canCheckBiometrics) {
+        emit(AuthFailure(error: (context) => AppLocalizations.of(context)!.biometricsNotAvailable));
+        return;
+      }
+
+      bool authenticated = await localAuth.authenticate(
+        localizedReason: AppLocalizations.of(event.context)!.biometricsReason,
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        final prefs = await SharedPreferences.getInstance();
+        final email = prefs.getString('lastEmail');
+        final password = prefs.getString('lastPassword');
+        if (email != null && password != null) {
+          final user = await authRepository.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+          emit(AuthAuthenticated(user: user));
+        } else {
+          emit(AuthFailure(
+              error: (context) => AppLocalizations.of(context)!.noSavedCredentials));
+        }
+      } else {
+        emit(AuthFailure(
+            error: (context) => AppLocalizations.of(context)!.biometricsError));
+      }
     } catch (e) {
       emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
@@ -114,6 +164,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await authRepository.signOut();
+      // Xóa thông tin đăng nhập khi đăng xuất
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('lastEmail');
+      await prefs.remove('lastPassword');
       emit(AuthUnauthenticated());
     } catch (e) {
       emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));

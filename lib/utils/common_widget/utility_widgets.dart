@@ -273,7 +273,7 @@ class UtilityWidgets {
   static void showCustomSnackBar({
     required BuildContext context,
     required String message,
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 3),
     SnackBarBehavior behavior = SnackBarBehavior.fixed,
     Color? backgroundColor,
     TextStyle? textStyle,

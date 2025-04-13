@@ -294,5 +294,13 @@
   "transactionAddedSuccess": "取引が正常に追加されました",
   "transactionUpdatedSuccess": "取引が正常に更新されました",
   "transactionDeletedSuccess": "取引が正常に削除されました",
-  "dashboardTitle": "ダッシュボード"
+  "dashboardTitle": "ダッシュボード",
+  "biometricsReason": "生体認証を有効にするには、認証してください",
+  "biometricsNotAvailable": "このデバイスでは生体認証を利用できません",
+  "biometricsError": "生体認証に失敗しました",
+  "noSavedCredentials": "生体認証でログインするための資格情報が見つかりません",
+  "loginWithBiometrics": "生体認証でログイン",
+  "biometricsEnabledSuccess": "生体認証が有効になりました。",
+  "biometricsDisabledSuccess": "生体認証が無効になりました。",
+  "biometricsNotSupported": "デバイスは生体認証に対応していません。"
 }

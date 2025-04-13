@@ -16,6 +16,8 @@ import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:local_auth/local_auth.dart'; // Thêm import
+import 'package:shared_preferences/shared_preferences.dart'; // Thêm import
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -41,12 +43,14 @@ class AccountScreen extends StatelessWidget {
               UtilityWidgets.showCustomSnackBar(
                 context: context,
                 message: state.message(context),
+                behavior: SnackBarBehavior.floating,
               );
             } else if (state is AccountPasswordChanged) {
               UtilityWidgets.showCustomSnackBar(
                 context: context,
                 message: l10n.passwordChangedSuccess,
                 backgroundColor: Theme.of(context).colorScheme.primary,
+                behavior: SnackBarBehavior.floating,
               );
             } else if (state is AccountLoggedOut) {
               AppRoutes.navigateToLogin(context);
@@ -103,12 +107,8 @@ class AccountScreen extends StatelessWidget {
                                 ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       const SizedBox(height: 8),
-                      _buildActionTile(
-                        context: context,
-                        title: l10n.biometrics,
-                        icon: Icons.fingerprint,
-                        onTap: () {},
-                      ),
+                      // Cập nhật mục Biometrics
+                      _buildBiometricsTile(context, state),
                       const SizedBox(height: 8),
                       _buildActionTile(
                         context: context,
@@ -149,6 +149,113 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Hàm mới: Xử lý bật/tắt sinh trắc học
+  Widget _buildBiometricsTile(BuildContext context, AccountLoaded state) {
+    final l10n = AppLocalizations.of(context)!;
+    return FutureBuilder<bool>(
+      future: _getBiometricsStatus(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        bool isBiometricsEnabled = snapshot.data ?? false;
+        return Container(
+          margin: const EdgeInsets.only(top: 8),
+          decoration: Decorations.boxDecoration(context),
+          child: ListTile(
+            leading: Icon(
+              Icons.fingerprint,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            title: Text(
+              l10n.biometrics,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            trailing: Switch(
+              value: isBiometricsEnabled,
+              onChanged: (value) async {
+                final localAuth = LocalAuthentication();
+                try {
+                  // Kiểm tra xem thiết bị có hỗ trợ sinh trắc học không
+                  bool isDeviceSupported = await localAuth.isDeviceSupported();
+                  bool canCheckBiometrics = await localAuth.canCheckBiometrics;
+                  if (!isDeviceSupported || !canCheckBiometrics) {
+                    UtilityWidgets.showCustomSnackBar(
+                      context: context,
+                      message: l10n.biometricsNotSupported,
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      behavior: SnackBarBehavior.floating,
+                    );
+                    return;
+                  }
+
+                  // Nếu bật sinh trắc học, yêu cầu xác thực trước
+                  if (value) {
+                    bool authenticated = await localAuth.authenticate(
+                      localizedReason: l10n.biometricsReason,
+                      options: const AuthenticationOptions(
+                        biometricOnly: true,
+                        stickyAuth: true,
+                      ),
+                    );
+
+                    if (authenticated) {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('isBiometricsEnabled', true);
+                      UtilityWidgets.showCustomSnackBar(
+                        context: context,
+                        message: l10n.biometricsEnabledSuccess,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        behavior: SnackBarBehavior.floating,
+                      );
+                    } else {
+                      UtilityWidgets.showCustomSnackBar(
+                        context: context,
+                        message: l10n.biometricsError,
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
+                      );
+                      return;
+                    }
+                  } else {
+                    // Tắt sinh trắc học
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('isBiometricsEnabled', false);
+                    UtilityWidgets.showCustomSnackBar(
+                      context: context,
+                      message: l10n.biometricsDisabledSuccess,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      behavior: SnackBarBehavior.floating,
+                    );
+                  }
+                } catch (e) {
+                  UtilityWidgets.showCustomSnackBar(
+                    context: context,
+                    message: l10n.genericErrorWithMessage(e.toString()),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    behavior: SnackBarBehavior.floating,
+                  );
+                }
+              },
+              activeColor: Theme.of(context).colorScheme.primary,
+              inactiveTrackColor: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.2),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Hàm lấy trạng thái sinh trắc học từ SharedPreferences
+  Future<bool> _getBiometricsStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isBiometricsEnabled') ?? false;
   }
 
   void _showChangePasswordDialog(BuildContext context) {
@@ -330,7 +437,12 @@ class AccountScreen extends StatelessWidget {
           backgroundImage:
               state.user.photoUrl != null
                   ? NetworkImage(state.user.photoUrl!)
-                  : AssetImage('assets/images/default_avatar.jpg'),
+                  : const AssetImage('assets/images/default_avatar.jpg')
+                      as ImageProvider,
+          onBackgroundImageError: (exception, stackTrace) {
+            print('Error loading avatar: $exception');
+          },
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         title: Text(
           state.user.displayName ?? 'Người dùng',
@@ -382,12 +494,8 @@ class AccountScreen extends StatelessWidget {
     final List<DropdownMenuItem<String>> languageDropdownItems =
         languages.map<DropdownMenuItem<String>>((String languageValue) {
           return DropdownMenuItem<String>(
-            value: languageValue, // Giá trị sẽ được trả về khi chọn
-            child: Text(
-              languageValue,
-              // Có thể thêm style nếu muốn
-              // style: GoogleFonts.poppins(color: theme.colorScheme.onSurface),
-            ),
+            value: languageValue,
+            child: Text(languageValue),
           );
         }).toList();
 
@@ -402,7 +510,7 @@ class AccountScreen extends StatelessWidget {
             context.read<AccountBloc>().add(ChangeLanguageEvent(newLanguage));
             context.read<LocalizationBloc>().add(
               localization.ChangeLanguageEvent(newLanguage),
-            ); // Sử dụng alias
+            );
           }
         },
         validator: (value) {
