@@ -501,8 +501,13 @@ class _TransactionListScreenState extends State<TransactionListScreen>
         }
 
         if (dateError != null || repaymentDateError != null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.checkDateError),behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),),);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.checkDateError),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            ),
+          );
           return;
         }
 
@@ -510,21 +515,33 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           if (selectedType == l10n.transactionTypeTransfer) {
             if (selectedFromWallet.isEmpty || selectedToWallet.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.selectSourceAndDestinationWalletError),behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
+                SnackBar(
+                  content: Text(l10n.selectSourceAndDestinationWalletError),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                ),
+              );
               return;
             }
             if (walletNames.length > 1 && selectedFromWallet == selectedToWallet) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.sourceAndDestinationWalletCannotBeSameError),behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
+                SnackBar(
+                  content: Text(l10n.sourceAndDestinationWalletCannotBeSameError),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                ),
+              );
               return;
             }
           } else if (selectedType != l10n.transactionTypeIncome) {
             if (selectedWallet.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.selectWalletForTransactionError(selectedType)),behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
+                SnackBar(
+                  content: Text(l10n.selectWalletForTransactionError(selectedType)),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                ),
+              );
               return;
             }
           }
@@ -553,9 +570,11 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                   .format(amount);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text(l10n.insufficientBalanceError(
-                        sourceWalletName, formattedSourceBalance, formattedAmount)),behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),),
+                  content: Text(l10n.insufficientBalanceError(
+                      sourceWalletName, formattedSourceBalance, formattedAmount)),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                ),
               );
               return;
             }
@@ -574,34 +593,38 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           context.read<TransactionBloc>().add(
             UpdateTransaction(
               TransactionModel(
-                id: transaction.id,
-                userId: transaction.userId,
-                description: descriptionController.text.trim(),
-                amount: amount,
-                date: selectedDate,
-                typeKey: mapLocalizedTypeToKey(selectedType, l10n),
-                categoryKey: selectedType == l10n.transactionTypeExpense ? selectedCategoryKey : '',
-                wallet: selectedType != l10n.transactionTypeTransfer ? selectedWallet : null,
-                fromWallet: selectedType == l10n.transactionTypeTransfer ? selectedFromWallet : null,
-                toWallet: selectedType == l10n.transactionTypeTransfer ? selectedToWallet : null,
-                lender: selectedType == l10n.transactionTypeBorrow ? lenderController.text.trim() : null,
-                borrower: selectedType == l10n.transactionTypeLend ? borrowerController.text.trim() : null,
-                repaymentDate: (selectedType == l10n.transactionTypeBorrow || selectedType == l10n.transactionTypeLend)
-                    ? repaymentDate
-                    : null,
-                balanceAfter: balanceAfter,
-              ),
+                  id: transaction.id,
+                  userId: transaction.userId,
+                  description: descriptionController.text.trim(),
+                  amount: amount,
+                  date: selectedDate,
+                  typeKey: mapLocalizedTypeToKey(selectedType, l10n),
+              categoryKey: selectedType == l10n.transactionTypeExpense ? selectedCategoryKey : '',
+              wallet: selectedType != l10n.transactionTypeTransfer ? selectedWallet : null,
+              fromWallet: selectedType == l10n.transactionTypeTransfer ? selectedFromWallet : null,
+              toWallet: selectedType == l10n.transactionTypeTransfer ? selectedToWallet : null,
+              lender: selectedType == l10n.transactionTypeBorrow ? lenderController.text.trim() : null,
+              borrower: selectedType == l10n.transactionTypeLend ? borrowerController.text.trim() : null,
+              repaymentDate: (selectedType == l10n.transactionTypeBorrow || selectedType == l10n.transactionTypeLend)
+                  ? repaymentDate
+                  : null,
+              balanceAfter: balanceAfter,
             ),
-          );
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              Navigator.of(context).pop(); // Quay lại TransactionListScreen
-            }
-          });;
+          ),
+        );
+        Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+        Navigator.of(context).pop(); // Quay lại TransactionListScreen
+        }
+        });
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.checkInputError),behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),));
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+        content: Text(l10n.checkInputError),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+        ),
+        );
         }
       },
     );
@@ -634,7 +657,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                 UtilityWidgets.showCustomSnackBar(
                   context: context,
                   message: state.message(context),
-                  backgroundColor: AppTheme.lightTheme.colorScheme.error,
+                  backgroundColor: Theme.of(context).colorScheme.primary, // Đồng bộ theme
                 );
                 if (_isInitialized && _userId != null) {
                   context.read<WalletBloc>().add(LoadWallets());
@@ -643,7 +666,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                 UtilityWidgets.showCustomSnackBar(
                   context: context,
                   message: "${l10n.genericError}: ${state.message(context)}",
-                  backgroundColor: AppTheme.expenseColor,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 );
               }
             },
@@ -666,9 +689,13 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                               AppRoutes.navigateToDashboard(context);
                             }
                           },
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                           actions: [
                             IconButton(
-                              icon: Icon(_isSearching ? Icons.close : Icons.search),
+                              icon: Icon(
+                                _isSearching ? Icons.close : Icons.search,
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              ),
                               tooltip: _isSearching ? l10n.closeSearchTooltip : l10n.searchTooltip,
                               onPressed: () {
                                 setState(() {
@@ -679,6 +706,11 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                             ),
                           ],
                         ),
+                        if (state is TransactionLoading || state is TransactionInitial)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: UtilityWidgets.buildLoadingIndicator(context: context),
+                          ),
                         if (_isSearching)
                           Padding(
                             padding: const EdgeInsets.all(16),
@@ -688,32 +720,34 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                               onChanged: (value) => setState(() => _searchQuery = value),
                             ),
                           ),
-                        AppBarTabBar.buildTabBar(
-                          context: context,
-                          tabTitles: [l10n.tabByDay, l10n.tabByMonth, l10n.tabByYear],
-                          onTabChanged: (index) {
-                            setState(() {
-                              _selectedTabIndex = index;
-                              _tabController.animateTo(index);
-                            });
-                          },
-                          controller: _tabController,
-                        ),
+                        if (!(state is TransactionLoading || state is TransactionInitial))
+                          AppBarTabBar.buildTabBar(
+                            context: context,
+                            tabTitles: [l10n.tabByDay, l10n.tabByMonth, l10n.tabByYear],
+                            onTabChanged: (index) {
+                              setState(() {
+                                _selectedTabIndex = index;
+                                _tabController.animateTo(index);
+                              });
+                            },
+                            controller: _tabController,
+                          ),
                       ],
                     ),
                   ),
-                  SliverFillRemaining(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: List.generate(
-                        3,
-                            (index) => RefreshIndicator(
-                          onRefresh: _refreshTransactions,
-                          child: _buildTabViewContent(state, index, l10n, locale),
+                  if (!(state is TransactionLoading || state is TransactionInitial))
+                    SliverFillRemaining(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: List.generate(
+                          3,
+                              (index) => RefreshIndicator(
+                            onRefresh: _refreshTransactions,
+                            child: _buildTabViewContent(state, index, l10n, locale),
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               );
             },
@@ -730,9 +764,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildTabViewContent(TransactionState state, int type, AppLocalizations l10n, Locale locale) {
-    if (state is TransactionLoading || state is TransactionInitial) {
-      return UtilityWidgets.buildLoadingIndicator(context: context);
-    } else if (state is TransactionLoaded) {
+    if (state is TransactionLoaded) {
       final transactions = _filterTransactions(_searchQuery, state.transactions)
         ..sort((a, b) => b.date.compareTo(a.date));
       if (transactions.isEmpty) {

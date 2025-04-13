@@ -500,10 +500,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                               ? SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(
-                              color: theme.colorScheme.onPrimary,
-                              strokeWidth: 2.5,
-                            ),
+                            child: UtilityWidgets.buildLoadingIndicator(context: context),
                           )
                               : Icon(
                             Icons.check,

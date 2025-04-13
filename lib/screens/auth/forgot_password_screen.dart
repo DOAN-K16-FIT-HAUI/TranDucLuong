@@ -9,7 +9,7 @@ import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm import l10n
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -38,14 +38,15 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!; // Lấy l10n
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBarTabBar.buildAppBar(
         context: context,
-        title: l10n.forgotPasswordTitle, // Sử dụng l10n
+        title: l10n.forgotPasswordTitle,
         showBackButton: true,
         onBackPressed: () => AppRoutes.navigateToLogin(context),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -58,7 +59,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           }
         },
         child: Container(
-          color: AppTheme.lightTheme.colorScheme.surface,
+          color: Theme.of(context).colorScheme.surface,
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
@@ -67,10 +68,11 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  l10n.enterEmailToResetPassword, // Sử dụng l10n
+                  l10n.enterEmailToResetPassword,
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppTheme.lightTheme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -78,7 +80,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 20),
                 Buttons.buildSubmitButton(
                   context,
-                  l10n.confirm, // Sử dụng l10n
+                  l10n.confirm,
                   _resetPassword,
                 ),
               ],
@@ -93,28 +95,30 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => Center(
+        child: UtilityWidgets.buildLoadingIndicator(context: context),
+      ),
     );
   }
 
   void _handleAuthInitial(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
+    final l10n = AppLocalizations.of(context)!;
     Navigator.of(context, rootNavigator: true).pop();
     UtilityWidgets.showCustomSnackBar(
       context: context,
       message: l10n.passwordResetRequestSent,
-      backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+      backgroundColor: AppTheme.incomeColor,
     );
     AppRoutes.navigateToLogin(context);
   }
 
   void _handleAuthFailure(BuildContext context, String Function(BuildContext) error) {
-    final l10n = AppLocalizations.of(context)!; // Lấy l10n trong hàm
+    final l10n = AppLocalizations.of(context)!;
     Navigator.of(context, rootNavigator: true).pop();
     UtilityWidgets.showCustomSnackBar(
       context: context,
       message: '${l10n.error}: ${error(context)}',
-      backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      backgroundColor: Theme.of(context).colorScheme.error,
     );
   }
 }
