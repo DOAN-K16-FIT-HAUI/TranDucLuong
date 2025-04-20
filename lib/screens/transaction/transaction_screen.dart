@@ -261,7 +261,6 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       ...walletState.savingsWallets,
       ...walletState.investmentWallets
     ].where((w) => w.id.isNotEmpty).toList();
-    allWallets.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
     walletNames = allWallets.map((w) => w.name).toList();
     final walletBalances =
     Map.fromEntries(allWallets.map((w) => MapEntry(w.name, w.balance.toDouble())));

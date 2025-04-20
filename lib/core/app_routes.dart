@@ -1,10 +1,14 @@
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/core/app_paths.dart';
+import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/app_notification/notification_screen.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
+import 'package:finance_app/screens/group_note/add_edit_group_note_screen.dart';
+import 'package:finance_app/screens/group_note/group_note_detail_screen.dart';
+import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
@@ -29,6 +33,9 @@ class AppRoutes {
   static const String transactionRoute = 'transaction';
   static const String transactionListRoute = 'transaction-list';
   static const String accountRoute = 'account';
+  static const String groupNoteRoute = 'group-note';
+  static const String addEditGroupNoteRoute = 'group-note/add-edit';
+  static const String groupNoteDetailRoute = 'group-note/detail';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -91,30 +98,51 @@ class AppRoutes {
         path: AppPaths.accountPath,
         builder: (context, state) => const AccountScreen(),
       ),
+      GoRoute(
+        name: groupNoteRoute,
+        path: AppPaths.groupNotePath,
+        builder: (context, state) => const GroupNoteScreen(),
+      ),
+      GoRoute(
+        name: addEditGroupNoteRoute,
+        path: AppPaths.addEditGroupNotePath,
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>?;
+          return AddEditGroupNoteScreen(
+            note: args?['note'] as GroupNoteModel?,
+            onSave: args?['onSave'] as Function(GroupNoteModel),
+            status: args?['status'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        name: groupNoteDetailRoute,
+        path: AppPaths.groupNoteDetailPath,
+        builder: (context, state) {
+          final note = state.extra as GroupNoteModel;
+          return GroupNoteDetailScreen(note: note);
+        },
+      ),
     ],
     redirect: (context, state) async {
       final isOnSplash = state.matchedLocation == AppPaths.splashPath;
 
-      // If on the splash screen, wait for a delay and then redirect
       if (isOnSplash) {
-        // Adjusted delay to 3 seconds
         await Future.delayed(const Duration(seconds: 2));
 
-        // Check onboarding and authentication status
         final hasSeenOnboarding = await OnboardingStatus.hasSeenOnboarding();
         final authState = context.read<AuthBloc>().state;
         final isAuthenticated = authState is AuthAuthenticated;
 
         if (!hasSeenOnboarding) {
-          return AppPaths.onBoardingPath; // Show onboarding if not seen
+          return AppPaths.onBoardingPath;
         } else if (isAuthenticated) {
-          return AppPaths.dashboardPath; // Go to top if authenticated
+          return AppPaths.dashboardPath;
         } else {
-          return AppPaths.loginPath; // Go to login if not authenticated
+          return AppPaths.loginPath;
         }
       }
 
-      // Existing redirect logic for other screens
       final hasSeenOnboarding = await OnboardingStatus.hasSeenOnboarding();
       final authState = context.read<AuthBloc>().state;
       final isAuthenticated = authState is AuthAuthenticated;
@@ -128,15 +156,21 @@ class AppRoutes {
         return AppPaths.onBoardingPath;
       }
 
-      if (hasSeenOnboarding && isAuthenticated && (isOnLogin || isOnRegister || isOnForgotPassword || isOnOnboarding)) {
+      if (hasSeenOnboarding &&
+          isAuthenticated &&
+          (isOnLogin || isOnRegister || isOnForgotPassword || isOnOnboarding)) {
         return AppPaths.dashboardPath;
       }
 
-      if (hasSeenOnboarding && !isAuthenticated && !isOnLogin && !isOnRegister && !isOnForgotPassword) {
+      if (hasSeenOnboarding &&
+          !isAuthenticated &&
+          !isOnLogin &&
+          !isOnRegister &&
+          !isOnForgotPassword) {
         return AppPaths.loginPath;
       }
 
-      return null; // No redirect
+      return null;
     },
   );
 
@@ -162,4 +196,15 @@ class AppRoutes {
       context.goNamed(transactionListRoute);
   static void navigateToAccount(BuildContext context) =>
       context.goNamed(accountRoute);
+  static void navigateToGroupNote(BuildContext context) =>
+      context.goNamed(groupNoteRoute);
+  static void navigateToAddEditGroupNote(
+      BuildContext context, GroupNoteModel? note, String status, Function(GroupNoteModel) onSave) {
+    context.pushNamed(addEditGroupNoteRoute,
+        extra: {'note': note, 'onSave': onSave, 'status': status});
+  }
+
+  static void navigateToGroupNoteDetail(BuildContext context, GroupNoteModel note) {
+    context.pushNamed(groupNoteDetailRoute, extra: note);
+  }
 }

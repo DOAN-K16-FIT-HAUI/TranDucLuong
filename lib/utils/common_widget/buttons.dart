@@ -5,24 +5,27 @@ class Buttons {
   static Widget buildSubmitButton(
     BuildContext context,
     String text,
-    VoidCallback onPressed,
-  ) {
+    VoidCallback onPressed, {
+    Color? backgroundColor,
+    Color? textColor,
+  }) {
     final theme = Theme.of(context);
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: backgroundColor ?? theme.colorScheme.primary,
           padding: const EdgeInsets.symmetric(vertical: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 2,
         ),
         child: Text(
           text,
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onPrimary,
+            color: textColor ?? theme.colorScheme.onPrimary,
           ),
         ),
       ),

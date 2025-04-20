@@ -30,9 +30,7 @@ class MenuActions {
             const SizedBox(width: 12),
             Text(
               editText.isEmpty ? l10n.edit : editText,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
               ),
             ),
@@ -51,9 +49,7 @@ class MenuActions {
             const SizedBox(width: 12),
             Text(
               deleteText.isEmpty ? l10n.delete : deleteText,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
               ),
             ),
