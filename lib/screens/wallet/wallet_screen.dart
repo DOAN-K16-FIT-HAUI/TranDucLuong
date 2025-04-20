@@ -389,10 +389,6 @@ class WalletScreen extends StatelessWidget {
         itemBuilder:
             (ctx, wallet, index) =>
                 _buildWalletCard(ctx, wallet, type, index, locale),
-        onReorder:
-            (oldIndex, newIndex) => context.read<WalletBloc>().add(
-              ReorderWallets(type, oldIndex, newIndex),
-            ),
       );
     }
   }
@@ -491,7 +487,6 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
                     ),
                     icon: selectedIcon,
                     type: widget.walletType,
-                    orderIndex: 0,
                   ),
                 ),
               );
@@ -639,7 +634,6 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
                     ),
                     icon: selectedIcon,
                     type: widget.wallet.type,
-                    orderIndex: widget.wallet.orderIndex,
                   ),
                 ),
               );

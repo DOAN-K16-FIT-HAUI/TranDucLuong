@@ -15,7 +15,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     on<AddWallet>(_onAddWallet);
     on<EditWallet>(_onEditWallet);
     on<DeleteWallet>(_onDeleteWallet);
-    on<ReorderWallets>(_onReorderWallets);
     on<TabChanged>(_onTabChanged);
     on<SearchWallets>(_onSearchWallets);
     on<ToggleSearch>(_onToggleSearch);
@@ -107,42 +106,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       debugPrint("Error in Bloc deleting wallet: $e");
       emit(state.copyWith(
         error: (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
-      ));
-    }
-  }
-
-  void _onReorderWallets(ReorderWallets event, Emitter<WalletState> emit) {
-    List<Wallet> listToReorder;
-    if (event.type == 0) {
-      listToReorder = List.from(state.wallets);
-    } else if (event.type == 1) {
-      listToReorder = List.from(state.savingsWallets);
-    } else {
-      listToReorder = List.from(state.investmentWallets);
-    }
-
-    if (event.oldIndex >= 0 &&
-        event.oldIndex < listToReorder.length &&
-        event.newIndex >= 0 &&
-        event.newIndex <= listToReorder.length) {
-      final Wallet item = listToReorder.removeAt(event.oldIndex);
-      listToReorder.insert(event.newIndex, item);
-
-      for (int i = 0; i < listToReorder.length; i++) {
-        listToReorder[i] = listToReorder[i].copyWith(orderIndex: i);
-      }
-
-      emit(state.copyWith(
-        wallets: event.type == 0 ? listToReorder : state.wallets,
-        savingsWallets: event.type == 1 ? listToReorder : state.savingsWallets,
-        investmentWallets: event.type == 2 ? listToReorder : state.investmentWallets,
-      ));
-
-      walletRepository.updateWalletOrder(listToReorder);
-    } else {
-      debugPrint("Reorder indices out of bounds: old=${event.oldIndex}, new=${event.newIndex}, len=${listToReorder.length}");
-      emit(state.copyWith(
-        error: (context) => AppLocalizations.of(context)!.genericError,
       ));
     }
   }
