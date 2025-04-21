@@ -15,6 +15,7 @@ import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/decorations.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -173,7 +174,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   Widget _buildMainBalanceAndWallets(
       BuildContext context,
       List<Wallet> wallets,
-      Locale locale, // Thêm tham số locale
+      Locale locale,
       ) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -184,7 +185,7 @@ class DashboardScreenState extends State<DashboardScreen> {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _boxDecoration(context),
+      decoration: Decorations.boxDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -221,17 +222,6 @@ class DashboardScreenState extends State<DashboardScreen> {
               ),
               const Expanded(child: Divider()),
             ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: wallets.take(3).map((wallet) {
-              return GestureDetector(
-                onTap: () {
-                  AppRoutes.navigateToWallet(context);
-                },
-                child: _buildWalletRow(wallet, context),
-              );
-            }).toList(),
           ),
         ],
       ),
@@ -276,7 +266,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     return Container(
       height: 200,
       padding: const EdgeInsets.all(16),
-      decoration: _boxDecoration(context),
+      decoration: Decorations.boxDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -378,6 +368,8 @@ class DashboardScreenState extends State<DashboardScreen> {
             (tx) => ListsCards.buildTransactionListItem(
           context: context,
           transaction: tx,
+          menuItems: [],
+          onMenuSelected: (_) {},
         ),
       )
           .toList(),
@@ -414,6 +406,8 @@ class DashboardScreenState extends State<DashboardScreen> {
             (tx) => ListsCards.buildTransactionListItem(
           context: context,
           transaction: tx,
+          menuItems: [],
+          onMenuSelected: (_) {},
         ),
       )
           .toList(),
@@ -441,10 +435,19 @@ class DashboardScreenState extends State<DashboardScreen> {
           onActionPressed: () => AppRoutes.navigateToWallet(context),
         ),
       ]
-          : savingsWallets
-          .take(3)
-          .map((wallet) => _buildWalletRow(wallet, context))
-          .toList(),
+          : savingsWallets.take(3).map((wallet) {
+        return ListsCards.buildItemCard(
+          context: context,
+          item: wallet,
+          itemKey: ValueKey(wallet.id),
+          title: wallet.name,
+          value: wallet.balance.toDouble(),
+          icon: wallet.icon,
+          valueLocale: Localizations.localeOf(context).toString(),
+          valuePrefix: '',
+          onTap: () => AppRoutes.navigateToWallet(context),
+        );
+      }).toList(),
       onTap: () => AppRoutes.navigateToWallet(context),
     );
   }
@@ -469,10 +472,19 @@ class DashboardScreenState extends State<DashboardScreen> {
           onActionPressed: () => AppRoutes.navigateToWallet(context),
         ),
       ]
-          : investmentWallets
-          .take(3)
-          .map((wallet) => _buildWalletRow(wallet, context))
-          .toList(),
+          : investmentWallets.take(3).map((wallet) {
+        return ListsCards.buildItemCard(
+          context: context,
+          item: wallet,
+          itemKey: ValueKey(wallet.id),
+          title: wallet.name,
+          value: wallet.balance.toDouble(),
+          icon: wallet.icon,
+          valueLocale: Localizations.localeOf(context).toString(),
+          valuePrefix: '',
+          onTap: () => AppRoutes.navigateToWallet(context),
+        );
+      }).toList(),
       onTap: () => AppRoutes.navigateToWallet(context),
     );
   }
@@ -507,57 +519,8 @@ class DashboardScreenState extends State<DashboardScreen> {
         ),
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: _boxDecoration(context),
+          decoration: Decorations.boxDecoration(context),
           child: Column(children: children),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWalletRow(Wallet wallet, BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Icon(
-          Icons.account_balance_wallet_outlined,
-          size: 32,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          wallet.name,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: theme.colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          NumberFormat.currency(
-            locale: Intl.getCurrentLocale(),
-            symbol: '₫',
-          ).format(wallet.balance),
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
-      ],
-    );
-  }
-
-  BoxDecoration _boxDecoration(BuildContext context) {
-    final theme = Theme.of(context);
-    return BoxDecoration(
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
         ),
       ],
     );
