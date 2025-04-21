@@ -163,12 +163,6 @@ class DashboardScreenState extends State<DashboardScreen> {
                   );
                 },
               ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () => AppRoutes.navigateToTransaction(context),
-                tooltip: l10n.addTransactionTooltip,
-                backgroundColor: theme.colorScheme.primary,
-                child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
-              ),
             );
           },
         );
