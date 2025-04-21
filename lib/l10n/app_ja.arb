@@ -349,7 +349,6 @@
   "noBalanceData": "残高データがありません",
   "noTransactionData": "取引データがありません",
   "addTransactionsToSeeChart": "取引を追加してグラフを表示してください",
-  "errorLoadingReportData": "レポートデータの読み込みに失敗しました",
   "pleaseLoginToViewReports": "レポートを表示するにはログインしてください",
   "dateRangeFilter": "日付範囲フィルター",
   "@dateRangeFilter": {
@@ -370,5 +369,21 @@
   "tryAgain": "再試行",
   "@tryAgain": {
     "description": "空の状態でデータを再読み込みしようとするアクションボタンのテキスト。"
+  },
+  "exportCsv": "CSVをエクスポート",
+  "@exportCsv": {
+    "description": "AppBar内でレポートデータをCSVファイルとしてエクスポートするためのボタンのツールチップ。"
+  },
+  "exportSuccess": "レポートが正常にエクスポートされました",
+  "@exportSuccess": {
+    "description": "レポートがCSVファイルに正常にエクスポートされたときに表示されるメッセージ。"
+  },
+  "exportFailure": "レポートのエクスポートに失敗しました",
+  "@exportFailure": {
+    "description": "レポートのエクスポートに失敗したときに表示されるメッセージ。"
+  },
+  "errorLoadingReportData": "レポートデータの読み込みエラー",
+  "@errorLoadingReportData": {
+    "description": "レポートデータの読み込みに失敗したときに表示されるメッセージ。"
   }
 }

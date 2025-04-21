@@ -349,7 +349,6 @@
   "noBalanceData": "Không có dữ liệu số dư",
   "noTransactionData": "Không có dữ liệu giao dịch",
   "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
-  "errorLoadingReportData": "Không thể tải dữ liệu báo cáo",
   "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo",
   "dateRangeFilter": "Bộ lọc khoảng thời gian",
   "@dateRangeFilter": {
@@ -370,5 +369,21 @@
   "tryAgain": "Thử lại",
   "@tryAgain": {
     "description": "Văn bản cho nút hành động để thử tải lại dữ liệu trong trạng thái trống."
+  },"exportCsv": "Xuất CSV",
+  "@exportCsv": {
+    "description": "Tooltip cho nút xuất dữ liệu báo cáo dưới dạng tệp CSV trong AppBar."
+  },
+  "exportSuccess": "Báo cáo đã được xuất thành công",
+  "@exportSuccess": {
+    "description": "Thông báo hiển thị khi báo cáo được xuất thành công vào tệp CSV."
+  },
+  "exportFailure": "Xuất báo cáo thất bại",
+  "@exportFailure": {
+    "description": "Thông báo hiển thị khi xuất báo cáo thất bại."
+  },
+  "errorLoadingReportData": "Lỗi tải dữ liệu báo cáo",
+  "@errorLoadingReportData": {
+    "description": "Thông báo hiển thị khi tải dữ liệu báo cáo thất bại."
   }
+
 }
