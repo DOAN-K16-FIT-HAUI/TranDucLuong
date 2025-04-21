@@ -28,7 +28,8 @@ class ReportScreen extends StatefulWidget {
   ReportScreenState createState() => ReportScreenState();
 }
 
-class ReportScreenState extends State<ReportScreen> with SingleTickerProviderStateMixin {
+class ReportScreenState extends State<ReportScreen>
+    with SingleTickerProviderStateMixin {
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
   late TabController _tabController;
@@ -56,25 +57,29 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
         );
         return;
       }
-      context.read<ReportBloc>().add(LoadReportData(
-        userId: authState.user.id,
-        startDate: _startDate,
-        endDate: _endDate,
-      ));
+      context.read<ReportBloc>().add(
+        LoadReportData(
+          userId: authState.user.id,
+          startDate: _startDate,
+          endDate: _endDate,
+        ),
+      );
     }
   }
 
   void _exportToCsv() async {
+    // Capture necessary values from BuildContext
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final authState = context.read<AuthBloc>().state;
 
     if (authState is! AuthAuthenticated) {
       UtilityWidgets.showCustomSnackBar(
         context: context,
         message: l10n.pleaseLoginToViewReports,
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         textStyle: GoogleFonts.poppins(
-          color: Theme.of(context).colorScheme.onError,
+          color: theme.colorScheme.onError,
           fontSize: 14,
         ),
       );
@@ -85,73 +90,82 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
       UtilityWidgets.showCustomSnackBar(
         context: context,
         message: l10n.invalidDateRange,
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         textStyle: GoogleFonts.poppins(
-          color: Theme.of(context).colorScheme.onError,
+          color: theme.colorScheme.onError,
           fontSize: 14,
         ),
       );
       return;
     }
 
-    // Gửi sự kiện để lấy dữ liệu giao dịch chi tiết
-    context.read<ReportBloc>().add(ExportReportData(
-      userId: authState.user.id,
-      startDate: _startDate,
-      endDate: _endDate,
-    ));
+    // Trigger the event to fetch detailed transaction data
+    context.read<ReportBloc>().add(
+      ExportReportData(
+        userId: authState.user.id,
+        startDate: _startDate,
+        endDate: _endDate,
+      ),
+    );
 
-    // Lắng nghe trạng thái để xử lý xuất CSV
+    // Listen to the state to handle CSV export
     final state = await context.read<ReportBloc>().stream.firstWhere(
-          (state) => state is ReportExportSuccess || state is ReportExportFailure,
+      (state) => state is ReportExportSuccess || state is ReportExportFailure,
     );
 
     if (state is ReportExportSuccess) {
       try {
         final List<List<dynamic>> csvData = [
-          ['Date', 'Category', 'Type', 'Amount', 'Description'], // Tiêu đề cột
-          ...state.transactions.map((transaction) => [
-            DateFormat('yyyy-MM-dd').format(transaction.date),
-            ListsCards.getLocalizedCategory(context, transaction.categoryKey),
-            ListsCards.getLocalizedType(context, transaction.typeKey),
-            transaction.amount,
-            transaction.description ?? '',
-          ]),
+          ['Date', 'Category', 'Type', 'Amount', 'Description'],
+          // Column headers
+          ...state.transactions.map(
+            (transaction) => [
+              DateFormat('yyyy-MM-dd').format(transaction.date),
+              ListsCards.getLocalizedCategory(context, transaction.categoryKey),
+              ListsCards.getLocalizedType(context, transaction.typeKey),
+              transaction.amount,
+              transaction.description,
+            ],
+          ),
         ];
 
         final csvString = const ListToCsvConverter().convert(csvData);
         final directory = await getTemporaryDirectory();
-        final path = '${directory.path}/report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
+        final path =
+            '${directory.path}/report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
         final file = File(path);
         await file.writeAsString(csvString);
-
+        if (!mounted) return;
         UtilityWidgets.showCustomSnackBar(
           context: context,
           message: l10n.exportSuccess,
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: theme.colorScheme.primary,
           textStyle: GoogleFonts.poppins(
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: theme.colorScheme.onPrimary,
             fontSize: 14,
           ),
         );
       } catch (e) {
+        if (!mounted) return;
+
         UtilityWidgets.showCustomSnackBar(
           context: context,
           message: l10n.exportFailure,
-          backgroundColor: Theme.of(context).colorScheme.error,
+          backgroundColor: theme.colorScheme.error,
           textStyle: GoogleFonts.poppins(
-            color: Theme.of(context).colorScheme.onError,
+            color: theme.colorScheme.onError,
             fontSize: 14,
           ),
         );
       }
     } else if (state is ReportExportFailure) {
+      if (!mounted) return;
       UtilityWidgets.showCustomSnackBar(
         context: context,
         message: state.message,
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         textStyle: GoogleFonts.poppins(
-          color: Theme.of(context).colorScheme.onError,
+          color: theme.colorScheme.onError,
           fontSize: 14,
         ),
       );
@@ -205,7 +219,10 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 ],
               ),
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 padding: const EdgeInsets.all(16),
                 decoration: Decorations.boxDecoration(context),
                 child: Column(
@@ -274,13 +291,16 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                   ],
                   onTabChanged: (index) {
                     setState(() {
-                      _selectedChartType = ['category', 'balance', 'type'][index];
+                      _selectedChartType =
+                          ['category', 'balance', 'type'][index];
                     });
                   },
                   controller: _tabController,
                   indicatorColor: theme.colorScheme.primary,
                   labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.6,
+                  ),
                   labelStyle: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -328,7 +348,11 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     );
   }
 
-  Widget _buildChartContent(BuildContext context, ReportLoaded state, AppLocalizations l10n) {
+  Widget _buildChartContent(
+    BuildContext context,
+    ReportLoaded state,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
@@ -339,17 +363,26 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
           children: [
             UtilityWidgets.buildLabel(
               context: context,
-              text: _selectedChartType == 'category'
-                  ? l10n.categoryChart
-                  : _selectedChartType == 'balance'
-                  ? l10n.balanceChart
-                  : l10n.typeChart,
+              text:
+                  _selectedChartType == 'category'
+                      ? l10n.categoryChart
+                      : _selectedChartType == 'balance'
+                      ? l10n.balanceChart
+                      : l10n.typeChart,
             ),
             const SizedBox(height: 16),
             switch (_selectedChartType) {
-              'category' => _buildPieChart(context, state.categoryExpenses, l10n),
+              'category' => _buildPieChart(
+                context,
+                state.categoryExpenses,
+                l10n,
+              ),
               'balance' => _buildLineChart(context, state.dailyBalances, l10n),
-              'type' => _buildBarChart(context, state.transactionTypeTotals, l10n),
+              'type' => _buildBarChart(
+                context,
+                state.transactionTypeTotals,
+                l10n,
+              ),
               _ => const SizedBox.shrink(),
             },
           ],
@@ -358,7 +391,11 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     );
   }
 
-  Widget _buildPieChart(BuildContext context, Map<String, double> data, AppLocalizations l10n) {
+  Widget _buildPieChart(
+    BuildContext context,
+    Map<String, double> data,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
     final total = data.values.fold(0.0, (sum, value) => sum + value);
 
@@ -381,22 +418,25 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
           height: 220,
           child: PieChart(
             PieChartData(
-              sections: data.entries.toList().asMap().entries.map((entry) {
-                final index = entry.key;
-                final value = entry.value.value;
-                return PieChartSectionData(
-                  color: AppTheme.categoryColors[index % AppTheme.categoryColors.length],
-                  value: value,
-                  title: '${(value / total * 100).toStringAsFixed(1)}%',
-                  radius: 80,
-                  titleStyle: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  titlePositionPercentageOffset: 0.6,
-                );
-              }).toList(),
+              sections:
+                  data.entries.toList().asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final value = entry.value.value;
+                    return PieChartSectionData(
+                      color:
+                          AppTheme.categoryColors[index %
+                              AppTheme.categoryColors.length],
+                      value: value,
+                      title: '${(value / total * 100).toStringAsFixed(1)}%',
+                      radius: 80,
+                      titleStyle: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      titlePositionPercentageOffset: 0.6,
+                    );
+                  }).toList(),
               sectionsSpace: 2,
               centerSpaceRadius: 40,
             ),
@@ -407,37 +447,44 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
           spacing: 8,
           runSpacing: 8,
           alignment: WrapAlignment.center,
-          children: data.entries.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final category = entry.value.key;
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: AppTheme.categoryColors[index % AppTheme.categoryColors.length],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  ListsCards.getLocalizedCategory(context, category),
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
+          children:
+              data.entries.toList().asMap().entries.map((entry) {
+                final index = entry.key;
+                final category = entry.value.key;
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color:
+                            AppTheme.categoryColors[index %
+                                AppTheme.categoryColors.length],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      ListsCards.getLocalizedCategory(context, category),
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildLineChart(BuildContext context, Map<DateTime, double> data, AppLocalizations l10n) {
+  Widget _buildLineChart(
+    BuildContext context,
+    Map<DateTime, double> data,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
 
     if (data.isEmpty) {
@@ -454,8 +501,14 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     }
 
     final sortedDates = data.keys.toList()..sort();
-    final minBalance = data.values.fold<double>(double.infinity, (min, v) => v < min ? v : min);
-    final maxBalance = data.values.fold<double>(-double.infinity, (max, v) => v > max ? v : max);
+    final minBalance = data.values.fold<double>(
+      double.infinity,
+      (min, v) => v < min ? v : min,
+    );
+    final maxBalance = data.values.fold<double>(
+      -double.infinity,
+      (max, v) => v > max ? v : max,
+    );
 
     return SizedBox(
       height: 320,
@@ -465,7 +518,8 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
             show: true,
             drawVerticalLine: true,
             horizontalInterval: (maxBalance - minBalance) / 5,
-            verticalInterval: sortedDates.length > 10 ? sortedDates.length / 5 : 1,
+            verticalInterval:
+                sortedDates.length > 10 ? sortedDates.length / 5 : 1,
             getDrawingHorizontalLine: (value) {
               return FlLine(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
@@ -503,7 +557,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 reservedSize: 36,
                 interval: sortedDates.length > 10 ? sortedDates.length / 5 : 1,
                 getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= sortedDates.length) return const SizedBox.shrink();
+                  if (value.toInt() >= sortedDates.length) {
+                    return const SizedBox.shrink();
+                  }
                   final date = sortedDates[value.toInt()];
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -511,7 +567,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                       DateFormat('dd/MM').format(date),
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.8,
+                        ),
                       ),
                     ),
                   );
@@ -523,15 +581,18 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
           ),
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+            ),
           ),
           minY: minBalance - (minBalance.abs() * 0.1),
           maxY: maxBalance + (maxBalance.abs() * 0.1),
           lineBarsData: [
             LineChartBarData(
-              spots: sortedDates.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), data[entry.value]!);
-              }).toList(),
+              spots:
+                  sortedDates.asMap().entries.map((entry) {
+                    return FlSpot(entry.key.toDouble(), data[entry.value]!);
+                  }).toList(),
               isCurved: true,
               curveSmoothness: 0.35,
               gradient: LinearGradient(
@@ -545,12 +606,13 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
               barWidth: 4,
               dotData: FlDotData(
                 show: true,
-                getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                  radius: 5,
-                  color: theme.colorScheme.primary,
-                  strokeWidth: 2,
-                  strokeColor: theme.colorScheme.onPrimary,
-                ),
+                getDotPainter:
+                    (spot, percent, barData, index) => FlDotCirclePainter(
+                      radius: 5,
+                      color: theme.colorScheme.primary,
+                      strokeWidth: 2,
+                      strokeColor: theme.colorScheme.onPrimary,
+                    ),
               ),
               belowBarData: BarAreaData(
                 show: true,
@@ -570,7 +632,11 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     );
   }
 
-  Widget _buildBarChart(BuildContext context, Map<String, Map<String, dynamic>> data, AppLocalizations l10n) {
+  Widget _buildBarChart(
+    BuildContext context,
+    Map<String, Map<String, dynamic>> data,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
 
     if (data.isEmpty) {
@@ -587,7 +653,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     }
 
     final maxAmount = data.values.fold<double>(
-        0, (max, v) => (v['amount'] as double) > max ? v['amount'] as double : max);
+      0,
+      (max, v) => (v['amount'] as double) > max ? v['amount'] as double : max,
+    );
 
     return SizedBox(
       height: 360,
@@ -595,27 +663,30 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: maxAmount + (maxAmount * 0.1),
-          barGroups: data.entries.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final value = entry.value.value['amount'] as double;
-            final color = entry.value.value['color'] as Color;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: value,
-                  color: color,
-                  width: 16,
-                  borderRadius: BorderRadius.circular(4),
-                  backDrawRodData: BackgroundBarChartRodData(
-                    show: true,
-                    toY: maxAmount + (maxAmount * 0.1),
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
+          barGroups:
+              data.entries.toList().asMap().entries.map((entry) {
+                final index = entry.key;
+                final value = entry.value.value['amount'] as double;
+                final color = entry.value.value['color'] as Color;
+                return BarChartGroupData(
+                  x: index,
+                  barRods: [
+                    BarChartRodData(
+                      toY: value,
+                      color: color,
+                      width: 16,
+                      borderRadius: BorderRadius.circular(4),
+                      backDrawRodData: BackgroundBarChartRodData(
+                        show: true,
+                        toY: maxAmount + (maxAmount * 0.1),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.05,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -639,7 +710,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 showTitles: true,
                 reservedSize: 60,
                 getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= data.keys.length) return const SizedBox.shrink();
+                  if (value.toInt() >= data.keys.length) {
+                    return const SizedBox.shrink();
+                  }
                   final type = data.keys.toList()[value.toInt()];
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -649,7 +722,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                         ListsCards.getLocalizedType(context, type),
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                         textAlign: TextAlign.right,
                         overflow: TextOverflow.ellipsis,
@@ -676,7 +751,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
           ),
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+            ),
           ),
         ),
       ),
