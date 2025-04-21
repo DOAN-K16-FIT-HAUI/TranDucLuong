@@ -338,5 +338,17 @@
   "totalIncomeLabel": "Tổng thu nhập",
   "totalExpenseLabel": "Tổng chi phí",
   "remainingAmountLabel": "Số tiền còn lại",
-  "participantsListLabel": "Danh sách thành viên"
+  "participantsListLabel": "Danh sách thành viên",
+  "reportsTitle": "Báo cáo",
+  "categoryChart": "Danh mục",
+  "balanceChart": "Số dư",
+  "typeChart": "Loại GD",
+  "noDataAvailable": "Không có dữ liệu",
+  "selectDifferentDateRange": "Hãy thử chọn khoảng thời gian khác",
+  "noExpenseData": "Không có dữ liệu chi tiêu",
+  "noBalanceData": "Không có dữ liệu số dư",
+  "noTransactionData": "Không có dữ liệu giao dịch",
+  "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
+  "errorLoadingReportData": "Không thể tải dữ liệu báo cáo",
+  "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo"
 }

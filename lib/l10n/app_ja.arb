@@ -338,5 +338,17 @@
   "totalIncomeLabel": "収入合計",
   "totalExpenseLabel": "支出合計",
   "remainingAmountLabel": "残額",
-  "participantsListLabel": "参加者リスト"
+  "participantsListLabel": "参加者リスト",
+  "reportsTitle": "レポート",
+  "categoryChart": "カテゴリ",
+  "balanceChart": "残高",
+  "typeChart": "取引種別",
+  "noDataAvailable": "データがありません",
+  "selectDifferentDateRange": "別の期間を選択してください",
+  "noExpenseData": "支出データがありません",
+  "noBalanceData": "残高データがありません",
+  "noTransactionData": "取引データがありません",
+  "addTransactionsToSeeChart": "取引を追加してグラフを表示してください",
+  "errorLoadingReportData": "レポートデータの読み込みに失敗しました",
+  "pleaseLoginToViewReports": "レポートを表示するにはログインしてください"
 }

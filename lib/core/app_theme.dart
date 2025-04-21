@@ -44,6 +44,19 @@ class AppTheme {
   static const Color lendColor = Color(0xFFFF9F1C); // Orange for lend
   static const Color adjustmentColor = Color(0xFF2A9D8F); // Teal for adjustment
 
+  static const List<Color> categoryColors = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.yellow,
+    Colors.purple,
+    Colors.orange,
+    Colors.teal,
+    Colors.pink,
+    Colors.cyan,
+    Colors.brown,
+  ];
+
   // Light theme
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,

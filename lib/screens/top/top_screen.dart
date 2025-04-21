@@ -1,9 +1,9 @@
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_screen.dart';
+import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TopScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class TopScreenState extends State<TopScreen> {
   static final List<Widget> _screens = [
     DashboardScreen(),
     GroupNoteScreen(),
-    _PlaceholderScreen(placeholderKey: 'reports'),
+    ReportScreen(),
     AccountScreen(),
   ];
 
@@ -140,48 +140,6 @@ class TopScreenState extends State<TopScreen> {
       ),
       label: '',
       tooltip: label,
-    );
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String placeholderKey;
-
-  const _PlaceholderScreen({required this.placeholderKey});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    String displayText;
-    switch (placeholderKey) {
-      case 'reports':
-        displayText = l10n.reportsPlaceholder;
-        break;
-      default:
-        displayText = placeholderKey;
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          displayText,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        automaticallyImplyLeading: false,
-      ),
-      body: Center(
-        child: Text(
-          displayText,
-          style: GoogleFonts.poppins(
-            fontSize: 24,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-      ),
     );
   }
 }

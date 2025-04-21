@@ -338,5 +338,17 @@
   "totalIncomeLabel": "Total Income",
   "totalExpenseLabel": "Total Expense",
   "remainingAmountLabel": "Remaining Amount",
-  "participantsListLabel": "Participants List"
+  "participantsListLabel": "Participants List",
+  "reportsTitle": "Reports",
+  "categoryChart": "Categories",
+  "balanceChart": "Balance",
+  "typeChart": "Types",
+  "noDataAvailable": "No data available",
+  "selectDifferentDateRange": "Try selecting a different date range",
+  "noExpenseData": "No expense data available",
+  "noBalanceData": "No balance data available",
+  "noTransactionData": "No transaction data available",
+  "addTransactionsToSeeChart": "Add transactions to see the chart",
+  "errorLoadingReportData": "Failed to load report data",
+  "pleaseLoginToViewReports": "Please log in to view reports"
 }
