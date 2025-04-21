@@ -88,6 +88,9 @@
   "tabByMonth": "By Month",
   "tabByYear": "By Year",
   "addTransactionTooltip": "Add new transaction",
+  "@addTransactionTooltip": {
+    "description": "Tooltip for the button to add a new transaction"
+  },
   "descriptionLabel": "Description",
   "descriptionHint": "Enter description (e.g., Lunch, Rent)",
   "transactionDateLabel": "Transaction Date",
@@ -385,5 +388,36 @@
   "errorLoadingReportData": "Error loading report data",
   "@errorLoadingReportData": {
     "description": "Message shown when loading report data fails."
-  }
+  },
+  "welcomeUser": "Hello {name}",
+  "@welcomeUser": {
+    "description": "Greets the user with their name",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsTooltip": "Notifications",
+  "viewAllAccounts": "View All Accounts",
+  "spendingTrend": "Spending Trend",
+  "recentTransactions": "Recent Transactions",
+  "loans": "Loans",
+  "noLoansYet": "No loans yet",
+  "addLoanHint": "Add a loan or debt to track",
+  "savings": "Savings",
+  "noSavingsYet": "No savings yet",
+  "addSavingsHint": "Add savings to manage your finances",
+  "addSavingsButton": "Add Savings",
+  "spendingLimits": "Spending Limits",
+  "monthlyLimit": "{month} Limit",
+  "@monthlyLimit": {
+    "description": "Spending limit for a specific month",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAll": "View All"
 }
