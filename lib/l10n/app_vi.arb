@@ -350,5 +350,25 @@
   "noTransactionData": "Không có dữ liệu giao dịch",
   "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
   "errorLoadingReportData": "Không thể tải dữ liệu báo cáo",
-  "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo"
+  "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo",
+  "dateRangeFilter": "Bộ lọc khoảng thời gian",
+  "@dateRangeFilter": {
+    "description": "Tiêu đề cho phần bộ lọc khoảng thời gian trong màn hình báo cáo."
+  },
+  "invalidDateRange": "Khoảng thời gian không hợp lệ. Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
+  "@invalidDateRange": {
+    "description": "Thông báo lỗi hiển thị khi ngày bắt đầu được chọn lớn hơn ngày kết thúc."
+  },
+  "apply": "Áp dụng",
+  "@apply": {
+    "description": "Văn bản cho nút áp dụng bộ lọc khoảng thời gian đã chọn."
+  },
+  "addTransaction": "Thêm giao dịch",
+  "@addTransaction": {
+    "description": "Văn bản cho nút hành động gợi ý thêm giao dịch mới trong trạng thái biểu đồ trống."
+  },
+  "tryAgain": "Thử lại",
+  "@tryAgain": {
+    "description": "Văn bản cho nút hành động để thử tải lại dữ liệu trong trạng thái trống."
+  }
 }

@@ -350,5 +350,25 @@
   "noTransactionData": "取引データがありません",
   "addTransactionsToSeeChart": "取引を追加してグラフを表示してください",
   "errorLoadingReportData": "レポートデータの読み込みに失敗しました",
-  "pleaseLoginToViewReports": "レポートを表示するにはログインしてください"
+  "pleaseLoginToViewReports": "レポートを表示するにはログインしてください",
+  "dateRangeFilter": "日付範囲フィルター",
+  "@dateRangeFilter": {
+    "description": "レポート画面の日付範囲フィルターセクションのタイトル。"
+  },
+  "invalidDateRange": "無効な日付範囲です。開始日は終了日以前でなければなりません。",
+  "@invalidDateRange": {
+    "description": "選択された開始日が終了日より後にある場合に表示されるエラーメッセージ。"
+  },
+  "apply": "適用",
+  "@apply": {
+    "description": "選択された日付範囲フィルターを適用するためのボタンのテキスト。"
+  },
+  "addTransaction": "取引を追加",
+  "@addTransaction": {
+    "description": "空のチャート状態で新しい取引を追加するよう促すアクションボタンのテキスト。"
+  },
+  "tryAgain": "再試行",
+  "@tryAgain": {
+    "description": "空の状態でデータを再読み込みしようとするアクションボタンのテキスト。"
+  }
 }
