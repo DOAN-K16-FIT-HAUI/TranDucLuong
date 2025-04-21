@@ -350,5 +350,25 @@
   "noTransactionData": "No transaction data available",
   "addTransactionsToSeeChart": "Add transactions to see the chart",
   "errorLoadingReportData": "Failed to load report data",
-  "pleaseLoginToViewReports": "Please log in to view reports"
+  "pleaseLoginToViewReports": "Please log in to view reports",
+  "dateRangeFilter": "Date Range Filter",
+  "@dateRangeFilter": {
+    "description": "Title for the date range filter section in the report screen."
+  },
+  "invalidDateRange": "Invalid date range. Start date must be before or equal to end date.",
+  "@invalidDateRange": {
+    "description": "Error message shown when the selected start date is after the end date."
+  },
+  "apply": "Apply",
+  "@apply": {
+    "description": "Text for the button to apply the selected date range filter."
+  },
+  "addTransaction": "Add Transaction",
+  "@addTransaction": {
+    "description": "Text for the action button to prompt adding a new transaction in empty chart states."
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Text for the action button to retry loading data in empty state."
+  }
 }
