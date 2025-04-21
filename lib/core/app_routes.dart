@@ -9,6 +9,7 @@ import 'package:finance_app/screens/auth/register_screen.dart';
 import 'package:finance_app/screens/group_note/add_edit_group_note_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_detail_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_screen.dart';
+import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
 import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
@@ -36,6 +37,7 @@ class AppRoutes {
   static const String groupNoteRoute = 'group-note';
   static const String addEditGroupNoteRoute = 'group-note/add-edit';
   static const String groupNoteDetailRoute = 'group-note/detail';
+  static const String reportRoute = 'report';
 
   static final router = GoRouter(
     initialLocation: AppPaths.splashPath,
@@ -123,6 +125,11 @@ class AppRoutes {
           return GroupNoteDetailScreen(note: note);
         },
       ),
+      GoRoute(
+        name: reportRoute,
+        path: AppPaths.reportsPath,
+        builder: (context, state) => const ReportScreen(),
+      ),
     ],
     redirect: (context, state) async {
       final isOnSplash = state.matchedLocation == AppPaths.splashPath;
@@ -203,8 +210,9 @@ class AppRoutes {
     context.pushNamed(addEditGroupNoteRoute,
         extra: {'note': note, 'onSave': onSave, 'status': status});
   }
-
   static void navigateToGroupNoteDetail(BuildContext context, GroupNoteModel note) {
     context.pushNamed(groupNoteDetailRoute, extra: note);
   }
+  static void navigateToReport(BuildContext context) =>
+      context.goNamed(reportRoute);
 }
