@@ -349,7 +349,6 @@
   "noBalanceData": "No balance data available",
   "noTransactionData": "No transaction data available",
   "addTransactionsToSeeChart": "Add transactions to see the chart",
-  "errorLoadingReportData": "Failed to load report data",
   "pleaseLoginToViewReports": "Please log in to view reports",
   "dateRangeFilter": "Date Range Filter",
   "@dateRangeFilter": {
@@ -370,5 +369,21 @@
   "tryAgain": "Try Again",
   "@tryAgain": {
     "description": "Text for the action button to retry loading data in empty state."
+  },
+  "exportCsv": "Export CSV",
+  "@exportCsv": {
+    "description": "Tooltip for the button to export report data as a CSV file in the AppBar."
+  },
+  "exportSuccess": "Report exported successfully",
+  "@exportSuccess": {
+    "description": "Message shown when the report is successfully exported to a CSV file."
+  },
+  "exportFailure": "Failed to export report",
+  "@exportFailure": {
+    "description": "Message shown when the report export fails."
+  },
+  "errorLoadingReportData": "Error loading report data",
+  "@errorLoadingReportData": {
+    "description": "Message shown when loading report data fails."
   }
 }

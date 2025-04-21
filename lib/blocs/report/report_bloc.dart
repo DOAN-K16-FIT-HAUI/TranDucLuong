@@ -9,6 +9,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
 
   ReportBloc(this._reportRepository) : super(ReportInitial()) {
     on<LoadReportData>(_onLoadReportData);
+    on<ExportReportData>(_onExportReportData);
   }
 
   Future<void> _onLoadReportData(LoadReportData event, Emitter<ReportState> emit) async {
@@ -37,6 +38,20 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       ));
     } catch (e) {
       emit(ReportError((context) => AppLocalizations.of(context)!.errorLoadingReportData));
+    }
+  }
+
+  Future<void> _onExportReportData(ExportReportData event, Emitter<ReportState> emit) async {
+    emit(ReportLoading());
+    try {
+      final transactions = await _reportRepository.getTransactions(
+        event.userId,
+        event.startDate,
+        event.endDate,
+      );
+      emit(ReportExportSuccess(transactions));
+    } catch (e) {
+      emit(ReportExportFailure('Failed to export report'));
     }
   }
 }

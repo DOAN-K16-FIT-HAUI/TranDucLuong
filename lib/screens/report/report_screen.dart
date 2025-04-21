@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
 import 'package:finance_app/blocs/report/report_bloc.dart';
@@ -16,6 +19,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -60,6 +64,100 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     }
   }
 
+  void _exportToCsv() async {
+    final l10n = AppLocalizations.of(context)!;
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is! AuthAuthenticated) {
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.pleaseLoginToViewReports,
+        backgroundColor: Theme.of(context).colorScheme.error,
+        textStyle: GoogleFonts.poppins(
+          color: Theme.of(context).colorScheme.onError,
+          fontSize: 14,
+        ),
+      );
+      return;
+    }
+
+    if (_startDate.isAfter(_endDate)) {
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.invalidDateRange,
+        backgroundColor: Theme.of(context).colorScheme.error,
+        textStyle: GoogleFonts.poppins(
+          color: Theme.of(context).colorScheme.onError,
+          fontSize: 14,
+        ),
+      );
+      return;
+    }
+
+    // Gửi sự kiện để lấy dữ liệu giao dịch chi tiết
+    context.read<ReportBloc>().add(ExportReportData(
+      userId: authState.user.id,
+      startDate: _startDate,
+      endDate: _endDate,
+    ));
+
+    // Lắng nghe trạng thái để xử lý xuất CSV
+    final state = await context.read<ReportBloc>().stream.firstWhere(
+          (state) => state is ReportExportSuccess || state is ReportExportFailure,
+    );
+
+    if (state is ReportExportSuccess) {
+      try {
+        final List<List<dynamic>> csvData = [
+          ['Date', 'Category', 'Type', 'Amount', 'Description'], // Tiêu đề cột
+          ...state.transactions.map((transaction) => [
+            DateFormat('yyyy-MM-dd').format(transaction.date),
+            ListsCards.getLocalizedCategory(context, transaction.categoryKey),
+            ListsCards.getLocalizedType(context, transaction.typeKey),
+            transaction.amount,
+            transaction.description ?? '',
+          ]),
+        ];
+
+        final csvString = const ListToCsvConverter().convert(csvData);
+        final directory = await getTemporaryDirectory();
+        final path = '${directory.path}/report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
+        final file = File(path);
+        await file.writeAsString(csvString);
+
+        UtilityWidgets.showCustomSnackBar(
+          context: context,
+          message: l10n.exportSuccess,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          textStyle: GoogleFonts.poppins(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 14,
+          ),
+        );
+      } catch (e) {
+        UtilityWidgets.showCustomSnackBar(
+          context: context,
+          message: l10n.exportFailure,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textStyle: GoogleFonts.poppins(
+            color: Theme.of(context).colorScheme.onError,
+            fontSize: 14,
+          ),
+        );
+      }
+    } else if (state is ReportExportFailure) {
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: state.message,
+        backgroundColor: Theme.of(context).colorScheme.error,
+        textStyle: GoogleFonts.poppins(
+          color: Theme.of(context).colorScheme.onError,
+          fontSize: 14,
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -97,6 +195,14 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
                 elevation: 4,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.download),
+                    tooltip: l10n.exportCsv,
+                    onPressed: _exportToCsv,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                ],
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -272,7 +378,7 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
     return Column(
       children: [
         SizedBox(
-          height: 220, // Giảm chiều cao từ 320 xuống 220
+          height: 220,
           child: PieChart(
             PieChartData(
               sections: data.entries.toList().asMap().entries.map((entry) {
@@ -282,17 +388,17 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                   color: AppTheme.categoryColors[index % AppTheme.categoryColors.length],
                   value: value,
                   title: '${(value / total * 100).toStringAsFixed(1)}%',
-                  radius: 80, // Giảm bán kính từ 120 xuống 80
+                  radius: 80,
                   titleStyle: GoogleFonts.poppins(
-                    fontSize: 12, // Giảm cỡ chữ từ 14 xuống 12
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                   titlePositionPercentageOffset: 0.6,
                 );
               }).toList(),
-              sectionsSpace: 2, // Giảm khoảng cách giữa các phần từ 4 xuống 2
-              centerSpaceRadius: 40, // Giảm bán kính trung tâm từ 50 xuống 40
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
             ),
           ),
         ),
@@ -427,11 +533,7 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 return FlSpot(entry.key.toDouble(), data[entry.value]!);
               }).toList(),
               isCurved: true,
-              curveSmoothness: 0.35, // Tăng độ mượt của đường cong
-              // color: [
-              //   theme.colorScheme.primary,
-              //   theme.colorScheme.secondary,
-              // ],
+              curveSmoothness: 0.35,
               gradient: LinearGradient(
                 colors: [
                   theme.colorScheme.primary.withValues(alpha: 0.8),
@@ -440,7 +542,7 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
-              barWidth: 4, // Tăng độ dày đường từ 3 lên 4
+              barWidth: 4,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
@@ -488,7 +590,7 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
         0, (max, v) => (v['amount'] as double) > max ? v['amount'] as double : max);
 
     return SizedBox(
-      height: 360, // Tăng chiều cao để chứa nhãn dọc
+      height: 360,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
@@ -503,7 +605,7 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                 BarChartRodData(
                   toY: value,
                   color: color,
-                  width: 16, // Giảm chiều rộng thanh để chứa nhiều cột hơn
+                  width: 16,
                   borderRadius: BorderRadius.circular(4),
                   backDrawRodData: BackgroundBarChartRodData(
                     show: true,
@@ -535,14 +637,14 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 60, // Tăng không gian cho nhãn xoay
+                reservedSize: 60,
                 getTitlesWidget: (value, meta) {
                   if (value.toInt() >= data.keys.length) return const SizedBox.shrink();
                   final type = data.keys.toList()[value.toInt()];
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Transform.rotate(
-                      angle: -45 * 3.14159 / 180, // Xoay nhãn 45 độ
+                      angle: -45 * 3.14159 / 180,
                       child: Text(
                         ListsCards.getLocalizedType(context, type),
                         style: GoogleFonts.poppins(

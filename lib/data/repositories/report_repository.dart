@@ -7,21 +7,20 @@ class ReportRepository {
 
   ReportRepository(this._firestoreService);
 
-  // Hàm lấy danh sách giao dịch
-  Future<List<TransactionModel>> _fetchTransactions(String userId) async {
+  Future<List<TransactionModel>> getTransactions(String userId, DateTime startDate, DateTime endDate) async {
     try {
-      // Truy vấn từ collection cấp cao "transactions"
       final querySnapshot = await _firestoreService.firestore
           .collection('transactions')
-          .where('userId', isEqualTo: userId) // Lọc giao dịch của người dùng hiện tại
-          .orderBy('date') // Sắp xếp theo trường 'date'
+          .where('userId', isEqualTo: userId)
+          .where('date', isGreaterThanOrEqualTo: startDate)
+          .where('date', isLessThanOrEqualTo: endDate)
+          .orderBy('date')
           .get();
 
       return querySnapshot.docs.map((doc) {
-        // Ánh xạ dữ liệu từ Firestore thành TransactionModel
         return TransactionModel.fromJson(
           doc.data(),
-          doc.id, // Truyền document ID vào fromJson
+          doc.id,
         );
       }).toList();
     } catch (e) {
@@ -29,16 +28,12 @@ class ReportRepository {
     }
   }
 
-  // Hàm lấy danh sách chi phí theo danh mục
   Future<Map<String, double>> getCategoryExpenses(
       String userId, DateTime startDate, DateTime endDate) async {
     try {
-      final transactions = await _fetchTransactions(userId);
+      final transactions = await getTransactions(userId, startDate, endDate);
       final filtered = transactions
-          .where((t) =>
-      t.typeKey == 'expense' &&
-          t.date.isAfter(startDate) &&
-          t.date.isBefore(endDate))
+          .where((t) => t.typeKey == 'expense')
           .toList();
 
       final categoryTotals = <String, double>{};
@@ -54,14 +49,11 @@ class ReportRepository {
     }
   }
 
-  // Hàm lấy số dư hàng ngày
   Future<Map<DateTime, double>> getDailyBalances(
       String userId, DateTime startDate, DateTime endDate) async {
     try {
-      final transactions = await _fetchTransactions(userId);
+      final transactions = await getTransactions(userId, startDate, endDate);
       final filtered = transactions
-          .where((t) => t.date.isAfter(startDate) && t.date.isBefore(endDate))
-          .toList()
         ..sort((a, b) => a.date.compareTo(b.date));
 
       final dailyBalances = <DateTime, double>{};
@@ -80,7 +72,6 @@ class ReportRepository {
           } else if (t.typeKey == 'expense' || t.typeKey == 'lend') {
             runningBalance -= t.amount;
           } else if (t.typeKey == 'transfer') {
-            // Chuyển khoản không ảnh hưởng đến tổng số dư
             continue;
           } else if (t.typeKey == 'adjustment' && t.balanceAfter != null) {
             runningBalance = t.balanceAfter!;
@@ -95,15 +86,10 @@ class ReportRepository {
     }
   }
 
-  // Hàm lấy tổng theo loại giao dịch với thông tin màu sắc từ AppTheme
   Future<Map<String, Map<String, dynamic>>> getTransactionTypeTotals(
       String userId, DateTime startDate, DateTime endDate) async {
     try {
-      final transactions = await _fetchTransactions(userId);
-      final filtered = transactions
-          .where((t) => t.date.isAfter(startDate) && t.date.isBefore(endDate))
-          .toList();
-
+      final transactions = await getTransactions(userId, startDate, endDate);
       final typeTotals = <String, Map<String, dynamic>>{
         'income': {'amount': 0.0, 'color': AppTheme.incomeColor},
         'expense': {'amount': 0.0, 'color': AppTheme.expenseColor},
@@ -113,14 +99,13 @@ class ReportRepository {
         'adjustment': {'amount': 0.0, 'color': AppTheme.adjustmentColor},
       };
 
-      for (var t in filtered) {
+      for (var t in transactions) {
         if (typeTotals.containsKey(t.typeKey)) {
           typeTotals[t.typeKey]!['amount'] =
               (typeTotals[t.typeKey]!['amount'] as double) + t.amount;
         }
       }
 
-      // Loại bỏ các loại giao dịch có amount = 0
       return Map.fromEntries(
           typeTotals.entries.where((entry) => entry.value['amount'] > 0));
     } catch (e) {

@@ -21,3 +21,18 @@ class LoadReportData extends ReportEvent {
   @override
   List<Object?> get props => [userId, startDate, endDate];
 }
+
+class ExportReportData extends ReportEvent {
+  final String userId;
+  final DateTime startDate;
+  final DateTime endDate;
+
+  const ExportReportData({
+    required this.userId,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  @override
+  List<Object?> get props => [userId, startDate, endDate];
+}
