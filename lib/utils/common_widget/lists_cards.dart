@@ -12,39 +12,11 @@ class ListsCards {
     required BuildContext context,
     required List<T> items,
     required Widget Function(BuildContext context, T item, int index) itemBuilder,
-    required void Function(int oldIndex, int newIndex) onReorder,
   }) {
-    return ReorderableListView.builder(
+    return ListView.builder(
       padding: const EdgeInsets.all(16).copyWith(bottom: 80),
       itemCount: items.length,
       itemBuilder: (context, index) => itemBuilder(context, items[index], index),
-      onReorder: (oldIndex, newIndex) {
-        if (oldIndex < newIndex) newIndex -= 1;
-        if (oldIndex >= 0 && oldIndex < items.length && newIndex >= 0 && newIndex < items.length) {
-          onReorder(oldIndex, newIndex);
-        } else {
-          debugPrint(
-            "ReorderableListView: Invalid indices ($oldIndex, $newIndex) for list length ${items.length}",
-          );
-        }
-      },
-      proxyDecorator: (Widget child, int index, Animation<double> animation) {
-        final theme = Theme.of(context);
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? _) {
-            final double elevation = lerpDouble(1.0, 6.0, animation.value)!;
-            return Material(
-              borderRadius: BorderRadius.circular(10),
-              elevation: elevation,
-              color: theme.colorScheme.surface,
-              shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.3),
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
     );
   }
 
@@ -65,102 +37,106 @@ class ListsCards {
     EdgeInsetsGeometry margin = const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
     EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
     Color? backgroundColor,
+    void Function()? onTap, // Thêm tham số onTap
   }) {
     final theme = Theme.of(context);
     final locale = valueLocale ?? Intl.getCurrentLocale();
     final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
 
-    return Container(
-      key: itemKey,
-      margin: margin,
-      decoration: BoxDecoration(
-        color: backgroundColor ?? theme.cardColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.5),
-          width: 2,
+    return GestureDetector(
+      onTap: onTap, // Gán sự kiện onTap
+      child: Container(
+        key: itemKey,
+        margin: margin,
+        decoration: BoxDecoration(
+          color: backgroundColor ?? theme.cardColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: theme.dividerColor.withValues(alpha: 0.5),
+            width: 0.05,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: padding,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (icon != null)
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: iconColor ?? theme.colorScheme.primary,
-                ),
-              ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+        child: Padding(
+          padding: padding,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (icon != null)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 3),
-                    DefaultTextStyle(
-                      style: theme.textTheme.bodySmall ?? const TextStyle(),
-                      child: subtitle,
-                    ),
-                  ],
-                  if (value != null && value != 0) ...[
-                    const SizedBox(height: 3),
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: iconColor ?? theme.colorScheme.primary,
+                  ),
+                ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Text(
-                      (valuePrefix ?? '') +
-                          NumberFormat.currency(
-                            locale: locale,
-                            symbol: currencySymbol,
-                            decimalDigits: 0,
-                          ).format(value),
+                      title,
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
+                        color: theme.colorScheme.onSurface,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 3),
+                      DefaultTextStyle(
+                        style: theme.textTheme.bodySmall ?? const TextStyle(),
+                        child: subtitle,
+                      ),
+                    ],
+                    if (value != null && value != 0) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        (valuePrefix ?? '') +
+                            NumberFormat.currency(
+                              locale: locale,
+                              symbol: currencySymbol,
+                              decimalDigits: 0,
+                            ).format(value),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
                   ],
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            if (menuItems != null && onMenuSelected != null)
-              PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  size: 22,
                 ),
-                offset: const Offset(0, 35),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                color: theme.colorScheme.surfaceContainerHighest,
-                elevation: 1.5,
-                onSelected: onMenuSelected,
-                itemBuilder: (context) => menuItems,
               ),
-          ],
+              const SizedBox(width: 8),
+              if (menuItems != null && onMenuSelected != null)
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 22,
+                  ),
+                  offset: const Offset(0, 35),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  elevation: 1.5,
+                  onSelected: onMenuSelected,
+                  itemBuilder: (context) => menuItems,
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -260,7 +236,7 @@ class ListsCards {
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(
           color: theme.dividerColor.withValues(alpha: 0.5),
-          width: 1.5,
+          width: 0.05,
         ),
       ),
       color: theme.cardColor,

@@ -11,8 +11,10 @@ import 'package:finance_app/blocs/localization/localization_state.dart';
 import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
+import 'package:finance_app/blocs/group_note/group_note_bloc.dart'; // Add this import
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
+import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/di/injection.dart';
 import 'package:finance_app/firebase_option.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -66,8 +68,14 @@ class MyApp extends StatelessWidget {
         BlocProvider<AccountBloc>(
           create: (context) => sl<AccountBloc>(),
         ),
+        BlocProvider<GroupNoteBloc>(
+          create: (context) => sl<GroupNoteBloc>(),
+        ),
         Provider<TransactionRepository>(
           create: (context) => sl<TransactionRepository>(),
+        ),
+        Provider<GroupNoteRepository>(
+          create: (context) => sl<GroupNoteRepository>(),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(

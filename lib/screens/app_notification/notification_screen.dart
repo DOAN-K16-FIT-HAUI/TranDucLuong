@@ -8,6 +8,7 @@ import 'package:finance_app/data/repositories/notification_repository.dart';
 import 'package:finance_app/data/services/firebase_messaging_service.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
+import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,7 +50,7 @@ class NotificationScreen extends StatelessWidget {
         body: BlocBuilder<NotificationBloc, NotificationState>(
           builder: (context, state) {
             if (!state.isInitialized) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: UtilityWidgets.buildLoadingIndicator(context: context));
             }
             if (state.notifications.isEmpty) {
               return Center(

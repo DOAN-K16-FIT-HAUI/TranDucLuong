@@ -8,6 +8,7 @@ class UserModel extends Equatable {
   final bool? isDarkMode;
   final String? language;
   final String? loginMethod;
+  final bool? isBiometricsEnabled; // Thêm thuộc tính
 
   const UserModel({
     required this.id,
@@ -17,15 +18,24 @@ class UserModel extends Equatable {
     this.isDarkMode,
     this.language,
     this.loginMethod,
+    this.isBiometricsEnabled = false, // Mặc định tắt
   });
 
   @override
-  List<Object?> get props =>
-      [id, email, displayName, photoUrl, isDarkMode, language, loginMethod];
+  List<Object?> get props => [
+    id,
+    email,
+    displayName,
+    photoUrl,
+    isDarkMode,
+    language,
+    loginMethod,
+    isBiometricsEnabled, // Thêm vào props
+  ];
 
   @override
   String toString() {
-    return 'UserModelEntity(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl), isDarkMode: $isDarkMode, language: $language, loginMethod: $loginMethod)';
+    return 'UserModelEntity(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, isDarkMode: $isDarkMode, language: $language, loginMethod: $loginMethod, isBiometricsEnabled: $isBiometricsEnabled)';
   }
 
   UserModel copyWith({
@@ -36,6 +46,7 @@ class UserModel extends Equatable {
     bool? isDarkMode,
     String? language,
     String? loginMethod,
+    bool? isBiometricsEnabled, // Thêm vào copyWith
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -45,6 +56,7 @@ class UserModel extends Equatable {
       isDarkMode: isDarkMode ?? this.isDarkMode,
       language: language ?? this.language,
       loginMethod: loginMethod ?? this.loginMethod,
+      isBiometricsEnabled: isBiometricsEnabled ?? this.isBiometricsEnabled,
     );
   }
 }

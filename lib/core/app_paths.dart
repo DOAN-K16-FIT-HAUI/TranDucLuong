@@ -14,4 +14,7 @@ class AppPaths {
   static const String transactionListPath = '/transaction-list';
   static const String walletListPath = '/wallet';
   static const String appNotificationListPath = '/app-notification';
+  static const String groupNotePath = '/group-note';
+  static const String addEditGroupNotePath = '/group-note/add-edit';
+  static const String groupNoteDetailPath = '/group-note/detail';
 }

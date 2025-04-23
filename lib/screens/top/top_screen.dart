@@ -1,5 +1,6 @@
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
+import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +19,7 @@ class TopScreenState extends State<TopScreen> {
   // Danh sách màn hình với const constructor
   static final List<Widget> _screens = [
     DashboardScreen(),
-    _PlaceholderScreen(placeholderKey: 'group_notes'),
+    GroupNoteScreen(),
     _PlaceholderScreen(placeholderKey: 'reports'),
     AccountScreen(),
   ];
@@ -47,6 +48,7 @@ class TopScreenState extends State<TopScreen> {
     int bottomNavIndex = _selectedIndex < 2 ? _selectedIndex : _selectedIndex + 1;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
@@ -63,14 +65,6 @@ class TopScreenState extends State<TopScreen> {
         selectedItemColor: theme.colorScheme.primary,
         unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addTransaction,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        tooltip: l10n.addTransactionTooltip, // Thêm tooltip từ l10n
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -84,7 +78,7 @@ class TopScreenState extends State<TopScreen> {
         Icons.home,
         0,
         bottomNavIndex,
-        l10n.dashboardTitle, // Thêm label từ l10n cho tooltip
+        l10n.dashboardTitle,
       ),
       _buildBottomNavItem(
         theme,
@@ -94,7 +88,23 @@ class TopScreenState extends State<TopScreen> {
         bottomNavIndex,
         l10n.groupNotesPlaceholder,
       ),
-      const BottomNavigationBarItem(icon: SizedBox.shrink(), label: ''),
+      BottomNavigationBarItem(
+        icon: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            Icons.add,
+            color: theme.colorScheme.onPrimary,
+            size: 30,
+          ),
+        ),
+        label: '',
+        tooltip: l10n.addTransactionTooltip,
+      ),
       _buildBottomNavItem(
         theme,
         Icons.bar_chart_outlined,
@@ -120,7 +130,7 @@ class TopScreenState extends State<TopScreen> {
       IconData activeIcon,
       int itemIndex,
       int currentBottomNavIndex,
-      String label, // Thêm label từ l10n
+      String label,
       ) {
     bool isSelected = itemIndex == currentBottomNavIndex;
     return BottomNavigationBarItem(
@@ -128,8 +138,8 @@ class TopScreenState extends State<TopScreen> {
         isSelected ? activeIcon : inactiveIcon,
         size: 26,
       ),
-      label: '', // Giữ trống để ẩn label
-      tooltip: label, // Sử dụng label từ l10n làm tooltip
+      label: '',
+      tooltip: label,
     );
   }
 }
@@ -146,9 +156,6 @@ class _PlaceholderScreen extends StatelessWidget {
 
     String displayText;
     switch (placeholderKey) {
-      case 'group_notes':
-        displayText = l10n.groupNotesPlaceholder;
-        break;
       case 'reports':
         displayText = l10n.reportsPlaceholder;
         break;
