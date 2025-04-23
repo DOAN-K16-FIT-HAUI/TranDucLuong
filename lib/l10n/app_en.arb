@@ -419,5 +419,19 @@
       }
     }
   },
-  "viewAll": "View All"
+  "viewAll": "View All",
+  "onboardingTitle1": "Track Your Budget Easily",
+  "onboardingDescription1": "Manage daily expenses, save effectively, and achieve your financial goals.",
+  "onboardingTitle2": "Smart Spending Control",
+  "onboardingDescription2": "Monitor daily spending, categorize expenses, and save smarter.",
+  "onboardingTitle3": "Plan for Long-Term Wealth",
+  "onboardingDescription3": "Build financial plans, save, and invest to reach your goals.",
+  "onboardingTitle4": "Secure Financial Management",
+  "onboardingDescription4": "Protect your financial data and manage accounts with ease and security.",
+  "onboardingContinue": "Continue",
+  "onboardingStart": "Get Started",
+  "onboardingSkip": "Skip",
+  "noEndedNotes": "No ended notes",
+  "noOngoingNotes": "No ongoing notes",
+  "noUpcomingNotes": "No upcoming notes"
 }

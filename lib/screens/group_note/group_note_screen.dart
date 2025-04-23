@@ -179,21 +179,21 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
                               context,
                               state,
                               filteredAllNotes,
-                              'all',
+                              l10n.statusEnded,
                               locale,
                             ),
                             _buildTabContent(
                               context,
                               state,
                               filteredDetailedNotes,
-                              'detailed',
+                              l10n.statusOngoing,
                               locale,
                             ),
                             _buildTabContent(
                               context,
                               state,
                               filteredSummaryNotes,
-                              'summary',
+                              l10n.statusUpcoming,
                               locale,
                             ),
                           ],
@@ -203,23 +203,6 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
                   ],
                 );
               },
-            ),
-            floatingActionButton: Builder(
-              builder: (fabContext) => FloatingActionButton(
-                heroTag: "group_note_fab",
-                onPressed: () {
-                  final status = DefaultTabController.of(context).index == 0
-                      ? 'all'
-                      : DefaultTabController.of(context).index == 1
-                      ? 'detailed'
-                      : 'summary';
-                  _showAddGroupNoteDialog(fabContext, status);
-                },
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                tooltip: l10n.addNote,
-                child: const Icon(Icons.add),
-              ),
             ),
           ),
         );
@@ -324,10 +307,10 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
       return UtilityWidgets.buildEmptyState(
         context: context,
         message: state is GroupNoteLoaded && state.isSearching
-            ? l10n.noMatchingTransactions
-            : status == 'all'
+            ? l10n.noItemsFound
+            : status == l10n.statusEnded
             ? l10n.noAllNotes
-            : status == 'detailed'
+            : status == l10n.statusOngoing
             ? l10n.noDetailedNotes
             : l10n.noSummaryNotes,
         suggestion: state is GroupNoteLoaded && state.isSearching ? null : l10n.addNoteSuggestion,
@@ -336,10 +319,25 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
         actionText: state is GroupNoteLoaded && state.isSearching ? null : l10n.addNote,
       );
     } else {
-      return ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: items.length,
-        itemBuilder: (ctx, index) => _buildGroupNoteCard(ctx, items[index], status, index, locale),
+      return Stack(
+        children: [
+          ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: items.length,
+            itemBuilder: (ctx, index) => _buildGroupNoteCard(ctx, items[index], status, index, locale),
+          ),
+          // Show FAB only for Ongoing and Upcoming tabs
+          if (status == l10n.statusOngoing || status == l10n.statusUpcoming)
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                onPressed: () => _showAddGroupNoteDialog(context, status),
+                tooltip: l10n.addNote,
+                child: const Icon(Icons.add),
+              ),
+            ),
+        ],
       );
     }
   }

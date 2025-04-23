@@ -419,5 +419,19 @@
       }
     }
   },
-  "viewAll": "Xem tất cả"
+  "viewAll": "Xem tất cả",
+  "onboardingTitle1": "Theo dõi ngân sách dễ dàng",
+  "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt được mục tiêu tài chính.",
+  "onboardingTitle2": "Kiểm soát chi tiêu thông minh",
+  "onboardingDescription2": "Theo dõi chi tiêu hàng ngày, phân loại chi phí và tiết kiệm hiệu quả.",
+  "onboardingTitle3": "Lập kế hoạch tài chính dài hạn",
+  "onboardingDescription3": "Xây dựng kế hoạch tài chính, tiết kiệm và đầu tư để đạt được mục tiêu.",
+  "onboardingTitle4": "Quản lý tài chính an toàn",
+  "onboardingDescription4": "Bảo mật thông tin tài chính, quản lý tài khoản dễ dàng và an toàn.",
+  "onboardingContinue": "Tiếp tục",
+  "onboardingStart": "Bắt đầu",
+  "onboardingSkip": "Bỏ qua",
+  "noEndedNotes": "Không có ghi chú đã kết thúc",
+  "noOngoingNotes": "Không có ghi chú đang triển khai",
+  "noUpcomingNotes": "Không có ghi chú sắp tới"
 }
