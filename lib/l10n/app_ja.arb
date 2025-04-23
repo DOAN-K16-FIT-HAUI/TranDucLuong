@@ -88,6 +88,9 @@
   "tabByMonth": "月別",
   "tabByYear": "年別",
   "addTransactionTooltip": "新しい取引を追加",
+  "@addTransactionTooltip": {
+    "description": "新しい取引を追加するボタンのツールチップ"
+  },
   "descriptionLabel": "内容",
   "descriptionHint": "内容を入力 (例: 昼食、家賃)",
   "transactionDateLabel": "取引日",
@@ -385,5 +388,50 @@
   "errorLoadingReportData": "レポートデータの読み込みエラー",
   "@errorLoadingReportData": {
     "description": "レポートデータの読み込みに失敗したときに表示されるメッセージ。"
-  }
+  },
+  "welcomeUser": "こんにちは、{name}さん",
+  "@welcomeUser": {
+    "description": "ユーザーの名前で挨拶します",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsTooltip": "通知",
+  "viewAllAccounts": "すべてのアカウントを表示",
+  "spendingTrend": "支出の傾向",
+  "recentTransactions": "最近の取引",
+  "loans": "ローン",
+  "noLoansYet": "まだローンがありません",
+  "addLoanHint": "ローンまたは借金を追加して追跡します",
+  "savings": "貯蓄",
+  "noSavingsYet": "まだ貯蓄がありません",
+  "addSavingsHint": "貯蓄を追加して財務を管理します",
+  "addSavingsButton": "貯蓄を追加",
+  "spendingLimits": "支出制限",
+  "monthlyLimit": "{month}の制限",
+  "@monthlyLimit": {
+    "description": "特定の月の支出制限",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAll": "すべて表示",
+  "onboardingTitle1": "予算を簡単に追跡",
+  "onboardingDescription1": "毎日の支出を管理し、効果的に貯蓄して、財務目標を達成します。",
+  "onboardingTitle2": "スマートな支出管理",
+  "onboardingDescription2": "毎日の支出を追跡し、費用を分類して、より賢く貯蓄します。",
+  "onboardingTitle3": "長期的な資産計画",
+  "onboardingDescription3": "財務計画を立て、貯蓄と投資を行い、目標を達成します。",
+  "onboardingTitle4": "安全な財務管理",
+  "onboardingDescription4": "財務情報を保護し、アカウントを簡単かつ安全に管理します。",
+  "onboardingContinue": "続ける",
+  "onboardingStart": "始める",
+  "onboardingSkip": "スキップ",
+  "noEndedNotes": "終了したノートはありません",
+  "noOngoingNotes": "進行中のノートはありません",
+  "noUpcomingNotes": "近日中のノートはありません"
 }
