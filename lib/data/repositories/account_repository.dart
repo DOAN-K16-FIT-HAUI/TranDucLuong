@@ -13,7 +13,6 @@ class AccountRepository {
   })  : _authService = authService ?? FirebaseAuthService(),
         _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
-  // Lấy dữ liệu tài khoản từ Firebase và SharedPreferences
   Future<UserModel> getAccountData() async {
     try {
       final firebaseUser = _firebaseAuth.currentUser;
@@ -28,10 +27,10 @@ class AccountRepository {
         loginMethod = 'facebook';
       }
 
-      // Lấy isDarkMode và language từ SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final isDarkMode = prefs.getBool('isDarkMode') ?? false;
       final language = prefs.getString('language') ?? 'Tiếng Việt';
+      final isBiometricsEnabled = prefs.getBool('isBiometricsEnabled') ?? false; // Thêm
 
       return UserModel(
         id: firebaseUser.uid,
@@ -41,13 +40,13 @@ class AccountRepository {
         isDarkMode: isDarkMode,
         language: language,
         loginMethod: loginMethod,
+        isBiometricsEnabled: isBiometricsEnabled, // Thêm
       );
     } catch (e) {
       throw Exception('Failed to fetch user data: $e');
     }
   }
 
-  // Lưu trạng thái chế độ tối vào SharedPreferences
   Future<void> saveDarkMode(bool isDarkMode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -57,7 +56,6 @@ class AccountRepository {
     }
   }
 
-  // Lưu ngôn ngữ vào SharedPreferences
   Future<void> saveLanguage(String language) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -67,7 +65,15 @@ class AccountRepository {
     }
   }
 
-  // Đổi mật khẩu
+  Future<void> saveBiometricsEnabled(bool isBiometricsEnabled) async { // Thêm
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isBiometricsEnabled', isBiometricsEnabled);
+    } catch (e) {
+      throw Exception('Failed to save biometrics setting: $e');
+    }
+  }
+
   Future<void> changePassword(String oldPassword, String newPassword) async {
     try {
       final user = _firebaseAuth.currentUser;
@@ -86,7 +92,6 @@ class AccountRepository {
     }
   }
 
-  // Đăng xuất
   Future<void> logout() async {
     try {
       await _authService.signOut();
@@ -95,7 +100,6 @@ class AccountRepository {
     }
   }
 
-  // Cập nhật thông tin user (bao gồm email)
   Future<void> updateUserInfo({
     String? displayName,
     String? photoUrl,
@@ -133,7 +137,6 @@ class AccountRepository {
     }
   }
 
-  // Xóa tài khoản
   Future<void> deleteAccount() async {
     try {
       final user = _firebaseAuth.currentUser;

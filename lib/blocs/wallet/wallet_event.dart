@@ -29,14 +29,6 @@ class DeleteWallet extends WalletEvent {
   DeleteWallet(this.walletId, this.type);
 }
 
-class ReorderWallets extends WalletEvent {
-  final int type;
-  final int oldIndex;
-  late final int newIndex;
-
-  ReorderWallets(this.type, this.oldIndex, this.newIndex);
-}
-
 class ToggleSearch extends WalletEvent {
   final bool isSearching;
 

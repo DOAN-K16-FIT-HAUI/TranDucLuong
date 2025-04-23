@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Thêm để dùng l10n
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 
@@ -15,13 +15,13 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     on<AddWallet>(_onAddWallet);
     on<EditWallet>(_onEditWallet);
     on<DeleteWallet>(_onDeleteWallet);
-    on<ReorderWallets>(_onReorderWallets);
     on<TabChanged>(_onTabChanged);
     on<SearchWallets>(_onSearchWallets);
     on<ToggleSearch>(_onToggleSearch);
   }
 
   Future<void> _onLoadWallets(LoadWallets event, Emitter<WalletState> emit) async {
+    emit(state.copyWith(isLoading: true)); // Bắt đầu loading
     try {
       final allWallets = await walletRepository.getWallets();
       debugPrint("Loaded wallets: ${allWallets.length}");
@@ -31,6 +31,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         investmentWallets: allWallets.where((w) => w.type == 2).toList(),
         searchQuery: '',
         isSearching: false,
+        isLoading: false, // Kết thúc loading
+        error: null,
       ));
     } catch (e) {
       debugPrint("Error in Bloc loading wallets: $e");
@@ -38,6 +40,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         wallets: [],
         savingsWallets: [],
         investmentWallets: [],
+        isLoading: false, // Kết thúc loading ngay cả khi lỗi
         error: (context) => AppLocalizations.of(context)!.errorLoadingWallets,
       ));
     }
@@ -103,42 +106,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       debugPrint("Error in Bloc deleting wallet: $e");
       emit(state.copyWith(
         error: (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString()),
-      ));
-    }
-  }
-
-  void _onReorderWallets(ReorderWallets event, Emitter<WalletState> emit) {
-    List<Wallet> listToReorder;
-    if (event.type == 0) {
-      listToReorder = List.from(state.wallets);
-    } else if (event.type == 1) {
-      listToReorder = List.from(state.savingsWallets);
-    } else {
-      listToReorder = List.from(state.investmentWallets);
-    }
-
-    if (event.oldIndex >= 0 &&
-        event.oldIndex < listToReorder.length &&
-        event.newIndex >= 0 &&
-        event.newIndex <= listToReorder.length) {
-      final Wallet item = listToReorder.removeAt(event.oldIndex);
-      listToReorder.insert(event.newIndex, item);
-
-      for (int i = 0; i < listToReorder.length; i++) {
-        listToReorder[i] = listToReorder[i].copyWith(orderIndex: i);
-      }
-
-      emit(state.copyWith(
-        wallets: event.type == 0 ? listToReorder : state.wallets,
-        savingsWallets: event.type == 1 ? listToReorder : state.savingsWallets,
-        investmentWallets: event.type == 2 ? listToReorder : state.investmentWallets,
-      ));
-
-      walletRepository.updateWalletOrder(listToReorder);
-    } else {
-      debugPrint("Reorder indices out of bounds: old=${event.oldIndex}, new=${event.newIndex}, len=${listToReorder.length}");
-      emit(state.copyWith(
-        error: (context) => AppLocalizations.of(context)!.genericError,
       ));
     }
   }

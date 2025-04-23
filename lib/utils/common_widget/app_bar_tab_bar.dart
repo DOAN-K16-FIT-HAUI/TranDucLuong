@@ -45,6 +45,7 @@ class AppBarTabBar {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onPrimary,
             ),
             overflow: TextOverflow.ellipsis,
           ),

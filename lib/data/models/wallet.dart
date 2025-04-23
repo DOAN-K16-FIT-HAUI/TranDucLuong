@@ -7,7 +7,6 @@ class Wallet {
   final int balance;
   final IconData icon;
   final int type;
-  final int orderIndex;
 
   Wallet({
     required this.id,
@@ -15,7 +14,6 @@ class Wallet {
     required this.balance,
     required this.icon,
     required this.type,
-    this.orderIndex = 0,
   });
 
   Wallet copyWith({
@@ -32,7 +30,6 @@ class Wallet {
       balance: balance ?? this.balance,
       icon: icon ?? this.icon,
       type: type ?? this.type,
-      orderIndex: orderIndex ?? this.orderIndex,
     );
   }
 
@@ -44,7 +41,6 @@ class Wallet {
       'icon_font_family': icon.fontFamily,
       'icon_font_package': icon.fontPackage,
       'type': type,
-      'orderIndex': orderIndex, // Đảm bảo lưu orderIndex
     };
   }
 
@@ -65,7 +61,6 @@ class Wallet {
         fontPackage: data['icon_font_package'],
       ),
       type: (data['type'] ?? 0).toInt(),
-      orderIndex: (data['orderIndex'] ?? 0).toInt(), // Đảm bảo đọc orderIndex
     );
   }
 

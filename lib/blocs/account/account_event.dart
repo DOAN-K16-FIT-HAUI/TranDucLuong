@@ -17,6 +17,15 @@ class ToggleDarkModeEvent extends AccountEvent {
   List<Object?> get props => [isDarkMode];
 }
 
+class ToggleBiometricsEvent extends AccountEvent { // Thêm sự kiện
+  final bool isBiometricsEnabled;
+
+  const ToggleBiometricsEvent(this.isBiometricsEnabled);
+
+  @override
+  List<Object?> get props => [isBiometricsEnabled];
+}
+
 class ChangePasswordEvent extends AccountEvent {
   final String oldPassword;
   final String newPassword;
@@ -39,8 +48,8 @@ class ChangeLanguageEvent extends AccountEvent {
 class UpdateUserInfoEvent extends AccountEvent {
   final String? displayName;
   final String? photoUrl;
-  final String? email; // Thêm email
-  final String? currentPassword; // Thêm mật khẩu hiện tại để xác thực lại
+  final String? email;
+  final String? currentPassword;
 
   const UpdateUserInfoEvent({
     this.displayName,

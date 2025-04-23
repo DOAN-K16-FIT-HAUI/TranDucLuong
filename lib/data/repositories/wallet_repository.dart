@@ -69,10 +69,6 @@ class WalletRepository {
     if (userId == null) throw Exception("User not logged in, cannot update wallet order");
 
     final batch = firestoreService.firestore.batch();
-    for (var wallet in wallets) {
-      final docRef = firestoreService.firestore.collection('users/$userId/wallets').doc(wallet.id);
-      batch.update(docRef, {'orderIndex': wallet.orderIndex});
-    }
 
     try {
       await batch.commit();

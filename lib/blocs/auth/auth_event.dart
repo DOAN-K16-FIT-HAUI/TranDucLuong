@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -49,4 +50,13 @@ class PasswordResetRequested extends AuthEvent {
 
   @override
   List<Object?> get props => [email];
+}
+
+class SignInWithBiometricsRequested extends AuthEvent {
+  final BuildContext context;
+
+  const SignInWithBiometricsRequested({required this.context});
+
+  @override
+  List<Object?> get props => [context];
 }

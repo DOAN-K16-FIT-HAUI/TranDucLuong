@@ -103,6 +103,7 @@ class WalletScreen extends StatelessWidget {
                       title: l10n.myWalletsTitle,
                       showBackButton: true,
                       backIcon: Icons.arrow_back,
+                      backgroundColor: theme.colorScheme.primaryContainer,
                       onBackPressed: () {
                         if (state.isSearching) {
                           context.read<WalletBloc>().add(ToggleSearch(false));
@@ -115,7 +116,7 @@ class WalletScreen extends StatelessWidget {
                         IconButton(
                           icon: Icon(
                             state.isSearching ? Icons.close : Icons.search,
-                            color: theme.colorScheme.onPrimary,
+                            color: theme.colorScheme.onPrimaryContainer,
                           ),
                           tooltip:
                               state.isSearching
@@ -131,69 +132,90 @@ class WalletScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (state.isSearching)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                        child: UtilityWidgets.buildSearchField(
-                          context: context,
-                          hintText: l10n.searchWalletsHint,
-                          onChanged: (value) {
-                            context.read<WalletBloc>().add(
-                              SearchWallets(value),
-                            );
-                          },
+                    if (state.isLoading)
+                      Expanded(
+                        child: Center(
+                          child: UtilityWidgets.buildLoadingIndicator(
+                            context: context,
+                          ),
                         ),
                       ),
-                    if (!state.isSearching) const SizedBox(height: 16),
-                    _buildTotalBalance(
-                      context,
-                      state,
-                      filteredWalletsTab0,
-                      filteredWalletsTab1,
-                      filteredWalletsTab2,
-                      locale,
-                    ),
-                    const SizedBox(height: 16),
-                    AppBarTabBar.buildTabBar(
-                      context: context,
-                      tabTitles: [
-                        l10n.tabAccounts,
-                        l10n.tabSavings,
-                        l10n.tabInvestments,
-                      ],
-                      controller: tabController,
-                      onTabChanged:
-                          (index) =>
-                              context.read<WalletBloc>().add(TabChanged(index)),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          _buildTabContent(
-                            context,
-                            state,
-                            filteredWalletsTab0,
-                            0,
-                            locale,
+                    if (!state.isLoading) ...[
+                      if (state.isSearching)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                          child: UtilityWidgets.buildSearchField(
+                            context: context,
+                            hintText: l10n.searchWalletsHint,
+                            onChanged: (value) {
+                              context.read<WalletBloc>().add(
+                                SearchWallets(value),
+                              );
+                            },
                           ),
-                          _buildTabContent(
-                            context,
-                            state,
-                            filteredWalletsTab1,
-                            1,
-                            locale,
-                          ),
-                          _buildTabContent(
-                            context,
-                            state,
-                            filteredWalletsTab2,
-                            2,
-                            locale,
-                          ),
-                        ],
+                        ),
+                      if (!state.isSearching) const SizedBox(height: 16),
+                      _buildTotalBalance(
+                        context,
+                        state,
+                        filteredWalletsTab0,
+                        filteredWalletsTab1,
+                        filteredWalletsTab2,
+                        locale,
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      AppBarTabBar.buildTabBar(
+                        context: context,
+                        tabTitles: [
+                          l10n.tabAccounts,
+                          l10n.tabSavings,
+                          l10n.tabInvestments,
+                        ],
+                        controller: tabController,
+                        onTabChanged:
+                            (index) => context.read<WalletBloc>().add(
+                              TabChanged(index),
+                            ),
+                      ),
+                      Expanded(
+                        child:
+                            state.error != null
+                                ? UtilityWidgets.buildErrorState(
+                                  context: context,
+                                  message: (context) => state.error!(context),
+                                  onRetry:
+                                      () => context.read<WalletBloc>().add(
+                                        LoadWallets(),
+                                      ),
+                                )
+                                : TabBarView(
+                                  controller: tabController,
+                                  children: [
+                                    _buildTabContent(
+                                      context,
+                                      state,
+                                      filteredWalletsTab0,
+                                      0,
+                                      locale,
+                                    ),
+                                    _buildTabContent(
+                                      context,
+                                      state,
+                                      filteredWalletsTab1,
+                                      1,
+                                      locale,
+                                    ),
+                                    _buildTabContent(
+                                      context,
+                                      state,
+                                      filteredWalletsTab2,
+                                      2,
+                                      locale,
+                                    ),
+                                  ],
+                                ),
+                      ),
+                    ],
                   ],
                 );
               },
@@ -278,7 +300,7 @@ class WalletScreen extends StatelessWidget {
           Text(
             l10n.totalBalance,
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.hintColor,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 4),
@@ -356,6 +378,9 @@ class WalletScreen extends StatelessWidget {
                 : l10n.noWalletsInThisCategory,
         suggestion: state.isSearching ? null : l10n.addWalletSuggestion,
         icon: Icons.account_balance_wallet_outlined,
+        onActionPressed:
+            state.isSearching ? null : () => _showAddWalletDialog(context),
+        actionText: state.isSearching ? null : l10n.addWalletButton,
       );
     } else {
       return ListsCards.buildTabContent<Wallet>(
@@ -364,10 +389,6 @@ class WalletScreen extends StatelessWidget {
         itemBuilder:
             (ctx, wallet, index) =>
                 _buildWalletCard(ctx, wallet, type, index, locale),
-        onReorder:
-            (oldIndex, newIndex) => context.read<WalletBloc>().add(
-              ReorderWallets(type, oldIndex, newIndex),
-            ),
       );
     }
   }
@@ -466,7 +487,6 @@ class _AddWalletDialogState extends State<_AddWalletDialog> {
                     ),
                     icon: selectedIcon,
                     type: widget.walletType,
-                    orderIndex: 0,
                   ),
                 ),
               );
@@ -614,7 +634,6 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
                     ),
                     icon: selectedIcon,
                     type: widget.wallet.type,
-                    orderIndex: widget.wallet.orderIndex,
                   ),
                 ),
               );

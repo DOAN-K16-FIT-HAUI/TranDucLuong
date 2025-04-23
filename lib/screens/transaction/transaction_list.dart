@@ -18,6 +18,7 @@ import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -385,7 +386,6 @@ class TransactionScreenState extends State<TransactionScreen> {
                   ...state.savingsWallets,
                   ...state.investmentWallets,
                 ].where((w) => w.id.isNotEmpty).toList();
-                _allWallets.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
                 _walletBalances = Map.fromEntries(
                   _allWallets.map((w) => MapEntry(w.name, w.balance.toDouble())),
                 );
@@ -500,10 +500,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                               ? SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(
-                              color: theme.colorScheme.onPrimary,
-                              strokeWidth: 2.5,
-                            ),
+                            child: UtilityWidgets.buildLoadingIndicator(context: context),
                           )
                               : Icon(
                             Icons.check,
