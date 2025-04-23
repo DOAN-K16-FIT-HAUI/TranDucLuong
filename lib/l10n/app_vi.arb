@@ -88,6 +88,9 @@
   "tabByMonth": "Theo Tháng",
   "tabByYear": "Theo Năm",
   "addTransactionTooltip": "Thêm giao dịch mới",
+  "@addTransactionTooltip": {
+    "description": "Tooltip cho nút thêm giao dịch mới"
+  },
   "descriptionLabel": "Diễn giải",
   "descriptionHint": "Nhập mô tả (vd: Ăn trưa, Tiền nhà)",
   "transactionDateLabel": "Ngày giao dịch",
@@ -369,7 +372,8 @@
   "tryAgain": "Thử lại",
   "@tryAgain": {
     "description": "Văn bản cho nút hành động để thử tải lại dữ liệu trong trạng thái trống."
-  },"exportCsv": "Xuất CSV",
+  },
+  "exportCsv": "Xuất CSV",
   "@exportCsv": {
     "description": "Tooltip cho nút xuất dữ liệu báo cáo dưới dạng tệp CSV trong AppBar."
   },
@@ -384,6 +388,50 @@
   "errorLoadingReportData": "Lỗi tải dữ liệu báo cáo",
   "@errorLoadingReportData": {
     "description": "Thông báo hiển thị khi tải dữ liệu báo cáo thất bại."
-  }
-
+  },
+  "welcomeUser": "Xin chào {name}",
+  "@welcomeUser": {
+    "description": "Chào người dùng với tên của họ",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsTooltip": "Thông báo",
+  "viewAllAccounts": "Xem tất cả tài khoản",
+  "spendingTrend": "Xu hướng chi tiêu",
+  "recentTransactions": "Giao dịch gần đây",
+  "loans": "Vay nợ",
+  "noLoansYet": "Chưa có khoản vay nào",
+  "addLoanHint": "Thêm khoản vay hoặc nợ để theo dõi",
+  "savings": "Tiết kiệm",
+  "noSavingsYet": "Chưa có khoản tiết kiệm nào",
+  "addSavingsHint": "Thêm khoản tiết kiệm để quản lý tài chính",
+  "addSavingsButton": "Thêm tiết kiệm",
+  "spendingLimits": "Hạn mức chi tiêu",
+  "monthlyLimit": "Hạn mức {month}",
+  "@monthlyLimit": {
+    "description": "Hạn mức chi tiêu cho tháng cụ thể",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAll": "Xem tất cả",
+  "onboardingTitle1": "Theo dõi ngân sách dễ dàng",
+  "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt được mục tiêu tài chính.",
+  "onboardingTitle2": "Kiểm soát chi tiêu thông minh",
+  "onboardingDescription2": "Theo dõi chi tiêu hàng ngày, phân loại chi phí và tiết kiệm hiệu quả.",
+  "onboardingTitle3": "Lập kế hoạch tài chính dài hạn",
+  "onboardingDescription3": "Xây dựng kế hoạch tài chính, tiết kiệm và đầu tư để đạt được mục tiêu.",
+  "onboardingTitle4": "Quản lý tài chính an toàn",
+  "onboardingDescription4": "Bảo mật thông tin tài chính, quản lý tài khoản dễ dàng và an toàn.",
+  "onboardingContinue": "Tiếp tục",
+  "onboardingStart": "Bắt đầu",
+  "onboardingSkip": "Bỏ qua",
+  "noEndedNotes": "Không có ghi chú đã kết thúc",
+  "noOngoingNotes": "Không có ghi chú đang triển khai",
+  "noUpcomingNotes": "Không có ghi chú sắp tới"
 }
