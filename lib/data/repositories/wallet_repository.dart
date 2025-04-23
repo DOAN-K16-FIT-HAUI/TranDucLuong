@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +18,6 @@ class WalletRepository {
     if (userId == null) return [];
     final snapshot = await firestoreService.firestore
         .collection('users/$userId/wallets') // Đồng bộ với subcollection
-        .orderBy('orderIndex')
         .get();
     return snapshot.docs.map((doc) => Wallet.fromSnapshot(doc)).toList();
   }
