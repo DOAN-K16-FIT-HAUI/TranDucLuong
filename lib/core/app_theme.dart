@@ -10,9 +10,9 @@ class AppTheme {
   static const Color _secondaryLight = Color(0xFF2A9D8F); // Teal
   static const Color _secondaryDark = Color(0xFF4ECDC4); // Light teal
 
-  // Accent colors
-  static const Color _accentLight = Color(0xFFFF9F1C); // Orange
-  static const Color _accentDark = Color(0xFFFFBF69); // Light orange
+  // Success colors
+  static const Color _successLight = Color(0xFF198754); // Green for success
+  static const Color _successDark = Color(0xFF2A9D8F); // Teal for success
 
   // Background colors
   static const Color _backgroundLight = Color(0xFFF8F9FA);
@@ -32,10 +32,6 @@ class AppTheme {
   static const Color _errorLight = Color(0xFFD62828);
   static const Color _errorDark = Color(0xFFFF6B6B);
 
-  // Success colors
-  static const Color _successLight = Color(0xFF198754);
-  static const Color _successDark = Color(0xFF2A9D8F);
-
   // Transaction type colors
   static const Color incomeColor = Color(0xFF198754); // Green for income
   static const Color expenseColor = Color(0xFFD62828); // Red for expense
@@ -43,6 +39,19 @@ class AppTheme {
   static const Color borrowColor = Color(0xFF7209B7); // Purple for borrow
   static const Color lendColor = Color(0xFFFF9F1C); // Orange for lend
   static const Color adjustmentColor = Color(0xFF2A9D8F); // Teal for adjustment
+
+  static const List<Color> categoryColors = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.yellow,
+    Colors.purple,
+    Colors.orange,
+    Colors.teal,
+    Colors.pink,
+    Colors.cyan,
+    Colors.brown,
+  ];
 
   // Light theme
   static ThemeData lightTheme = ThemeData(
@@ -52,11 +61,12 @@ class AppTheme {
     colorScheme: ColorScheme.light(
       primary: _primaryLight,
       secondary: _secondaryLight,
-      tertiary: _accentLight,
+      tertiary: _successLight,
       error: _errorLight,
       surface: _surfaceLight,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
+      onTertiary: Colors.white,
       onSurface: _textPrimaryLight,
       onError: Colors.white,
     ),
@@ -193,11 +203,12 @@ class AppTheme {
     colorScheme: ColorScheme.dark(
       primary: _primaryDark,
       secondary: _secondaryDark,
-      tertiary: _accentDark,
+      tertiary: _successDark, // Use successDark for tertiary
       error: _errorDark,
       surface: _surfaceDark,
       onPrimary: Colors.black,
       onSecondary: Colors.black,
+      onTertiary: Colors.black, // Text/icon color on success background
       onSurface: _textPrimaryDark,
       onError: Colors.black,
     ),

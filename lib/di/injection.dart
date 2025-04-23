@@ -2,6 +2,7 @@ import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/blocs/localization/localization_bloc.dart';
+import 'package:finance_app/blocs/report/report_bloc.dart';
 import 'package:finance_app/blocs/theme/theme_bloc.dart';
 import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:finance_app/data/repositories/account_repository.dart';
 import 'package:finance_app/data/repositories/auth_repository.dart';
 import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
+import 'package:finance_app/data/repositories/report_repository.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
@@ -57,6 +59,9 @@ void setupDependencies() {
   sl.registerLazySingleton<GroupNoteRepository>(
         () => GroupNoteRepository(sl<FirestoreService>()),
   );
+  sl.registerLazySingleton<ReportRepository>(
+        () => ReportRepository(sl<FirestoreService>()),
+  );
 
   // Register Blocs
   sl.registerLazySingleton<AuthBloc>(
@@ -76,4 +81,7 @@ void setupDependencies() {
   );
   sl.registerFactory<ThemeBloc>(() => ThemeBloc());
   sl.registerFactory<LocalizationBloc>(() => LocalizationBloc());
+  sl.registerFactory<ReportBloc>(
+        () => ReportBloc(sl<ReportRepository>()),
+  );
 }

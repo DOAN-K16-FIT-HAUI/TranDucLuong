@@ -338,5 +338,52 @@
   "totalIncomeLabel": "Tổng thu nhập",
   "totalExpenseLabel": "Tổng chi phí",
   "remainingAmountLabel": "Số tiền còn lại",
-  "participantsListLabel": "Danh sách thành viên"
+  "participantsListLabel": "Danh sách thành viên",
+  "reportsTitle": "Báo cáo",
+  "categoryChart": "Danh mục",
+  "balanceChart": "Số dư",
+  "typeChart": "Loại GD",
+  "noDataAvailable": "Không có dữ liệu",
+  "selectDifferentDateRange": "Hãy thử chọn khoảng thời gian khác",
+  "noExpenseData": "Không có dữ liệu chi tiêu",
+  "noBalanceData": "Không có dữ liệu số dư",
+  "noTransactionData": "Không có dữ liệu giao dịch",
+  "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
+  "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo",
+  "dateRangeFilter": "Bộ lọc khoảng thời gian",
+  "@dateRangeFilter": {
+    "description": "Tiêu đề cho phần bộ lọc khoảng thời gian trong màn hình báo cáo."
+  },
+  "invalidDateRange": "Khoảng thời gian không hợp lệ. Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
+  "@invalidDateRange": {
+    "description": "Thông báo lỗi hiển thị khi ngày bắt đầu được chọn lớn hơn ngày kết thúc."
+  },
+  "apply": "Áp dụng",
+  "@apply": {
+    "description": "Văn bản cho nút áp dụng bộ lọc khoảng thời gian đã chọn."
+  },
+  "addTransaction": "Thêm giao dịch",
+  "@addTransaction": {
+    "description": "Văn bản cho nút hành động gợi ý thêm giao dịch mới trong trạng thái biểu đồ trống."
+  },
+  "tryAgain": "Thử lại",
+  "@tryAgain": {
+    "description": "Văn bản cho nút hành động để thử tải lại dữ liệu trong trạng thái trống."
+  },"exportCsv": "Xuất CSV",
+  "@exportCsv": {
+    "description": "Tooltip cho nút xuất dữ liệu báo cáo dưới dạng tệp CSV trong AppBar."
+  },
+  "exportSuccess": "Báo cáo đã được xuất thành công",
+  "@exportSuccess": {
+    "description": "Thông báo hiển thị khi báo cáo được xuất thành công vào tệp CSV."
+  },
+  "exportFailure": "Xuất báo cáo thất bại",
+  "@exportFailure": {
+    "description": "Thông báo hiển thị khi xuất báo cáo thất bại."
+  },
+  "errorLoadingReportData": "Lỗi tải dữ liệu báo cáo",
+  "@errorLoadingReportData": {
+    "description": "Thông báo hiển thị khi tải dữ liệu báo cáo thất bại."
+  }
+
 }
