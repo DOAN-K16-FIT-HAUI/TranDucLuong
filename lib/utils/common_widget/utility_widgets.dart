@@ -25,11 +25,11 @@ class UtilityWidgets {
           hintText: hintText,
           hintStyle: GoogleFonts.poppins(
             fontSize: 15,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sửa thành withOpacity
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sửa thành withOpacity
             size: 22,
           ),
           border: InputBorder.none,
@@ -49,16 +49,20 @@ class UtilityWidgets {
     );
   }
 
-  static Widget buildCategoryChips({
+  static Widget buildCategoryChips<T>({
     required BuildContext context,
-    required List<String> categories,
-    required String selectedCategory,
-    required ValueChanged<String> onCategorySelected,
+    required List<T> categories,
+    required T? selectedCategory, // Chấp nhận T?
+    required ValueChanged<T> onCategorySelected,
+    String Function(T category)? categoryLabelBuilder, // Thêm tham số này
     String? title,
   }) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (title != null)
           Padding(
@@ -68,53 +72,49 @@ class UtilityWidgets {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Sửa thành withOpacity
               ),
             ),
           ),
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
-          children:
-              categories.map((category) {
-                final bool isSelected = selectedCategory == category;
-                return ChoiceChip(
-                  label: Text(category),
-                  labelStyle: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color:
-                        isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface.withValues(
-                              alpha: 0.8,
-                            ),
-                  ),
-                  selected: isSelected,
-                  onSelected: (bool selected) {
-                    if (selected) onCategorySelected(category);
-                  },
-                  selectedColor: theme.colorScheme.primary.withValues(
-                    alpha: 0.12,
-                  ),
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(
-                      color:
-                          isSelected
-                              ? theme.colorScheme.primary
-                              : theme.dividerColor,
-                      width: isSelected ? 1.0 : 0.8,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  showCheckmark: false,
-                );
-              }).toList(),
+          children: categories.map((category) {
+            final bool isSelected = selectedCategory == category;
+            final String label = categoryLabelBuilder?.call(category) ?? (category == null ? l10n.all : category.toString());
+
+            return ChoiceChip(
+              label: Text(label),
+              labelStyle: GoogleFonts.poppins(
+                fontSize: 13,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.8), // Sửa thành withOpacity
+              ),
+              selected: isSelected,
+              onSelected: (bool selected) {
+                if (selected) {
+                  onCategorySelected(category);
+                }
+              },
+              selectedColor: theme.colorScheme.primary.withValues(alpha: 0.12), // Sửa thành withOpacity
+              backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // Sửa thành withOpacity
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.dividerColor,
+                  width: isSelected ? 1.0 : 0.8,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 6,
+              ),
+              showCheckmark: false,
+            );
+          }).toList(),
         ),
       ],
     );
@@ -173,7 +173,7 @@ class UtilityWidgets {
               message,
               style: GoogleFonts.poppins(
                 fontSize: 17,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Sửa thành withOpacity
               ),
               textAlign: TextAlign.center,
             ),
@@ -192,9 +192,9 @@ class UtilityWidgets {
               const SizedBox(height: 30),
               ElevatedButton.icon(
                 icon:
-                    actionIcon != null
-                        ? Icon(actionIcon, size: 18)
-                        : const SizedBox.shrink(),
+                actionIcon != null
+                    ? Icon(actionIcon, size: 18)
+                    : const SizedBox.shrink(),
                 label: Text(actionText),
                 onPressed: onActionPressed,
                 style: ElevatedButton.styleFrom(
@@ -216,7 +216,7 @@ class UtilityWidgets {
 
   static Widget buildErrorState({
     required BuildContext context,
-    required String Function(BuildContext) message, // Thay String bằng String Function(BuildContext)
+    required String Function(BuildContext) message,
     required VoidCallback onRetry,
     String title = '',
     IconData icon = Icons.error_outline_rounded,
@@ -245,7 +245,7 @@ class UtilityWidgets {
             ),
             const SizedBox(height: 10),
             Text(
-              message(context), // Gọi hàm message với context hiện tại
+              message(context),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(fontSize: 14, color: theme.hintColor),
             ),
@@ -288,10 +288,28 @@ class UtilityWidgets {
         ),
         duration: duration,
         behavior: behavior,
-        // margin: margin,
-        backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
+        backgroundColor: backgroundColor ?? Theme.of(context).snackBarTheme.backgroundColor, // Sử dụng theme snackbar
         action: action,
       ),
+    );
+  }
+
+  static void showLoadingDialog(BuildContext context, {String? message}) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 20),
+              Text(message ?? l10n.loading),
+            ],
+          ),
+        );
+      },
     );
   }
 }

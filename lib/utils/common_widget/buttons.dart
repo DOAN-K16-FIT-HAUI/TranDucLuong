@@ -3,22 +3,27 @@ import 'package:google_fonts/google_fonts.dart';
 
 class Buttons {
   static Widget buildSubmitButton(
-    BuildContext context,
-    String text,
-    VoidCallback onPressed, {
-    Color? backgroundColor,
-    Color? textColor,
-  }) {
+      BuildContext context,
+      String text,
+      VoidCallback onPressed, {
+        Color? backgroundColor,
+        Color? textColor,
+        double borderRadius = 8.0,
+        EdgeInsets padding = const EdgeInsets.symmetric(vertical: 15),
+        double elevation = 2,
+        double? minWidth, // Optional minimum width
+      }) {
     final theme = Theme.of(context);
     return SizedBox(
-      width: double.infinity,
+      width: minWidth == null ? double.infinity : null,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? theme.colorScheme.primary,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          elevation: 2,
+          padding: padding,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          elevation: elevation,
+          minimumSize: minWidth != null ? Size(minWidth, padding.vertical + 30) : null, // Adjust height based on padding
         ),
         child: Text(
           text,
@@ -32,11 +37,38 @@ class Buttons {
     );
   }
 
+  static Widget buildIconButton({
+    required BuildContext context,
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    double size = 24.0, // Default icon size
+    double padding = 8.0,
+    double borderRadius = 12.0,
+  }) {
+    final theme = Theme.of(context);
+    return IconButton(
+      icon: Icon(icon, size: size),
+      tooltip: tooltip,
+      onPressed: onPressed,
+      style: IconButton.styleFrom(
+        backgroundColor: backgroundColor ?? theme.colorScheme.primary,
+        foregroundColor: foregroundColor ?? theme.colorScheme.onPrimary,
+        padding: EdgeInsets.all(padding),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+    );
+  }
+
   static Widget buildSocialLoginButton({
     required BuildContext context,
     required VoidCallback onPressed,
     required Color? color,
-    required String text,
+    required String text, // Consider using an Icon instead of text for social logos
     Color? textColor,
   }) {
     final theme = Theme.of(context);
@@ -52,7 +84,7 @@ class Buttons {
           foregroundColor: textColor ?? theme.colorScheme.primary,
         ),
         child: Text(
-          text,
+          text, // Example: 'G' for Google, 'f' for Facebook
           style: GoogleFonts.poppins(
             fontSize: 22,
             fontWeight: FontWeight.bold,

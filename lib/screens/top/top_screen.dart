@@ -1,10 +1,13 @@
+import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 
 class TopScreen extends StatefulWidget {
   const TopScreen({super.key});
@@ -16,12 +19,14 @@ class TopScreen extends StatefulWidget {
 class TopScreenState extends State<TopScreen> {
   int _selectedIndex = 0;
 
-  // Danh sách màn hình với const constructor
   static final List<Widget> _screens = [
     DashboardScreen(),
-    GroupNoteScreen(),
-    ReportScreen(),
-    AccountScreen(),
+    BlocProvider.value(
+        value: GetIt.instance<GroupNoteBloc>(),
+        child: const GroupNoteScreen()
+    ),
+    const ReportScreen(),
+    const AccountScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -35,9 +40,7 @@ class TopScreenState extends State<TopScreen> {
   }
 
   void _addTransaction() {
-    if (mounted) {
-      AppRoutes.navigateToTransaction(context);
-    }
+    AppRoutes.navigateToTransaction(context);
   }
 
   @override
@@ -54,73 +57,48 @@ class TopScreenState extends State<TopScreen> {
         children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 8,
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+        elevation: theme.bottomNavigationBarTheme.elevation ?? 8,
+        type: theme.bottomNavigationBarTheme.type ?? BottomNavigationBarType.fixed,
+        showSelectedLabels: theme.bottomNavigationBarTheme.showSelectedLabels ?? false,
+        showUnselectedLabels: theme.bottomNavigationBarTheme.showUnselectedLabels ?? false,
         currentIndex: bottomNavIndex,
         onTap: _onItemTapped,
-        items: _buildBottomNavigationBarItems(theme, l10n),
-        selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        items: _buildBottomNavigationBarItems(theme, l10n, bottomNavIndex),
+        selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
+        selectedLabelStyle: theme.bottomNavigationBarTheme.selectedLabelStyle,
+        unselectedLabelStyle: theme.bottomNavigationBarTheme.unselectedLabelStyle,
       ),
     );
   }
 
-  List<BottomNavigationBarItem> _buildBottomNavigationBarItems(ThemeData theme, AppLocalizations l10n) {
-    int bottomNavIndex = _selectedIndex < 2 ? _selectedIndex : _selectedIndex + 1;
+  List<BottomNavigationBarItem> _buildBottomNavigationBarItems(ThemeData theme, AppLocalizations l10n, int currentBottomNavIndex) {
+    const double standardIconSize = 26.0;
+    const double fabIconSize = 30.0;
+    const double fabContainerHeight = 48.0;
+    const double fabContainerWidth = 56.0;
 
     return [
-      _buildBottomNavItem(
-        theme,
-        Icons.home_outlined,
-        Icons.home,
-        0,
-        bottomNavIndex,
-        l10n.dashboardTitle,
-      ),
-      _buildBottomNavItem(
-        theme,
-        Icons.note_alt_outlined,
-        Icons.note_alt,
-        1,
-        bottomNavIndex,
-        l10n.groupNotesPlaceholder,
-      ),
+      _buildBottomNavItem(theme, Icons.dashboard_outlined, Icons.dashboard, 0, currentBottomNavIndex, l10n.dashboardTitle, standardIconSize),
+      _buildBottomNavItem(theme, Icons.group_outlined, Icons.group, 1, currentBottomNavIndex, l10n.groupNotesTitle, standardIconSize),
       BottomNavigationBarItem(
         icon: Container(
-          padding: const EdgeInsets.all(8),
+          width: fabContainerWidth,
+          height: fabContainerHeight,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8),
+              color: theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [ BoxShadow( color: theme.colorScheme.primary.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2), ) ]
           ),
-          child: Icon(
-            Icons.add,
-            color: theme.colorScheme.onPrimary,
-            size: 30,
-          ),
+          child: Icon( Icons.add, color: theme.colorScheme.onPrimary, size: fabIconSize,),
         ),
         label: '',
         tooltip: l10n.addTransactionTooltip,
       ),
-      _buildBottomNavItem(
-        theme,
-        Icons.bar_chart_outlined,
-        Icons.bar_chart,
-        3,
-        bottomNavIndex,
-        l10n.reportsPlaceholder,
-      ),
-      _buildBottomNavItem(
-        theme,
-        Icons.person_outlined,
-        Icons.person,
-        4,
-        bottomNavIndex,
-        l10n.accountTitle,
-      ),
+      _buildBottomNavItem(theme, Icons.analytics_outlined, Icons.analytics, 3, currentBottomNavIndex, l10n.reportsTitle, standardIconSize),
+      _buildBottomNavItem(theme, Icons.person_outline, Icons.person, 4, currentBottomNavIndex, l10n.accountTitle, standardIconSize),
     ];
   }
 
@@ -131,12 +109,12 @@ class TopScreenState extends State<TopScreen> {
       int itemIndex,
       int currentBottomNavIndex,
       String label,
-      ) {
+      double iconSize) {
     bool isSelected = itemIndex == currentBottomNavIndex;
     return BottomNavigationBarItem(
       icon: Icon(
         isSelected ? activeIcon : inactiveIcon,
-        size: 26,
+        size: iconSize,
       ),
       label: '',
       tooltip: label,

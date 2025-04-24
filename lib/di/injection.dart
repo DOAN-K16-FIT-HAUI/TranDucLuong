@@ -76,7 +76,7 @@ void setupDependencies() {
   sl.registerFactory<WalletBloc>(
         () => WalletBloc(walletRepository: sl<WalletRepository>()),
   );
-  sl.registerLazySingleton<GroupNoteBloc>(
+  sl.registerFactory<GroupNoteBloc>(
         () => GroupNoteBloc(groupNoteRepository: sl<GroupNoteRepository>()),
   );
   sl.registerFactory<ThemeBloc>(() => ThemeBloc());
