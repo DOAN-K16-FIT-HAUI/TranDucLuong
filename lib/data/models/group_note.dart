@@ -1,63 +1,117 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_app/data/models/transaction.dart';
+import 'package:equatable/equatable.dart';
 
-class GroupNoteModel {
+class GroupNoteModel extends Equatable {
   final String id;
+  final String groupId;
   final String title;
-  final DateTime startDate;
-  final DateTime endDate;
-  final double amount;
-  final String status;
-  final String note;
-  final List<String> participants;
-  final String creatorId;
-  final List<TransactionModel> transactions;
+  final String content;
+  final String createdBy; // User ID of the creator
+  final DateTime createdAt;
+  final List<String> tags;
+  final List<CommentModel> comments;
 
-  GroupNoteModel({
+  const GroupNoteModel({
     required this.id,
+    required this.groupId,
     required this.title,
-    required this.startDate,
-    required this.endDate,
-    required this.amount,
-    required this.status,
-    required this.note,
-    required this.participants,
-    required this.creatorId,
-    this.transactions = const [],
+    required this.content,
+    required this.createdBy,
+    required this.createdAt,
+    this.tags = const [],
+    this.comments = const [],
   });
 
-  factory GroupNoteModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  GroupNoteModel copyWith({
+    String? id,
+    String? groupId,
+    String? title,
+    String? content,
+    String? createdBy,
+    DateTime? createdAt,
+    List<String>? tags,
+    List<CommentModel>? comments,
+  }) {
     return GroupNoteModel(
-      id: doc.id,
-      title: data['title'] ?? '',
-      startDate: (data['start_date'] as Timestamp).toDate(),
-      endDate: (data['end_date'] as Timestamp).toDate(),
-      amount: (data['amount'] as num).toDouble(),
-      status: data['status'] ?? 'all',
-      note: data['note'] ?? '',
-      participants: List<String>.from(data['participants'] ?? []),
-      creatorId: data['creator_id'] ?? '',
+      id: id ?? this.id,
+      groupId: groupId ?? this.groupId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      createdBy: createdBy ?? this.createdBy,
+      createdAt: createdAt ?? this.createdAt,
+      tags: tags ?? this.tags,
+      comments: comments ?? this.comments,
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toJson() {
     return {
+      'groupId': groupId,
       'title': title,
-      'start_date': Timestamp.fromDate(startDate),
-      'end_date': Timestamp.fromDate(endDate),
-      'amount': amount,
-      'status': status,
-      'note': note,
-      'participants': participants,
-      'creator_id': creatorId,
+      'content': content,
+      'createdBy': createdBy,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'tags': tags,
+      'comments': comments.map((c) => c.toJson()).toList(),
     };
   }
 
-  bool canEdit(String currentUserId) {
-    if (participants.isEmpty) {
-      return currentUserId == creatorId;
-    }
-    return currentUserId == creatorId || participants.contains(currentUserId);
+  factory GroupNoteModel.fromJson(Map<String, dynamic> json, String id) {
+    return GroupNoteModel(
+      id: id,
+      groupId: json['groupId'] ?? '',
+      title: json['title'] ?? '',
+      content: json['content'] ?? '',
+      createdBy: json['createdBy'] ?? '',
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      tags: List<String>.from(json['tags'] ?? []),
+      comments: (json['comments'] as List<dynamic>?)
+          ?.map((c) => CommentModel.fromJson(c as Map<String, dynamic>))
+          .toList() ??
+          [],
+    );
   }
+
+  @override
+  List<Object?> get props => [
+    id,
+    groupId,
+    title,
+    content,
+    createdBy,
+    createdAt,
+    tags,
+    comments,
+  ];
+}
+
+class CommentModel extends Equatable {
+  final String userId; // User ID of the commenter
+  final String content;
+  final DateTime createdAt;
+
+  const CommentModel({
+    required this.userId,
+    required this.content,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'content': content,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
+  }
+
+  factory CommentModel.fromJson(Map<String, dynamic> json) {
+    return CommentModel(
+      userId: json['userId'] ?? '',
+      content: json['content'] ?? '',
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [userId, content, createdAt];
 }
