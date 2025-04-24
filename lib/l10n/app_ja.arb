@@ -34,7 +34,7 @@
   "invalidUrl": "無効なURL",
   "confirmLogout": "ログアウトしてもよろしいですか？",
   "logout": "ログアウト",
-  "emailLabel": "メール",
+  "emailLabel": "メールアドレス",
   "enterEmailHint": "メールアドレスを入力してください",
   "invalidEmail": "無効なメールアドレス",
   "passwordLabel": "パスワード",
@@ -50,15 +50,6 @@
   "delete": "削除",
   "confirmDeleteTitle": "削除の確認",
   "confirmDeleteContent": "本当に「{itemName}」を削除しますか？この操作は元に戻せません。",
-  "@confirmDeleteContent": {
-    "description": "アイテム削除の確認メッセージ",
-    "placeholders": {
-      "itemName": {
-        "type": "String",
-        "example": "給料"
-      }
-    }
-  },
   "selectValueError": "値を選択してください",
   "notSelected": "未選択",
   "favoriteCategories": "お気に入りカテゴリ",
@@ -67,8 +58,8 @@
   "noDescription": "(説明なし)",
   "from": "から",
   "to": "へ",
-  "borrowFrom": "から借りる",
-  "lendTo": "に貸す",
+  "borrowFrom": "借入先",
+  "lendTo": "貸付先",
   "wallet": "ウォレット",
   "expenseType": "支出",
   "transferType": "振替",
@@ -82,15 +73,11 @@
   "searchTransactions": "取引を検索",
   "transactionHistoryTitle": "取引履歴",
   "closeSearchTooltip": "検索を閉じる",
-  "searchTooltip": "検索",
   "searchTransactionsHint": "内容、種類、ウォレットで検索...",
   "tabByDay": "日別",
   "tabByMonth": "月別",
   "tabByYear": "年別",
   "addTransactionTooltip": "新しい取引を追加",
-  "@addTransactionTooltip": {
-    "description": "新しい取引を追加するボタンのツールチップ"
-  },
   "descriptionLabel": "内容",
   "descriptionHint": "内容を入力 (例: 昼食、家賃)",
   "transactionDateLabel": "取引日",
@@ -129,15 +116,6 @@
   "noWalletsFound": "ウォレットが見つかりません",
   "totalBalance": "合計残高",
   "confirmDeleteWalletContent": "ウォレット「{walletName}」を削除してもよろしいですか？この操作は元に戻せません。",
-  "@confirmDeleteWalletContent": {
-    "description": "ウォレット削除の確認メッセージ",
-    "placeholders": {
-      "walletName": {
-        "type": "String",
-        "example": "現金"
-      }
-    }
-  },
   "errorLoadingWallets": "ウォレットの読み込みエラー。再試行してください。",
   "noWalletsFoundSearch": "検索に一致するウォレットが見つかりません。",
   "noWalletsInThisCategory": "このカテゴリにはまだウォレットがありません。",
@@ -149,27 +127,7 @@
   "selectSourceAndDestinationWalletError": "支払元と入金先の両方のウォレットを選択してください。",
   "sourceAndDestinationWalletCannotBeSameError": "支払元と入金先のウォレットを同じにすることはできません。",
   "selectWalletForTransactionError": "{transactionType} 取引のウォレットを選択してください。",
-  "@selectWalletForTransactionError": {
-    "placeholders": {
-      "transactionType": {
-        "type": "String"
-      }
-    }
-  },
   "insufficientBalanceError": "ウォレット「{walletName}」（残高{balance}）では、{amount} の取引を実行するには残高が不足しています。",
-  "@insufficientBalanceError": {
-    "placeholders": {
-      "walletName": {
-        "type": "String"
-      },
-      "balance": {
-        "type": "String"
-      },
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
   "checkInputError": "入力情報を再確認してください。",
   "noWalletsAvailable": "利用可能なウォレットがありません！",
   "pleaseCreateWalletFirst": "取引を追加する前に、ウォレット管理でウォレットを作成してください。",
@@ -179,24 +137,9 @@
   "walletToAdjustLabel": "調整するウォレット",
   "actualBalanceAfterAdjustmentLabel": "調整後の実際残高",
   "transactionTypeName": "{key, select, income{収入} expense{支出} transfer{振替} borrow{借入} lend{貸付} adjustment{残高調整} other{取引}}",
-  "@transactionTypeName": {
-    "description": "取引種類キーの表示名",
-    "placeholders": {
-      "key": {
-        "type": "String"
-      }
-    }
-  },
   "invalidAmount": "無効な金額",
   "amountMustBePositive": "金額は0より大きい必要があります",
   "insufficientBalanceShortError": "残高不足 ({balance})",
-  "@insufficientBalanceShortError": {
-    "placeholders": {
-      "balance": {
-        "type": "String"
-      }
-    }
-  },
   "pleaseEnterBalance": "残高を入力してください",
   "invalidBalance": "無効な残高",
   "balanceCannotBeNegative": "残高をマイナスにすることはできません",
@@ -205,56 +148,21 @@
   "pleaseEnterDescription": "説明を入力してください。",
   "descriptionTooLong": "説明が長すぎます（最大100文字）。",
   "fieldCannotBeEmpty": "{fieldName} は空にできません。",
-  "@fieldCannotBeEmpty": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "pleaseSelectDate": "日付を選択してください。",
   "dateCannotBeInFuture": "未来の日付は選択できません。",
   "repaymentDateCannotBeBeforeTransactionDate": "返済予定日は取引日より前に設定できません。",
   "pleaseEnterActualBalance": "実際の残高を入力してください。",
   "pleaseSelectField": "{fieldName} を選択してください。",
-  "@pleaseSelectField": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "fieldCannotBeSameAsSource": "{fieldName} は支払元ウォレットと同じにすることはできません。",
-  "@fieldCannotBeSameAsSource": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "cancelButton": "キャンセル",
-  "@cancelButton": {
-    "description": "Label for the cancel button in dialogs",
-    "type": "text"
-  },
   "confirmDeleteTransactionContent": "取引 '{description}' を削除してもよろしいですか？",
-  "@confirmDeleteTransactionContent": {
-    "description": "Confirmation message for deleting a transaction with its description",
-    "type": "text",
-    "placeholders": {
-      "description": {
-        "type": "Object",
-        "description": "The description of the transaction to be deleted"
-      }
-    }
-  },
   "transactionTypeIncome": "収入",
   "transactionTypeExpense": "支出",
   "transactionTypeTransfer": "振替",
   "transactionTypeBorrow": "借入",
   "transactionTypeLend": "貸出",
   "transactionTypeAdjustment": "残高調整",
-  "categoryFood": "飲食",
+  "categoryFood": "食費",
   "categoryLiving": "生活",
   "categoryTransport": "交通",
   "categoryHealth": "健康",
@@ -307,36 +215,36 @@
   "biometricsEnabledSuccess": "生体認証が有効になりました。",
   "biometricsDisabledSuccess": "生体認証が無効になりました。",
   "biometricsNotSupported": "デバイスは生体認証に対応していません。",
-  "groupNoteTitle": "グループメモ",
+  "groupNoteTitle": "グループノート",
   "doneTab": "完了",
   "byRealityTab": "実績別",
-  "noDoneNotes": "完了したメモはありません。",
-  "noByRealityNotes": "実績別のメモはありません。",
-  "addNoteSuggestion": "新しいメモを追加して始めましょう。",
-  "addNote": "メモを追加",
+  "noDoneNotes": "完了したノートはありません。",
+  "noByRealityNotes": "実績別のノートはありません。",
+  "addNoteSuggestion": "新しいノートを追加して始めましょう。",
+  "addNote": "ノートを追加",
   "titleLabel": "タイトル",
   "enterTitleHint": "タイトルを入力",
   "startDateLabel": "開始日",
   "endDateLabel": "終了日",
   "selectDateError": "日付を選択してください。",
   "statusLabel": "ステータス",
-  "noteLabel": "メモ",
-  "enterNoteHint": "メモを入力",
+  "noteLabel": "ノート",
+  "enterNoteHint": "ノートを入力",
   "informationLabel": "情報",
   "percentageAllocation": "割合の割り当て (1)",
   "participantsLabel": "参加者",
   "invalidAmountError": "無効な金額です",
   "addParticipantLabel": "参加者を追加",
   "enterParticipantHint": "参加者の名前を入力",
-  "noAllNotes": "メモはありません。",
-  "noDetailedNotes": "詳細なメモはありません。",
+  "noAllNotes": "ノートはありません。",
+  "noDetailedNotes": "詳細なノートはありません。",
   "noSummaryNotes": "概要メモはありません。",
-  "searchGroupNotesHint": "メモのタイトルで検索",
+  "searchGroupNotesHint": "ノートのタイトルで検索",
   "statusEnded": "終了",
   "statusOngoing": "進行中",
   "statusUpcoming": "予定",
   "splitMoneyButton": "割り勘",
-  "noteButton": "メモ",
+  "noteButton": "ノート",
   "totalAmountPaidLabel": "支払総額",
   "totalIncomeLabel": "収入合計",
   "totalExpenseLabel": "支出合計",
@@ -354,50 +262,15 @@
   "addTransactionsToSeeChart": "取引を追加してグラフを表示してください",
   "pleaseLoginToViewReports": "レポートを表示するにはログインしてください",
   "dateRangeFilter": "日付範囲フィルター",
-  "@dateRangeFilter": {
-    "description": "レポート画面の日付範囲フィルターセクションのタイトル。"
-  },
   "invalidDateRange": "無効な日付範囲です。開始日は終了日以前でなければなりません。",
-  "@invalidDateRange": {
-    "description": "選択された開始日が終了日より後にある場合に表示されるエラーメッセージ。"
-  },
   "apply": "適用",
-  "@apply": {
-    "description": "選択された日付範囲フィルターを適用するためのボタンのテキスト。"
-  },
   "addTransaction": "取引を追加",
-  "@addTransaction": {
-    "description": "空のチャート状態で新しい取引を追加するよう促すアクションボタンのテキスト。"
-  },
   "tryAgain": "再試行",
-  "@tryAgain": {
-    "description": "空の状態でデータを再読み込みしようとするアクションボタンのテキスト。"
-  },
   "exportCsv": "CSVをエクスポート",
-  "@exportCsv": {
-    "description": "AppBar内でレポートデータをCSVファイルとしてエクスポートするためのボタンのツールチップ。"
-  },
   "exportSuccess": "レポートが正常にエクスポートされました",
-  "@exportSuccess": {
-    "description": "レポートがCSVファイルに正常にエクスポートされたときに表示されるメッセージ。"
-  },
   "exportFailure": "レポートのエクスポートに失敗しました",
-  "@exportFailure": {
-    "description": "レポートのエクスポートに失敗したときに表示されるメッセージ。"
-  },
   "errorLoadingReportData": "レポートデータの読み込みエラー",
-  "@errorLoadingReportData": {
-    "description": "レポートデータの読み込みに失敗したときに表示されるメッセージ。"
-  },
   "welcomeUser": "こんにちは、{name}さん",
-  "@welcomeUser": {
-    "description": "ユーザーの名前で挨拶します",
-    "placeholders": {
-      "name": {
-        "type": "Object"
-      }
-    }
-  },
   "notificationsTooltip": "通知",
   "viewAllAccounts": "すべてのアカウントを表示",
   "spendingTrend": "支出の傾向",
@@ -411,14 +284,6 @@
   "addSavingsButton": "貯蓄を追加",
   "spendingLimits": "支出制限",
   "monthlyLimit": "{month}の制限",
-  "@monthlyLimit": {
-    "description": "特定の月の支出制限",
-    "placeholders": {
-      "month": {
-        "type": "String"
-      }
-    }
-  },
   "viewAll": "すべて表示",
   "onboardingTitle1": "予算を簡単に追跡",
   "onboardingDescription1": "毎日の支出を管理し、効果的に貯蓄して、財務目標を達成します。",
@@ -433,5 +298,59 @@
   "onboardingSkip": "スキップ",
   "noEndedNotes": "終了したノートはありません",
   "noOngoingNotes": "進行中のノートはありません",
-  "noUpcomingNotes": "近日中のノートはありません"
+  "noUpcomingNotes": "近日中のノートはありません",
+  "groupNotesTitle": "グループノート",
+  "searchTooltip": "ノートを検索",
+  "filterTooltip": "ノートをフィルタリング",
+  "noNotesInGroup": "このグループにはまだノートがありません。",
+  "noNotesFoundSearch": "検索に一致するノートが見つかりませんでした。",
+  "addNoteTooltip": "新しいノートを追加",
+  "filterNotesTitle": "ノートをフィルタリング",
+  "errorAddingNote": "ノートの追加に失敗しました。もう一度お試しください。",
+  "errorUpdatingNote": "ノートの更新に失敗しました。もう一度お試しください。",
+  "errorDeletingNote": "ノートの削除に失敗しました。もう一度お試しください。",
+  "errorAddingComment": "コメントの追加に失敗しました。もう一度お試しください。",
+  "addNoteDialogTitle": "ノートを追加",
+  "editNoteDialogTitle": "ノートを編集",
+  "noteTitleLabel": "タイトル",
+  "noteTitleHint": "ノートタイトルを入力",
+  "noteContentLabel": "内容",
+  "noteContentHint": "ノート内容を入力",
+  "noteTagLabel": "タグ",
+  "selectTagHint": "タグを選択",
+  "noteDetailTitle": "ノート詳細",
+  "createdBy": "作成者",
+  "commentsLabel": "コメント",
+  "noComments": "まだコメントがありません。",
+  "addCommentLabel": "コメントを追加",
+  "addCommentHint": "コメントを入力",
+  "sendButton": "送信",
+  "noGroupsFound": "グループが見つかりません",
+  "joinGroupSuggestion": "メモを追加するには、グループに参加するか作成してください",
+  "createGroup": "グループを作成",
+  "pleaseLogin": "続行するにはログインしてください",
+  "failedToCreateGroup": "グループの作成に失敗しました",
+  "groupNameLabel": "グループ名",
+  "groupNameHint": "グループ名を入力してください",
+  "addMemberEmailLabel": "メールでメンバーを追加",
+  "addMemberEmailHint": "メンバーのメールを入力してください",
+  "groupNameRequired": "グループ名が必要です",
+  "selectGroup": "グループを選択してください",
+  "create": "作成",
+  "all": "すべて",
+  "tagExpense": "費用",
+  "tagNote": "リマインダー",
+  "tagGoal": "目標",
+  "tagOther": "その他",
+  "addEmailTooltip": "メールアドレスを追加",
+  "addMembersInstruction": "メールアドレスを入力してメンバーを追加します。",
+  "emailAlreadyAdded": "メールアドレスは既に追加されています。",
+  "creatingGroup": "グループを作成中...",
+  "groupCreatedSuccess": "グループが正常に作成されました！",
+  "errorCreatingGroup": "グループ作成エラー",
+  "errorLoadingGroups": "グループリストの読み込みエラー",
+  "pleaseSelectGroup": "メモを表示するグループを選択してください。",
+  "noNotesFoundSearchFilter": "検索/フィルターに一致するメモが見つかりません。",
+  "tryDifferentSearchFilter": "検索条件やフィルターを変更してみてください。",
+  "loading": "読み込み中..."
 }

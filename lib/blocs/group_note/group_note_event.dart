@@ -1,5 +1,4 @@
-import 'package:equatable/equatable.dart';
-import 'package:finance_app/data/models/group_note.dart';
+part of 'group_note_bloc.dart';
 
 abstract class GroupNoteEvent extends Equatable {
   const GroupNoteEvent();
@@ -8,33 +7,78 @@ abstract class GroupNoteEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadGroupNotes extends GroupNoteEvent {}
+class LoadNotes extends GroupNoteEvent {
+  final String groupId;
 
-class AddGroupNote extends GroupNoteEvent {
+  const LoadNotes(this.groupId);
+
+  @override
+  List<Object?> get props => [groupId];
+}
+
+// Internal event to update state when stream emits data
+class _UpdateNotes extends GroupNoteEvent {
+  final List<GroupNoteModel> notes;
+
+  const _UpdateNotes(this.notes);
+
+  @override
+  List<Object?> get props => [notes];
+}
+
+// Internal event to handle stream errors
+class _NotesError extends GroupNoteEvent {
+  final String message;
+  const _NotesError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class AddNote extends GroupNoteEvent {
   final GroupNoteModel note;
 
-  const AddGroupNote(this.note);
+  const AddNote(this.note);
 
   @override
   List<Object?> get props => [note];
 }
 
-class UpdateGroupNote extends GroupNoteEvent {
+class EditNote extends GroupNoteEvent {
   final GroupNoteModel note;
 
-  const UpdateGroupNote(this.note);
+  const EditNote(this.note);
 
   @override
   List<Object?> get props => [note];
 }
 
-class DeleteGroupNote extends GroupNoteEvent {
+class DeleteNote extends GroupNoteEvent {
   final String noteId;
+  final String groupId;
 
-  const DeleteGroupNote(this.noteId);
+  const DeleteNote(this.noteId, {required this.groupId});
 
   @override
-  List<Object?> get props => [noteId];
+  List<Object?> get props => [noteId, groupId];
+}
+
+class SearchNotes extends GroupNoteEvent {
+  final String query;
+
+  const SearchNotes(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+class FilterNotes extends GroupNoteEvent {
+  final String? tag; // tag can be null (representing 'All')
+
+  const FilterNotes(this.tag);
+
+  @override
+  List<Object?> get props => [tag];
 }
 
 class ToggleSearch extends GroupNoteEvent {
@@ -46,40 +90,13 @@ class ToggleSearch extends GroupNoteEvent {
   List<Object?> get props => [isSearching];
 }
 
-class SearchGroupNotes extends GroupNoteEvent {
-  final String query;
-
-  const SearchGroupNotes(this.query);
-
-  @override
-  List<Object?> get props => [query];
-}
-
-class TabChanged extends GroupNoteEvent {
-  final int tabIndex;
-
-  const TabChanged(this.tabIndex);
-
-  @override
-  List<Object?> get props => [tabIndex];
-}
-
-class ReorderGroupNotes extends GroupNoteEvent {
-  final String status;
-  final int oldIndex;
-  final int newIndex;
-
-  const ReorderGroupNotes(this.status, this.oldIndex, this.newIndex);
-
-  @override
-  List<Object?> get props => [status, oldIndex, newIndex];
-}
-
-class LoadGroupNoteDetails extends GroupNoteEvent {
+class AddComment extends GroupNoteEvent {
   final String noteId;
+  final CommentModel comment;
+  final String groupId;
 
-  const LoadGroupNoteDetails(this.noteId);
+  const AddComment(this.noteId, this.comment, {required this.groupId});
 
   @override
-  List<Object?> get props => [noteId];
+  List<Object?> get props => [noteId, comment, groupId];
 }

@@ -9,11 +9,11 @@
   "darkMode": "Chế độ tối",
   "language": "Ngôn ngữ",
   "selectLanguageError": "Vui lòng chọn một ngôn ngữ",
-  "security": "Bảo mật và quyền riêng tư",
+  "security": "Bảo mật & Quyền riêng tư",
   "changePassword": "Đổi mật khẩu",
   "biometrics": "Sinh trắc học",
   "deleteAccount": "Xóa tài khoản",
-  "deleteAccountConfirm": "Bạn có chắc chắn xóa tài khoản không?",
+  "deleteAccountConfirm": "Bạn có chắc chắn muốn xóa tài khoản không?",
   "actionCannotBeUndone": "Hành động này không thể hoàn tác.",
   "changePasswordTitle": "Đổi mật khẩu",
   "confirm": "Xác nhận",
@@ -24,7 +24,7 @@
   "passwordMinLength": "Mật khẩu phải dài ít nhất 6 ký tự",
   "confirmNewPassword": "Xác nhận mật khẩu mới",
   "enterConfirmPassword": "Xác nhận mật khẩu mới",
-  "passwordsDoNotMatch": "Mật khẩu xác nhận không khớp",
+  "passwordsDoNotMatch": "Mật khẩu không khớp",
   "editPersonalInfo": "Sửa thông tin cá nhân",
   "save": "Lưu",
   "displayName": "Tên hiển thị",
@@ -32,11 +32,11 @@
   "photoUrl": "URL ảnh đại diện",
   "enterPhotoUrl": "Nhập URL ảnh đại diện",
   "invalidUrl": "URL không hợp lệ",
-  "confirmLogout": "Bạn có chắc chắn đăng xuất tài khoản không?",
+  "confirmLogout": "Bạn có chắc chắn muốn đăng xuất?",
   "logout": "Đăng xuất",
   "emailLabel": "Email",
   "enterEmailHint": "Nhập email của bạn",
-  "invalidEmail": "Email không hợp lệ",
+  "invalidEmail": "Địa chỉ email không hợp lệ",
   "passwordLabel": "Mật khẩu",
   "enterPasswordHint": "Nhập mật khẩu của bạn",
   "amountLabel": "Số tiền",
@@ -50,15 +50,6 @@
   "delete": "Xóa",
   "confirmDeleteTitle": "Xác nhận xóa",
   "confirmDeleteContent": "Bạn có chắc chắn muốn xóa \"{itemName}\" không? Hành động này không thể hoàn tác.",
-  "@confirmDeleteContent": {
-    "description": "Thông báo xác nhận xóa một mục",
-    "placeholders": {
-      "itemName": {
-        "type": "String",
-        "example": "Lương"
-      }
-    }
-  },
   "selectValueError": "Vui lòng chọn một giá trị",
   "notSelected": "Chưa chọn",
   "favoriteCategories": "Danh mục yêu thích",
@@ -77,21 +68,17 @@
   "incomeType": "Thu nhập",
   "balanceAdjustmentType": "Điều chỉnh số dư",
   "noTransactionsYet": "Chưa có giao dịch nào",
-  "addFirstTransactionHint": "Hãy nhấn nút '+' để tạo giao dịch đầu tiên!",
+  "addFirstTransactionHint": "Nhấn nút '+' để tạo giao dịch đầu tiên!",
   "addTransactionButton": "Thêm giao dịch",
   "searchTransactions": "Tìm kiếm giao dịch",
-  "transactionHistoryTitle": "Lịch sử Giao dịch",
+  "transactionHistoryTitle": "Lịch sử giao dịch",
   "closeSearchTooltip": "Đóng tìm kiếm",
-  "searchTooltip": "Tìm kiếm",
   "searchTransactionsHint": "Tìm theo mô tả, loại, ví...",
-  "tabByDay": "Theo Ngày",
-  "tabByMonth": "Theo Tháng",
-  "tabByYear": "Theo Năm",
+  "tabByDay": "Theo ngày",
+  "tabByMonth": "Theo tháng",
+  "tabByYear": "Theo năm",
   "addTransactionTooltip": "Thêm giao dịch mới",
-  "@addTransactionTooltip": {
-    "description": "Tooltip cho nút thêm giao dịch mới"
-  },
-  "descriptionLabel": "Diễn giải",
+  "descriptionLabel": "Mô tả",
   "descriptionHint": "Nhập mô tả (vd: Ăn trưa, Tiền nhà)",
   "transactionDateLabel": "Ngày giao dịch",
   "transactionTypeLabel": "Loại giao dịch",
@@ -102,9 +89,9 @@
   "toWalletDestinationLabel": "Đến ví (Đích)",
   "lenderLabel": "Người cho vay",
   "lenderHint": "Tên người hoặc tổ chức cho vay",
-  "borrowerLabel": "Người vay tiền",
+  "borrowerLabel": "Người vay",
   "borrowerHint": "Tên người hoặc tổ chức vay",
-  "repaymentDateOptionalLabel": "Ngày hẹn trả (tùy chọn)",
+  "repaymentDateOptionalLabel": "Ngày trả (tùy chọn)",
   "editTransactionTitle": "Sửa giao dịch",
   "errorUserNotAuthenticated": "Lỗi: Người dùng chưa được xác thực.",
   "thisTransaction": "giao dịch này",
@@ -118,136 +105,57 @@
   "tabInvestments": "Đầu tư",
   "addWalletTooltip": "Thêm ví mới",
   "addWalletDialogTitle": "Thêm ví mới",
-  "addWalletButton": "Thêm Ví",
+  "addWalletButton": "Thêm ví",
   "add": "Thêm",
   "walletNameLabel": "Tên ví",
   "walletNameHint": "Nhập tên ví",
   "iconLabel": "Biểu tượng",
   "thisWallet": "ví này",
-  "editWalletDialogTitle": "Sửa thông tin ví",
+  "editWalletDialogTitle": "Sửa ví",
   "saveButton": "Lưu",
   "noWalletsFound": "Không tìm thấy ví nào",
   "totalBalance": "Tổng số dư",
-  "confirmDeleteWalletContent": "Bạn có chắc chắn muốn xóa ví \"{walletName}\" không? Hành động này không thể hoàn tác.",
-  "@confirmDeleteWalletContent": {
-    "description": "Thông báo xác nhận xóa một ví",
-    "placeholders": {
-      "walletName": {
-        "type": "String",
-        "example": "Tiền mặt"
-      }
-    }
-  },
+  "confirmDeleteWalletContent": "Bạn có chắc chắn muốn xóa ví \"{walletName}\"? Hành động này không thể hoàn tác.",
   "errorLoadingWallets": "Lỗi tải danh sách ví. Vui lòng thử lại.",
   "noWalletsFoundSearch": "Không tìm thấy ví phù hợp với tìm kiếm.",
-  "noWalletsInThisCategory": "Chưa có ví nào trong mục này.",
+  "noWalletsInThisCategory": "Chưa có ví nào trong danh mục này.",
   "addWalletSuggestion": "Nhấn nút '+' để thêm ví!",
-  "genericError": "Đã có lỗi không mong muốn xảy ra.",
+  "genericError": "Đã xảy ra lỗi không mong muốn.",
   "loginToAddTransaction": "Vui lòng đăng nhập để thêm giao dịch.",
   "checkDateError": "Vui lòng kiểm tra lại ngày đã chọn.",
   "userNotLoggedInError": "Người dùng chưa đăng nhập.",
   "selectSourceAndDestinationWalletError": "Vui lòng chọn cả ví nguồn và ví đích.",
   "sourceAndDestinationWalletCannotBeSameError": "Ví nguồn và ví đích không được trùng nhau.",
   "selectWalletForTransactionError": "Vui lòng chọn ví cho giao dịch {transactionType}.",
-  "@selectWalletForTransactionError": {
-    "placeholders": {
-      "transactionType": {
-        "type": "String"
-      }
-    }
-  },
-  "insufficientBalanceError": "Số dư trong ví \"{walletName}\" không đủ ({balance}) để thực hiện giao dịch {amount}.",
-  "@insufficientBalanceError": {
-    "placeholders": {
-      "walletName": {
-        "type": "String"
-      },
-      "balance": {
-        "type": "String"
-      },
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
+  "insufficientBalanceError": "Số dư trong ví \"{walletName}\" ({balance}) không đủ để thực hiện giao dịch {amount}.",
   "checkInputError": "Vui lòng kiểm tra lại thông tin đã nhập.",
-  "noWalletsAvailable": "Bạn chưa có ví nào!",
-  "pleaseCreateWalletFirst": "Vui lòng tạo ví trong phần Quản lý Ví trước khi thêm giao dịch.",
+  "noWalletsAvailable": "Không có ví nào!",
+  "pleaseCreateWalletFirst": "Vui lòng tạo ví trong Quản lý Ví trước khi thêm giao dịch.",
   "goToWalletManagement": "Đến Quản lý Ví",
   "pleaseLoginToManageTransactions": "Vui lòng đăng nhập để quản lý giao dịch.",
   "saveTransactionTooltip": "Lưu giao dịch",
   "walletToAdjustLabel": "Ví cần điều chỉnh",
   "actualBalanceAfterAdjustmentLabel": "Số dư thực tế sau điều chỉnh",
   "transactionTypeName": "{key, select, income{Thu nhập} expense{Chi tiêu} transfer{Chuyển khoản} borrow{Đi vay} lend{Cho vay} adjustment{Điều chỉnh số dư} other{Giao dịch}}",
-  "@transactionTypeName": {
-    "description": "Tên hiển thị cho khóa loại giao dịch",
-    "placeholders": {
-      "key": {
-        "type": "String"
-      }
-    }
-  },
   "invalidAmount": "Số tiền không hợp lệ",
   "amountMustBePositive": "Số tiền phải lớn hơn 0",
   "insufficientBalanceShortError": "Số dư không đủ ({balance})",
-  "@insufficientBalanceShortError": {
-    "placeholders": {
-      "balance": {
-        "type": "String"
-      }
-    }
-  },
   "pleaseEnterBalance": "Vui lòng nhập số dư",
   "invalidBalance": "Số dư không hợp lệ",
-  "balanceCannotBeNegative": "Số dư không thể âm",
+  "balanceCannotBeNegative": "Số dư không được âm",
   "pleaseSelectCategory": "Vui lòng chọn danh mục",
   "pleaseEnterValue": "Vui lòng nhập giá trị",
-  "pleaseEnterDescription": "Vui lòng nhập diễn giải.",
-  "descriptionTooLong": "Diễn giải quá dài (tối đa 100 ký tự).",
+  "pleaseEnterDescription": "Vui lòng nhập mô tả.",
+  "descriptionTooLong": "Mô tả quá dài (tối đa 100 ký tự).",
   "fieldCannotBeEmpty": "{fieldName} không được để trống.",
-  "@fieldCannotBeEmpty": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "pleaseSelectDate": "Vui lòng chọn ngày.",
-  "dateCannotBeInFuture": "Ngày không được trong tương lai.",
-  "repaymentDateCannotBeBeforeTransactionDate": "Ngày hẹn trả không được trước ngày giao dịch.",
+  "dateCannotBeInFuture": "Ngày không được ở tương lai.",
+  "repaymentDateCannotBeBeforeTransactionDate": "Ngày trả không được trước ngày giao dịch.",
   "pleaseEnterActualBalance": "Vui lòng nhập số dư thực tế.",
   "pleaseSelectField": "Vui lòng chọn {fieldName}.",
-  "@pleaseSelectField": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "fieldCannotBeSameAsSource": "{fieldName} không được trùng với Ví nguồn.",
-  "@fieldCannotBeSameAsSource": {
-    "placeholders": {
-      "fieldName": {
-        "type": "String"
-      }
-    }
-  },
   "cancelButton": "Hủy",
-  "@cancelButton": {
-    "description": "Label for the cancel button in dialogs",
-    "type": "text"
-  },
-  "confirmDeleteTransactionContent": "Bạn có chắc chắn muốn xóa giao dịch '{description}' không?",
-  "@confirmDeleteTransactionContent": {
-    "description": "Confirmation message for deleting a transaction with its description",
-    "type": "text",
-    "placeholders": {
-      "description": {
-        "type": "Object",
-        "description": "The description of the transaction to be deleted"
-      }
-    }
-  },
+  "confirmDeleteTransactionContent": "Bạn có chắc chắn muốn xóa giao dịch '{description}'?",
   "transactionTypeIncome": "Thu nhập",
   "transactionTypeExpense": "Chi tiêu",
   "transactionTypeTransfer": "Chuyển khoản",
@@ -264,10 +172,10 @@
   "categoryBills": "Hóa đơn",
   "categoryGift": "Quà tặng",
   "categoryOther": "Khác",
-  "requiresRecentLoginError": "Hành động này yêu cầu đăng nhập lại. Vui lòng đăng xuất và đăng nhập lại để tiếp tục.",
+  "requiresRecentLoginError": "Hành động này yêu cầu đăng nhập gần đây. Vui lòng đăng xuất và đăng nhập lại để tiếp tục.",
   "wrongPasswordError": "Mật khẩu hiện tại không đúng. Vui lòng kiểm tra lại.",
   "tooManyRequestsError": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
-  "networkRequestFailedError": "Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+  "networkRequestFailedError": "Kết nối mạng thất bại. Vui lòng kiểm tra kết nối và thử lại.",
   "emailAlreadyInUseError": "Email này đã được sử dụng. Vui lòng chọn email khác.",
   "invalidEmailError": "Email không hợp lệ. Vui lòng kiểm tra lại.",
   "genericErrorWithMessage": "Đã xảy ra lỗi: {message}. Vui lòng thử lại.",
@@ -282,7 +190,7 @@
   "accountExistsWithDifferentCredentialError": "Tài khoản đã tồn tại với thông tin đăng nhập khác.",
   "operationNotAllowedError": "Đăng nhập bằng Facebook chưa được kích hoạt trong Firebase.",
   "forgotPasswordTitle": "Quên mật khẩu",
-  "enterEmailToResetPassword": "Nhập email để khôi phục mật khẩu",
+  "enterEmailToResetPassword": "Nhập email của bạn để đặt lại mật khẩu",
   "passwordResetRequestSent": "Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn!",
   "error": "Lỗi",
   "loginTitle": "Đăng nhập",
@@ -295,24 +203,24 @@
   "createAccountButton": "Tạo tài khoản",
   "alreadyHaveAccount": "Đã có tài khoản? ",
   "loginNow": "Đăng nhập ngay",
-  "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
-  "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
-  "transactionDeletedSuccess": "Giao dịch đã được xóa thành công",
+  "transactionAddedSuccess": "Thêm giao dịch thành công",
+  "transactionUpdatedSuccess": "Cập nhật giao dịch thành công",
+  "transactionDeletedSuccess": "Xóa giao dịch thành công",
   "dashboardTitle": "Bảng điều khiển",
-  "biometricsReason": "Vui lòng xác thực để kích hoạt sinh trắc học",
+  "biometricsReason": "Vui lòng xác thực để bật sinh trắc học",
   "biometricsNotAvailable": "Sinh trắc học không khả dụng trên thiết bị này",
   "biometricsError": "Xác thực sinh trắc học thất bại",
-  "noSavedCredentials": "Không tìm thấy thông tin đăng nhập để đăng nhập bằng sinh trắc học",
-  "loginWithBiometrics": "Đăng nhập bằng sinh trắc học",
+  "noSavedCredentials": "Không tìm thấy thông tin đăng nhập đã lưu cho đăng nhập sinh trắc học",
+  "loginWithBiometrics": "Đăng nhập bằng Sinh trắc học",
   "biometricsEnabledSuccess": "Xác thực sinh trắc học đã được bật.",
   "biometricsDisabledSuccess": "Xác thực sinh trắc học đã được tắt.",
   "biometricsNotSupported": "Thiết bị không hỗ trợ sinh trắc học.",
   "groupNoteTitle": "Ghi chú nhóm",
-  "doneTab": "Đã thực hiện",
+  "doneTab": "Đã xong",
   "byRealityTab": "Theo thực tế",
-  "noDoneNotes": "Không có ghi chú đã thực hiện.",
+  "noDoneNotes": "Không có ghi chú đã hoàn thành.",
   "noByRealityNotes": "Không có ghi chú theo thực tế.",
-  "addNoteSuggestion": "Hãy thêm một ghi chú mới để bắt đầu.",
+  "addNoteSuggestion": "Thêm ghi chú mới để bắt đầu.",
   "addNote": "Thêm ghi chú",
   "titleLabel": "Tiêu đề",
   "enterTitleHint": "Nhập tiêu đề",
@@ -323,25 +231,25 @@
   "noteLabel": "Ghi chú",
   "enterNoteHint": "Nhập ghi chú",
   "informationLabel": "Thông tin",
-  "percentageAllocation": "Định phần trăm (1)",
+  "percentageAllocation": "Phân bổ phần trăm (1)",
   "participantsLabel": "Người tham gia",
   "invalidAmountError": "Số tiền không hợp lệ",
-  "addParticipantLabel": "Thêm thành viên",
-  "enterParticipantHint": "Nhập tên thành viên",
+  "addParticipantLabel": "Thêm người tham gia",
+  "enterParticipantHint": "Nhập tên người tham gia",
   "noAllNotes": "Không có ghi chú nào.",
   "noDetailedNotes": "Không có ghi chú chi tiết.",
   "noSummaryNotes": "Không có ghi chú tóm tắt.",
-  "searchGroupNotesHint": "Tìm kiếm tên ghi chú",
+  "searchGroupNotesHint": "Tìm theo tiêu đề ghi chú",
   "statusEnded": "Đã kết thúc",
   "statusOngoing": "Đang diễn ra",
   "statusUpcoming": "Sắp diễn ra",
   "splitMoneyButton": "Chia tiền",
   "noteButton": "Ghi chú",
-  "totalAmountPaidLabel": "Tổng số tiền đã trả",
+  "totalAmountPaidLabel": "Tổng tiền đã trả",
   "totalIncomeLabel": "Tổng thu nhập",
   "totalExpenseLabel": "Tổng chi phí",
   "remainingAmountLabel": "Số tiền còn lại",
-  "participantsListLabel": "Danh sách thành viên",
+  "participantsListLabel": "Danh sách người tham gia",
   "reportsTitle": "Báo cáo",
   "categoryChart": "Danh mục",
   "balanceChart": "Số dư",
@@ -353,51 +261,16 @@
   "noTransactionData": "Không có dữ liệu giao dịch",
   "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
   "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo",
-  "dateRangeFilter": "Bộ lọc khoảng thời gian",
-  "@dateRangeFilter": {
-    "description": "Tiêu đề cho phần bộ lọc khoảng thời gian trong màn hình báo cáo."
-  },
-  "invalidDateRange": "Khoảng thời gian không hợp lệ. Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
-  "@invalidDateRange": {
-    "description": "Thông báo lỗi hiển thị khi ngày bắt đầu được chọn lớn hơn ngày kết thúc."
-  },
+  "dateRangeFilter": "Lọc theo khoảng ngày",
+  "invalidDateRange": "Khoảng ngày không hợp lệ. Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
   "apply": "Áp dụng",
-  "@apply": {
-    "description": "Văn bản cho nút áp dụng bộ lọc khoảng thời gian đã chọn."
-  },
-  "addTransaction": "Thêm giao dịch",
-  "@addTransaction": {
-    "description": "Văn bản cho nút hành động gợi ý thêm giao dịch mới trong trạng thái biểu đồ trống."
-  },
+  "addTransaction": "Thêm Giao dịch",
   "tryAgain": "Thử lại",
-  "@tryAgain": {
-    "description": "Văn bản cho nút hành động để thử tải lại dữ liệu trong trạng thái trống."
-  },
   "exportCsv": "Xuất CSV",
-  "@exportCsv": {
-    "description": "Tooltip cho nút xuất dữ liệu báo cáo dưới dạng tệp CSV trong AppBar."
-  },
-  "exportSuccess": "Báo cáo đã được xuất thành công",
-  "@exportSuccess": {
-    "description": "Thông báo hiển thị khi báo cáo được xuất thành công vào tệp CSV."
-  },
+  "exportSuccess": "Xuất báo cáo thành công",
   "exportFailure": "Xuất báo cáo thất bại",
-  "@exportFailure": {
-    "description": "Thông báo hiển thị khi xuất báo cáo thất bại."
-  },
   "errorLoadingReportData": "Lỗi tải dữ liệu báo cáo",
-  "@errorLoadingReportData": {
-    "description": "Thông báo hiển thị khi tải dữ liệu báo cáo thất bại."
-  },
   "welcomeUser": "Xin chào {name}",
-  "@welcomeUser": {
-    "description": "Chào người dùng với tên của họ",
-    "placeholders": {
-      "name": {
-        "type": "Object"
-      }
-    }
-  },
   "notificationsTooltip": "Thông báo",
   "viewAllAccounts": "Xem tất cả tài khoản",
   "spendingTrend": "Xu hướng chi tiêu",
@@ -411,27 +284,73 @@
   "addSavingsButton": "Thêm tiết kiệm",
   "spendingLimits": "Hạn mức chi tiêu",
   "monthlyLimit": "Hạn mức {month}",
-  "@monthlyLimit": {
-    "description": "Hạn mức chi tiêu cho tháng cụ thể",
-    "placeholders": {
-      "month": {
-        "type": "String"
-      }
-    }
-  },
   "viewAll": "Xem tất cả",
   "onboardingTitle1": "Theo dõi ngân sách dễ dàng",
-  "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt được mục tiêu tài chính.",
+  "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt mục tiêu tài chính.",
   "onboardingTitle2": "Kiểm soát chi tiêu thông minh",
-  "onboardingDescription2": "Theo dõi chi tiêu hàng ngày, phân loại chi phí và tiết kiệm hiệu quả.",
+  "onboardingDescription2": "Theo dõi chi tiêu hàng ngày, phân loại chi phí và tiết kiệm thông minh hơn.",
   "onboardingTitle3": "Lập kế hoạch tài chính dài hạn",
-  "onboardingDescription3": "Xây dựng kế hoạch tài chính, tiết kiệm và đầu tư để đạt được mục tiêu.",
+  "onboardingDescription3": "Xây dựng kế hoạch tài chính, tiết kiệm và đầu tư để đạt mục tiêu.",
   "onboardingTitle4": "Quản lý tài chính an toàn",
-  "onboardingDescription4": "Bảo mật thông tin tài chính, quản lý tài khoản dễ dàng và an toàn.",
+  "onboardingDescription4": "Bảo vệ dữ liệu tài chính và quản lý tài khoản dễ dàng, an toàn.",
   "onboardingContinue": "Tiếp tục",
   "onboardingStart": "Bắt đầu",
   "onboardingSkip": "Bỏ qua",
   "noEndedNotes": "Không có ghi chú đã kết thúc",
-  "noOngoingNotes": "Không có ghi chú đang triển khai",
-  "noUpcomingNotes": "Không có ghi chú sắp tới"
+  "noOngoingNotes": "Không có ghi chú đang diễn ra",
+  "noUpcomingNotes": "Không có ghi chú sắp tới",
+  "groupNotesTitle": "Ghi chú nhóm",
+  "searchTooltip": "Tìm kiếm ghi chú",
+  "filterTooltip": "Lọc ghi chú",
+  "noNotesInGroup": "Chưa có ghi chú nào trong nhóm này.",
+  "noNotesFoundSearch": "Không tìm thấy ghi chú nào cho tìm kiếm của bạn.",
+  "addNoteTooltip": "Thêm ghi chú mới",
+  "filterNotesTitle": "Lọc ghi chú",
+  "errorAddingNote": "Không thể thêm ghi chú. Vui lòng thử lại.",
+  "errorUpdatingNote": "Không thể cập nhật ghi chú. Vui lòng thử lại.",
+  "errorDeletingNote": "Không thể xóa ghi chú. Vui lòng thử lại.",
+  "errorAddingComment": "Không thể thêm bình luận. Vui lòng thử lại.",
+  "addNoteDialogTitle": "Thêm ghi chú",
+  "editNoteDialogTitle": "Sửa ghi chú",
+  "noteTitleLabel": "Tiêu đề",
+  "noteTitleHint": "Nhập tiêu đề ghi chú",
+  "noteContentLabel": "Nội dung",
+  "noteContentHint": "Nhập nội dung ghi chú",
+  "noteTagLabel": "Thẻ",
+  "selectTagHint": "Chọn một thẻ",
+  "noteDetailTitle": "Chi tiết ghi chú",
+  "createdBy": "Được tạo bởi",
+  "commentsLabel": "Bình luận",
+  "noComments": "Chưa có bình luận nào.",
+  "addCommentLabel": "Thêm bình luận",
+  "addCommentHint": "Nhập bình luận của bạn",
+  "sendButton": "Gửi",
+  "noGroupsFound": "Không tìm thấy nhóm nào",
+  "joinGroupSuggestion": "Tham gia hoặc tạo nhóm để bắt đầu thêm ghi chú",
+  "createGroup": "Tạo nhóm",
+  "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
+  "failedToCreateGroup": "Tạo nhóm thất bại",
+  "groupNameLabel": "Tên nhóm",
+  "groupNameHint": "Nhập tên nhóm",
+  "addMemberEmailLabel": "Thêm thành viên bằng Email",
+  "addMemberEmailHint": "Nhập email thành viên",
+  "groupNameRequired": "Tên nhóm là bắt buộc",
+  "selectGroup": "Chọn một nhóm",
+  "create": "Tạo",
+  "all": "Tất cả",
+  "tagExpense": "Chi phí",
+  "tagNote": "Nhắc nhở",
+  "tagGoal": "Mục tiêu",
+  "tagOther": "Khác",
+  "addEmailTooltip": "Thêm email",
+  "addMembersInstruction": "Thêm thành viên bằng cách nhập email của họ.",
+  "emailAlreadyAdded": "Email đã được thêm.",
+  "creatingGroup": "Đang tạo nhóm...",
+  "groupCreatedSuccess": "Tạo nhóm thành công!",
+  "errorCreatingGroup": "Lỗi khi tạo nhóm",
+  "errorLoadingGroups": "Lỗi khi tải danh sách nhóm",
+  "pleaseSelectGroup": "Vui lòng chọn một nhóm để xem ghi chú.",
+  "noNotesFoundSearchFilter": "Không tìm thấy ghi chú nào phù hợp với tìm kiếm/bộ lọc.",
+  "tryDifferentSearchFilter": "Thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn.",
+  "loading": "Đang tải..."
 }

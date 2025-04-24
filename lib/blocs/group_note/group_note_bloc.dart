@@ -1,190 +1,191 @@
-import 'package:finance_app/blocs/group_note/group_note_event.dart';
-import 'package:finance_app/blocs/group_note/group_note_state.dart';
+import 'dart:async'; // Import async
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/data/repositories/group_note_repository.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import l10n
+
+part 'group_note_event.dart';
+part 'group_note_state.dart';
 
 class GroupNoteBloc extends Bloc<GroupNoteEvent, GroupNoteState> {
   final GroupNoteRepository groupNoteRepository;
+  StreamSubscription? _notesSubscription; // Keep track of the subscription
 
   GroupNoteBloc({required this.groupNoteRepository})
-      : super(GroupNoteInitial()) {
-    on<LoadGroupNotes>(_onLoadGroupNotes);
-    on<AddGroupNote>(_onAddGroupNote);
-    on<UpdateGroupNote>(_onUpdateGroupNote);
-    on<DeleteGroupNote>(_onDeleteGroupNote);
+      : super(const GroupNoteState()) {
+    on<LoadNotes>(_onLoadNotes);
+    on<_UpdateNotes>(_onUpdateNotes); // Handle internal update event
+    on<_NotesError>(_onNotesError);   // Handle internal error event
+    on<AddNote>(_onAddNote);
+    on<EditNote>(_onEditNote);
+    on<DeleteNote>(_onDeleteNote);
+    on<SearchNotes>(_onSearchNotes);
+    on<FilterNotes>(_onFilterNotes);
     on<ToggleSearch>(_onToggleSearch);
-    on<SearchGroupNotes>(_onSearchGroupNotes);
-    on<TabChanged>(_onTabChanged);
-    on<ReorderGroupNotes>(_onReorderGroupNotes);
-    on<LoadGroupNoteDetails>(_onLoadGroupNoteDetails);
+    on<AddComment>(_onAddComment);
   }
 
-  Future<void> _onLoadGroupNotes(
-      LoadGroupNotes event, Emitter<GroupNoteState> emit) async {
-    emit(GroupNoteLoading(
-        isSearching: state is GroupNoteLoaded ? (state as GroupNoteLoaded).isSearching : false));
+  @override
+  Future<void> close() {
+    _notesSubscription?.cancel(); // Cancel subscription when Bloc is closed
+    return super.close();
+  }
+
+  Future<void> _onLoadNotes(
+      LoadNotes event, Emitter<GroupNoteState> emit) async {
+    emit(state.copyWith(isLoading: true, error: null, clearError: true)); // Clear previous error
+    await _notesSubscription?.cancel(); // Cancel previous subscription if any
+
     try {
-      final notes = await groupNoteRepository.getGroupNotes();
-      final allNotes = notes.where((note) => note.status == 'all').toList();
-      final detailedNotes = notes.where((note) => note.status == 'detailed').toList();
-      final summaryNotes = notes.where((note) => note.status == 'summary').toList();
-
-      if (allNotes.isEmpty && detailedNotes.isEmpty && summaryNotes.isEmpty) {
-        emit(GroupNoteError(
-                (context) => AppLocalizations.of(context)!.noAllNotes));
-        return;
-      }
-
-      emit(GroupNoteLoaded(
-        allNotes: allNotes,
-        detailedNotes: detailedNotes,
-        summaryNotes: summaryNotes,
-        searchQuery: state is GroupNoteLoaded
-            ? (state as GroupNoteLoaded).searchQuery
-            : '',
-        isSearching: state is GroupNoteLoaded
-            ? (state as GroupNoteLoaded).isSearching
-            : false,
-        selectedTab: state is GroupNoteLoaded
-            ? (state as GroupNoteLoaded).selectedTab
-            : 1, // Default to "Ongoing" tab
-      ));
+      _notesSubscription =
+          groupNoteRepository.getGroupNotes(event.groupId).listen(
+                (notes) {
+              add(_UpdateNotes(notes)); // Trigger internal update event
+            },
+            onError: (error) {
+              add(_NotesError("Error loading notes: ${error.toString()}")); // Trigger internal error event
+            },
+          );
+      // Don't set isLoading to false here, let _UpdateNotes or _NotesError handle it
     } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
+      // Catch synchronous errors during stream setup
+      emit(state.copyWith(
+        isLoading: false,
+        error: (context) => AppLocalizations.of(context)!.errorLoadingData + " (Setup)",
+      ));
     }
   }
 
-  Future<void> _onAddGroupNote(
-      AddGroupNote event, Emitter<GroupNoteState> emit) async {
+  // Handles updates from the Firestore stream
+  void _onUpdateNotes(_UpdateNotes event, Emitter<GroupNoteState> emit) {
+    final filtered = _applyFiltersAndSearch(event.notes, state.searchQuery, state.selectedTag);
+    emit(state.copyWith(
+      isLoading: false, // Loading finished
+      notes: event.notes,
+      filteredNotes: filtered,
+      error: null, // Clear error on successful update
+      clearError: true,
+    ));
+  }
+
+  // Handles errors from the Firestore stream
+  void _onNotesError(_NotesError event, Emitter<GroupNoteState> emit) {
+    emit(state.copyWith(
+      isLoading: false,
+      error: (context) => event.message, // Show the error message
+    ));
+  }
+
+
+  Future<void> _onAddNote(AddNote event, Emitter<GroupNoteState> emit) async {
     try {
+      // Optimistic UI update (optional): add note locally first
+      // emit(state.copyWith(notes: [...state.notes, event.note]));
       await groupNoteRepository.addGroupNote(event.note);
-      add(LoadGroupNotes());
+      // No explicit emit needed here if listening to the stream
     } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.errorAddingNote,
+        // Optionally revert optimistic update if it failed
+      ));
     }
   }
 
-  Future<void> _onUpdateGroupNote(
-      UpdateGroupNote event, Emitter<GroupNoteState> emit) async {
+  Future<void> _onEditNote(EditNote event, Emitter<GroupNoteState> emit) async {
     try {
+      // Optimistic UI update (optional)
       await groupNoteRepository.updateGroupNote(event.note);
-      add(LoadGroupNotes());
+      // Stream will handle the update
     } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.errorUpdatingNote,
+      ));
     }
   }
 
-  Future<void> _onDeleteGroupNote(
-      DeleteGroupNote event, Emitter<GroupNoteState> emit) async {
+  Future<void> _onDeleteNote(
+      DeleteNote event, Emitter<GroupNoteState> emit) async {
+    // Optimistic UI update: Remove immediately
+    final optimisticNotes = state.notes.where((note) => note.id != event.noteId).toList();
+    final optimisticFiltered = state.filteredNotes.where((note) => note.id != event.noteId).toList();
+    emit(state.copyWith(notes: optimisticNotes, filteredNotes: optimisticFiltered));
+
     try {
-      await groupNoteRepository.deleteGroupNote(event.noteId);
-      add(LoadGroupNotes());
+      await groupNoteRepository.deleteGroupNote(event.noteId, event.groupId);
+      // Stream listener will eventually confirm, but UI is already updated
     } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
-    }
-  }
-
-  Future<void> _onToggleSearch(
-      ToggleSearch event, Emitter<GroupNoteState> emit) async {
-    if (state is GroupNoteLoaded) {
-      final currentState = state as GroupNoteLoaded;
-      emit(GroupNoteLoaded(
-        allNotes: currentState.allNotes,
-        detailedNotes: currentState.detailedNotes,
-        summaryNotes: currentState.summaryNotes,
-        searchQuery: currentState.searchQuery,
-        isSearching: event.isSearching,
-        selectedTab: currentState.selectedTab,
+      // Revert optimistic update if delete failed
+      add(LoadNotes(event.groupId)); // Reload to get the correct state
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.errorDeletingNote,
       ));
     }
   }
 
-  Future<void> _onSearchGroupNotes(
-      SearchGroupNotes event, Emitter<GroupNoteState> emit) async {
-    if (state is GroupNoteLoaded) {
-      final currentState = state as GroupNoteLoaded;
-      emit(GroupNoteLoaded(
-        allNotes: currentState.allNotes,
-        detailedNotes: currentState.detailedNotes,
-        summaryNotes: currentState.summaryNotes,
-        searchQuery: event.query,
-        isSearching: currentState.isSearching,
-        selectedTab: currentState.selectedTab,
-      ));
-    }
+  void _onSearchNotes(SearchNotes event, Emitter<GroupNoteState> emit) {
+    final filtered =
+    _applyFiltersAndSearch(state.notes, event.query, state.selectedTag);
+    emit(state.copyWith(
+      filteredNotes: filtered,
+      searchQuery: event.query,
+    ));
   }
 
-  Future<void> _onTabChanged(TabChanged event, Emitter<GroupNoteState> emit) async {
-    if (state is GroupNoteLoaded) {
-      final currentState = state as GroupNoteLoaded;
-      emit(GroupNoteLoaded(
-        allNotes: currentState.allNotes,
-        detailedNotes: currentState.detailedNotes,
-        summaryNotes: currentState.summaryNotes,
-        searchQuery: currentState.searchQuery,
-        isSearching: currentState.isSearching,
-        selectedTab: event.tabIndex,
-      ));
-    }
+  void _onFilterNotes(FilterNotes event, Emitter<GroupNoteState> emit) {
+    final filtered =
+    _applyFiltersAndSearch(state.notes, state.searchQuery, event.tag);
+    emit(state.copyWith(
+      filteredNotes: filtered,
+      selectedTag: event.tag, // Directly use event.tag (can be null)
+    ));
   }
 
-  Future<void> _onReorderGroupNotes(
-      ReorderGroupNotes event, Emitter<GroupNoteState> emit) async {
+  void _onToggleSearch(ToggleSearch event, Emitter<GroupNoteState> emit) {
+    // When toggling search off, reset search query and re-apply filters
+    String query = event.isSearching ? state.searchQuery : '';
+    final notesToFilter = state.notes;
+    final filtered = _applyFiltersAndSearch(notesToFilter, query, state.selectedTag);
+
+    emit(state.copyWith(
+      isSearching: event.isSearching,
+      searchQuery: query, // Reset query if turning search off
+      filteredNotes: filtered,
+    ));
+  }
+
+  Future<void> _onAddComment(
+      AddComment event, Emitter<GroupNoteState> emit) async {
     try {
-      final currentState = state as GroupNoteLoaded;
-      List<GroupNoteModel> notes;
-      if (event.status == 'all') {
-        notes = List<GroupNoteModel>.from(currentState.allNotes);
-      } else if (event.status == 'detailed') {
-        notes = List<GroupNoteModel>.from(currentState.detailedNotes);
-      } else {
-        notes = List<GroupNoteModel>.from(currentState.summaryNotes);
-      }
-
-      final note = notes[event.oldIndex];
-      notes.removeAt(event.oldIndex);
-      notes.insert(event.newIndex, note);
-
-      await groupNoteRepository.updateGroupNoteOrder(notes);
-      add(LoadGroupNotes());
+      // Optimistic UI update (optional): Add comment locally
+      await groupNoteRepository.addComment(
+          event.noteId, event.comment, event.groupId);
+      // Stream listener will update the note with the new comment
     } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
+      emit(state.copyWith(
+        error: (context) => AppLocalizations.of(context)!.errorAddingComment,
+      ));
     }
   }
 
-  Future<void> _onLoadGroupNoteDetails(
-      LoadGroupNoteDetails event, Emitter<GroupNoteState> emit) async {
-    emit(GroupNoteLoading());
-    try {
-      // Fetch group note to get amount and participants
-      final notes = await groupNoteRepository.getGroupNotes();
-      final note = notes.firstWhere((n) => n.id == event.noteId, orElse: () => throw Exception('Note not found'));
+  List<GroupNoteModel> _applyFiltersAndSearch(
+      List<GroupNoteModel> notes, String query, String? tag) {
+    var filtered = notes;
 
-      // Placeholder: Assume no transaction data, split amount equally
-      final participantCount = note.participants.isNotEmpty ? note.participants.length : 1;
-      final splitAmount = note.amount / participantCount;
-      final participantBalances = {
-        for (var participant in note.participants) participant: splitAmount
-      };
-
-      emit(GroupNoteDetailsLoaded(
-        noteId: event.noteId,
-        totalAmountPaid: note.amount, // Placeholder: Assume amount is paid
-        totalIncome: 0, // No transaction data
-        totalExpense: 0, // No transaction data
-        remainingAmount: note.amount, // Placeholder: No expenses yet
-        participantBalances: participantBalances,
-      ));
-    } catch (e) {
-      emit(GroupNoteError(
-              (context) => AppLocalizations.of(context)!.genericErrorWithMessage(e.toString())));
+    if (query.isNotEmpty) {
+      final lowerQuery = query.toLowerCase();
+      filtered = filtered.where((note) {
+        return note.title.toLowerCase().contains(lowerQuery) ||
+            note.content.toLowerCase().contains(lowerQuery);
+      }).toList();
     }
+
+    // Filter by tag if a tag is selected (tag is not null and not empty)
+    if (tag != null && tag.isNotEmpty) {
+      filtered = filtered.where((note) => note.tags.contains(tag)).toList();
+    }
+
+    return filtered;
   }
 }

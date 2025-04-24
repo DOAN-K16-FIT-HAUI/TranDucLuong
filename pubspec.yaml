@@ -49,9 +49,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/images/
-
-  # Thêm phần generate để sinh mã AppLocalizations
-  generate: true
