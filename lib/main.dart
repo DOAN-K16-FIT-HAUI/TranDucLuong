@@ -17,26 +17,49 @@ import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
 import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/di/injection.dart';
-import 'package:finance_app/firebase_option.dart';
+import 'package:finance_app/flavor_config.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp();
+  // Kết nối với Firebase Emulator trong flavor test
+  if (FlavorConfig.isTest())
+    FirebaseAuth.instance.useAuthEmulator('10.0.2.2', 9099);
   debugPrint('Background message: ${message.messageId}');
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        throw Exception('Firebase initialization timed out');
+      },
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+    rethrow;
+  }
+
+  // Kết nối với Firebase Emulator trong flavor test
+  if (FlavorConfig.isTest()) {
+    print('Connecting to Firebase Emulator...');
+    FirebaseAuth.instance.useAuthEmulator('10.0.2.2', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator('10.0.2.2', 8080);
+    print('Emulator setup complete.');
+  }
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await SharedPreferences.getInstance();
   setupDependencies();
   runApp(const MyApp());
 }
@@ -52,13 +75,14 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<ThemeBloc>()..add(LoadThemeEvent()),
         ),
         BlocProvider<LocalizationBloc>(
-          create: (context) => sl<LocalizationBloc>()..add(LoadLocalizationEvent()),
+          create:
+              (context) => sl<LocalizationBloc>()..add(LoadLocalizationEvent()),
         ),
-        BlocProvider<AuthBloc>(
-          create: (context) => sl<AuthBloc>(),
-        ),
+        BlocProvider<AuthBloc>(create: (context) => sl<AuthBloc>()),
         BlocProvider<NotificationBloc>(
-          create: (context) => sl<NotificationBloc>()..add(InitializeNotifications()),
+          create:
+              (context) =>
+                  sl<NotificationBloc>()..add(InitializeNotifications()),
         ),
         BlocProvider<WalletBloc>(
           create: (context) => sl<WalletBloc>()..add(LoadWallets()),
@@ -66,15 +90,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<TransactionBloc>(
           create: (context) => sl<TransactionBloc>(),
         ),
-        BlocProvider<AccountBloc>(
-          create: (context) => sl<AccountBloc>(),
-        ),
-        BlocProvider<GroupNoteBloc>(
-          create: (context) => sl<GroupNoteBloc>(),
-        ),
-        BlocProvider<ReportBloc>(
-          create: (context) => sl<ReportBloc>(),
-        ),
+        BlocProvider<AccountBloc>(create: (context) => sl<AccountBloc>()),
+        BlocProvider<GroupNoteBloc>(create: (context) => sl<GroupNoteBloc>()),
+        BlocProvider<ReportBloc>(create: (context) => sl<ReportBloc>()),
         Provider<TransactionRepository>(
           create: (context) => sl<TransactionRepository>(),
         ),

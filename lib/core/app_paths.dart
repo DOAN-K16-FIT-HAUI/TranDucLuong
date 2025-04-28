@@ -1,6 +1,4 @@
 class AppPaths {
-  static const String splashPath = '/splash';
-  static const String onBoardingPath = '/onboarding';
   static const String loginPath = '/login';
   static const String registerPath = '/register';
   static const String forgotPasswordPath = '/forgot-password';

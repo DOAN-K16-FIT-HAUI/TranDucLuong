@@ -76,12 +76,16 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                InputFields.buildEmailField(controller: _emailController),
+                InputFields.buildEmailField(
+                  controller: _emailController,
+                  key: const Key('forgot_password_email_field'),
+                ),
                 const SizedBox(height: 20),
                 Buttons.buildSubmitButton(
                   context,
                   l10n.confirm,
                   _resetPassword,
+                  key: const Key('forgot_password_submit_button'),
                 ),
               ],
             ),
@@ -95,9 +99,10 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Center(
-        child: UtilityWidgets.buildLoadingIndicator(context: context),
-      ),
+      builder:
+          (_) => Center(
+            child: UtilityWidgets.buildLoadingIndicator(context: context),
+          ),
     );
   }
 
@@ -112,7 +117,10 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     AppRoutes.navigateToLogin(context);
   }
 
-  void _handleAuthFailure(BuildContext context, String Function(BuildContext) error) {
+  void _handleAuthFailure(
+    BuildContext context,
+    String Function(BuildContext) error,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     Navigator.of(context, rootNavigator: true).pop();
     UtilityWidgets.showCustomSnackBar(

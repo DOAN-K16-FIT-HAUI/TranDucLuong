@@ -21,8 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<PasswordResetRequested>(_onPasswordResetRequested);
-    on<SignInWithBiometricsRequested>(_onSignInWithBiometricsRequested);
-
+    
     // Kích hoạt kiểm tra trạng thái xác thực ngay khi khởi tạo
     add(const CheckAuthStatus());
   }

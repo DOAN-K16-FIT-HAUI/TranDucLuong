@@ -10,12 +10,14 @@ class InputFields {
   static Widget buildEmailField({
     required TextEditingController controller,
     void Function(String)? onChanged,
+    Key? key, // Thêm tham số key
   }) {
     return Builder(
       builder: (context) {
         final l10n = AppLocalizations.of(context)!;
         final theme = Theme.of(context);
         return TextFormField(
+          key: key, // Truyền key vào TextFormField
           controller: controller,
           decoration: InputDecoration(
             label: RichText(
@@ -68,22 +70,24 @@ class InputFields {
           cursorColor: theme.colorScheme.primary,
           keyboardType: TextInputType.emailAddress,
           onChanged: onChanged,
-          validator: (value) => Validators.validateEmail(value, l10n),
+          validator: (value) => value == null || value.isEmpty ? l10n.enterEmailHint : null,
         );
       },
     );
   }
 
   static Widget buildPasswordField(
-      TextEditingController controller,
-      bool isPasswordVisible,
-      VoidCallback toggleVisibility,
-      ) {
+    TextEditingController controller,
+    bool isPasswordVisible,
+    VoidCallback toggleVisibility, {
+    Key? key, // Thêm tham số key
+  }) {
     return Builder(
       builder: (context) {
         final l10n = AppLocalizations.of(context)!;
         final theme = Theme.of(context);
         return TextFormField(
+          key: key, // Truyền key vào TextFormField
           controller: controller,
           decoration: InputDecoration(
             label: RichText(
@@ -142,7 +146,7 @@ class InputFields {
           ),
           cursorColor: theme.colorScheme.primary,
           obscureText: !isPasswordVisible,
-          validator: (value) => Validators.validatePassword(value, l10n),
+          validator: (value) => value == null || value.isEmpty ? l10n.enterPasswordHint : null,
         );
       },
     );
