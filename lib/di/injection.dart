@@ -31,57 +31,55 @@ void setupDependencies() {
 
   // Register Services
   sl.registerLazySingleton<FirebaseAuthService>(
-        () => FirebaseAuthService(
+    () => FirebaseAuthService(
       firebaseAuth: sl<FirebaseAuth>(),
       googleSignIn: sl<GoogleSignIn>(),
       facebookAuth: sl<FacebookAuth>(),
     ),
   );
   sl.registerLazySingleton<FirebaseMessagingService>(
-        () => FirebaseMessagingService(),
+    () => FirebaseMessagingService(),
   );
   sl.registerLazySingleton<FirestoreService>(() => FirestoreService());
 
   // Register Repositories
   sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepository(firebaseAuthService: sl<FirebaseAuthService>()),
+    () => AuthRepository(firebaseAuthService: sl<FirebaseAuthService>()),
   );
   sl.registerLazySingleton<AccountRepository>(() => AccountRepository());
   sl.registerLazySingleton<NotificationRepository>(
-        () => NotificationRepository(sl<FirebaseMessagingService>()),
+    () => NotificationRepository(sl<FirebaseMessagingService>()),
   );
   sl.registerLazySingleton<TransactionRepository>(
-        () => TransactionRepository(sl<FirestoreService>()),
+    () => TransactionRepository(sl<FirestoreService>()),
   );
   sl.registerLazySingleton<WalletRepository>(
-        () => WalletRepository(sl<FirestoreService>()),
+    () => WalletRepository(sl<FirestoreService>()),
   );
   sl.registerLazySingleton<GroupNoteRepository>(
-        () => GroupNoteRepository(sl<FirestoreService>()),
+    () => GroupNoteRepository(sl<FirestoreService>()),
   );
   sl.registerLazySingleton<ReportRepository>(
-        () => ReportRepository(sl<FirestoreService>()),
+    () => ReportRepository(sl<FirestoreService>()),
   );
 
   // Register Blocs
   sl.registerLazySingleton<AuthBloc>(
-        () => AuthBloc(authRepository: sl<AuthRepository>()),
+    () => AuthBloc(authRepository: sl<AuthRepository>()),
   );
   sl.registerFactory<NotificationBloc>(
-        () => NotificationBloc(sl<NotificationRepository>()),
+    () => NotificationBloc(sl<NotificationRepository>()),
   );
   sl.registerFactory<TransactionBloc>(
-        () => TransactionBloc(transactionRepository: sl<TransactionRepository>()),
+    () => TransactionBloc(transactionRepository: sl<TransactionRepository>()),
   );
   sl.registerFactory<WalletBloc>(
-        () => WalletBloc(walletRepository: sl<WalletRepository>()),
+    () => WalletBloc(walletRepository: sl<WalletRepository>()),
   );
   sl.registerFactory<GroupNoteBloc>(
-        () => GroupNoteBloc(groupNoteRepository: sl<GroupNoteRepository>()),
+    () => GroupNoteBloc(groupNoteRepository: sl<GroupNoteRepository>()),
   );
-  sl.registerFactory<ThemeBloc>(() => ThemeBloc());
-  sl.registerFactory<LocalizationBloc>(() => LocalizationBloc());
-  sl.registerFactory<ReportBloc>(
-        () => ReportBloc(sl<ReportRepository>()),
-  );
+  sl.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
+  sl.registerLazySingleton<LocalizationBloc>(() => LocalizationBloc());
+  sl.registerFactory<ReportBloc>(() => ReportBloc(sl<ReportRepository>()));
 }

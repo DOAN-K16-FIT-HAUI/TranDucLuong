@@ -124,6 +124,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
+                      key: const Key('onboarding_next_button'),
                       onPressed: _next,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -143,6 +144,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     if (_currentPage < onboardingData.length - 1)
                       TextButton(
+                        key: const Key('onboarding_skip_button'),
                         onPressed: _skip,
                         child: Text(
                           AppLocalizations.of(context)!.onboardingSkip,

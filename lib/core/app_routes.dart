@@ -26,12 +26,10 @@ import 'package:go_router/go_router.dart';
 import 'app_paths.dart'; // Import AppPaths
 
 class AppRoutes {
-  static const String splashRoute = 'splash';
   static const String loginRoute = 'login';
   static const String registerRoute = 'register';
   static const String dashboardRoute = 'top';
   static const String forgotPasswordRoute = 'forgot-password';
-  static const String onBoardingRoute = 'on-boarding';
   static const String walletRoute = 'wallet';
   static const String appNotificationRoute = 'app-notification';
   static const String transactionRoute = 'transaction';
@@ -44,29 +42,13 @@ class AppRoutes {
   static const String barcodeScannerRoute = 'barcode-scanner'; // Thêm route
 
   static final router = GoRouter(
-    initialLocation: AppPaths.splashPath,
+    initialLocation: AppPaths.loginPath,
     debugLogDiagnostics: true,
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Error')),
       body: Center(child: Text('Page not found: ${state.error}')),
     ),
     routes: [
-      GoRoute(
-        name: splashRoute,
-        path: AppPaths.splashPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const SplashScreen(),
-          state: state,
-        ),
-      ),
-      GoRoute(
-        name: onBoardingRoute,
-        path: AppPaths.onBoardingPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const OnboardingScreen(),
-          state: state,
-        ),
-      ),
       GoRoute(
         name: loginRoute,
         path: AppPaths.loginPath,
@@ -224,34 +206,15 @@ class AppRoutes {
 
       final authState = authBloc.state;
       final isAuthenticated = authState is AuthAuthenticated;
-      final isOnSplash = state.matchedLocation == AppPaths.splashPath;
       final isOnLogin = state.matchedLocation == AppPaths.loginPath;
       final isOnRegister = state.matchedLocation == AppPaths.registerPath;
       final isOnForgotPassword = state.matchedLocation == AppPaths.forgotPasswordPath;
-      final isOnOnboarding = state.matchedLocation == AppPaths.onBoardingPath;
 
-      if (isOnSplash) {
-        await Future.delayed(const Duration(seconds: 1));
-        final hasSeenOnboarding = await OnboardingStatus.hasSeenOnboarding();
-
-        if (!hasSeenOnboarding) {
-          return AppPaths.onBoardingPath;
-        } else {
-          return isAuthenticated ? AppPaths.dashboardPath : AppPaths.loginPath;
-        }
-      }
-
-      final hasSeenOnboarding = await OnboardingStatus.hasSeenOnboarding();
-
-      if (!hasSeenOnboarding && !isOnOnboarding) {
-        return AppPaths.onBoardingPath;
-      }
-
-      if (hasSeenOnboarding && !isAuthenticated && !isOnLogin && !isOnRegister && !isOnForgotPassword && !isOnOnboarding) {
+      if (!isAuthenticated && !isOnLogin && !isOnRegister && !isOnForgotPassword) {
         return AppPaths.loginPath;
       }
 
-      if (isAuthenticated && (isOnLogin || isOnRegister || isOnOnboarding || isOnForgotPassword)) {
+      if (isAuthenticated && (isOnLogin || isOnRegister || isOnForgotPassword)) {
         return AppPaths.dashboardPath;
       }
 
@@ -260,8 +223,6 @@ class AppRoutes {
   );
 
   // Navigation Helpers
-  static void navigateToSplash(BuildContext context) => context.go(AppPaths.splashPath);
-  static void navigateToOnBoarding(BuildContext context) => context.go(AppPaths.onBoardingPath);
   static void navigateToLogin(BuildContext context) => context.go(AppPaths.loginPath);
   static void navigateToRegister(BuildContext context) => context.go(AppPaths.registerPath);
   static void navigateToForgotPassword(BuildContext context) => context.push(AppPaths.forgotPasswordPath);

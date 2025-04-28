@@ -69,30 +69,34 @@ class LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
-                  InputFields.buildEmailField(controller: _emailController),
+                  InputFields.buildEmailField(
+                    controller: _emailController,
+                    key: const Key('login_email_field'),
+                  ),
                   const SizedBox(height: 15),
                   InputFields.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                        () => setState(() {
+                    () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
+                    key: const Key('login_password_field'),
                   ),
                   const SizedBox(height: 15),
                   Row(
                     children: [
                       Checkbox(
                         value: _rememberPassword,
-                        onChanged: (value) => setState(() {
-                          _rememberPassword = value ?? false;
-                        }),
+                        onChanged:
+                            (value) => setState(() {
+                              _rememberPassword = value ?? false;
+                            }),
                         activeColor: Theme.of(context).colorScheme.primary,
                         checkColor: Theme.of(context).colorScheme.onPrimary,
                         side: BorderSide(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                       Text(
@@ -106,37 +110,20 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
-                  Buttons.buildSubmitButton(context, l10n.loginButton, _login),
-                  const SizedBox(height: 15),
-                  // Nút đăng nhập bằng sinh trắc học
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(
-                          SignInWithBiometricsRequested(context: context),
-                        );
-                      },
-                      icon: Icon(
-                        Icons.fingerprint,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      label: Text(
-                        l10n.loginWithBiometrics,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+                  Buttons.buildSubmitButton(
+                    context,
+                    l10n.loginButton,
+                    _login,
+                    key: const Key('login_submit_button'),
                   ),
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () =>
-                            AppRoutes.navigateToForgotPassword(context),
+                        key: const Key('login_forgot_password_button'),
+                        onPressed:
+                            () => AppRoutes.navigateToForgotPassword(context),
                         child: Text(
                           l10n.forgotPasswordQuestion,
                           style: TextStyle(
@@ -147,6 +134,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       TextButton(
+                        key: const Key('login_register_button'),
                         onPressed: () => AppRoutes.navigateToRegister(context),
                         child: Text(
                           l10n.registerButton,
@@ -164,10 +152,9 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       Expanded(
                         child: Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.3),
                           thickness: 1,
                         ),
                       ),
@@ -176,10 +163,9 @@ class LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           l10n.or,
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -187,10 +173,9 @@ class LoginScreenState extends State<LoginScreen> {
                       ),
                       Expanded(
                         child: Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.3),
                           thickness: 1,
                         ),
                       ),
@@ -202,20 +187,24 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       Buttons.buildSocialLoginButton(
                         context: context,
-                        onPressed: () => context.read<AuthBloc>().add(
-                          const SignInWithFacebookRequested(),
-                        ),
+                        onPressed:
+                            () => context.read<AuthBloc>().add(
+                              const SignInWithFacebookRequested(),
+                            ),
                         color: Theme.of(context).colorScheme.surface,
                         text: 'f',
+                        key: const Key('login_facebook_button'),
                       ),
                       Buttons.buildSocialLoginButton(
                         context: context,
-                        onPressed: () => context.read<AuthBloc>().add(
-                          const SignInWithGoogleRequested(),
-                        ),
+                        onPressed:
+                            () => context.read<AuthBloc>().add(
+                              const SignInWithGoogleRequested(),
+                            ),
                         color: Theme.of(context).colorScheme.surface,
                         text: 'G',
                         textColor: Theme.of(context).colorScheme.onSurface,
+                        key: const Key('login_google_button'),
                       ),
                     ],
                   ),
