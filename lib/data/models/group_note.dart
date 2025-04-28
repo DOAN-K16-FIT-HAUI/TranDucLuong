@@ -6,7 +6,7 @@ class GroupNoteModel extends Equatable {
   final String groupId;
   final String title;
   final String content;
-  final String createdBy; // User ID of the creator
+  final String createdBy;
   final DateTime createdAt;
   final List<String> tags;
   final List<CommentModel> comments;

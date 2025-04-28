@@ -27,7 +27,7 @@ class Buttons {
         ),
         child: Text(
           text,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: textColor ?? theme.colorScheme.onPrimary,
@@ -85,7 +85,7 @@ class Buttons {
         ),
         child: Text(
           text, // Example: 'G' for Google, 'f' for Facebook
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: textColor ?? theme.colorScheme.primary,

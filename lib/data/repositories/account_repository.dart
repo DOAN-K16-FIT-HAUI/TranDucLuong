@@ -30,7 +30,6 @@ class AccountRepository {
       final prefs = await SharedPreferences.getInstance();
       final isDarkMode = prefs.getBool('isDarkMode') ?? false;
       final language = prefs.getString('language') ?? 'Tiếng Việt';
-      final isBiometricsEnabled = prefs.getBool('isBiometricsEnabled') ?? false; // Thêm
 
       return UserModel(
         id: firebaseUser.uid,
@@ -40,7 +39,6 @@ class AccountRepository {
         isDarkMode: isDarkMode,
         language: language,
         loginMethod: loginMethod,
-        isBiometricsEnabled: isBiometricsEnabled, // Thêm
       );
     } catch (e) {
       throw Exception('Failed to fetch user data: $e');
@@ -62,15 +60,6 @@ class AccountRepository {
       await prefs.setString('language', language);
     } catch (e) {
       throw Exception('Failed to save language: $e');
-    }
-  }
-
-  Future<void> saveBiometricsEnabled(bool isBiometricsEnabled) async { // Thêm
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isBiometricsEnabled', isBiometricsEnabled);
-    } catch (e) {
-      throw Exception('Failed to save biometrics setting: $e');
     }
   }
 

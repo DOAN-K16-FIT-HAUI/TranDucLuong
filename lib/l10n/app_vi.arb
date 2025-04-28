@@ -49,7 +49,16 @@
   "edit": "Sửa",
   "delete": "Xóa",
   "confirmDeleteTitle": "Xác nhận xóa",
-  "confirmDeleteContent": "Bạn có chắc chắn muốn xóa \"{itemName}\" không? Hành động này không thể hoàn tác.",
+  "confirmDeleteContent": "Bạn có chắc chắn muốn xóa \"{itemName}\"? Hành động này không thể hoàn tác.",
+  "@confirmDeleteContent": {
+    "description": "Thông báo xác nhận khi xóa một mục",
+    "placeholders": {
+      "itemName": {
+        "type": "String",
+        "example": "Lương"
+      }
+    }
+  },
   "selectValueError": "Vui lòng chọn một giá trị",
   "notSelected": "Chưa chọn",
   "favoriteCategories": "Danh mục yêu thích",
@@ -78,6 +87,9 @@
   "tabByMonth": "Theo tháng",
   "tabByYear": "Theo năm",
   "addTransactionTooltip": "Thêm giao dịch mới",
+  "@addTransactionTooltip": {
+    "description": "Chú giải cho nút thêm giao dịch mới"
+  },
   "descriptionLabel": "Mô tả",
   "descriptionHint": "Nhập mô tả (vd: Ăn trưa, Tiền nhà)",
   "transactionDateLabel": "Ngày giao dịch",
@@ -116,6 +128,15 @@
   "noWalletsFound": "Không tìm thấy ví nào",
   "totalBalance": "Tổng số dư",
   "confirmDeleteWalletContent": "Bạn có chắc chắn muốn xóa ví \"{walletName}\"? Hành động này không thể hoàn tác.",
+  "@confirmDeleteWalletContent": {
+    "description": "Thông báo xác nhận khi xóa ví",
+    "placeholders": {
+      "walletName": {
+        "type": "String",
+        "example": "Tiền mặt"
+      }
+    }
+  },
   "errorLoadingWallets": "Lỗi tải danh sách ví. Vui lòng thử lại.",
   "noWalletsFoundSearch": "Không tìm thấy ví phù hợp với tìm kiếm.",
   "noWalletsInThisCategory": "Chưa có ví nào trong danh mục này.",
@@ -127,7 +148,29 @@
   "selectSourceAndDestinationWalletError": "Vui lòng chọn cả ví nguồn và ví đích.",
   "sourceAndDestinationWalletCannotBeSameError": "Ví nguồn và ví đích không được trùng nhau.",
   "selectWalletForTransactionError": "Vui lòng chọn ví cho giao dịch {transactionType}.",
+  "@selectWalletForTransactionError": {
+    "placeholders": {
+      "transactionType": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo lỗi yêu cầu chọn ví cho loại giao dịch cụ thể"
+  },
   "insufficientBalanceError": "Số dư trong ví \"{walletName}\" ({balance}) không đủ để thực hiện giao dịch {amount}.",
+  "@insufficientBalanceError": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo lỗi khi số dư không đủ"
+  },
   "checkInputError": "Vui lòng kiểm tra lại thông tin đã nhập.",
   "noWalletsAvailable": "Không có ví nào!",
   "pleaseCreateWalletFirst": "Vui lòng tạo ví trong Quản lý Ví trước khi thêm giao dịch.",
@@ -137,9 +180,25 @@
   "walletToAdjustLabel": "Ví cần điều chỉnh",
   "actualBalanceAfterAdjustmentLabel": "Số dư thực tế sau điều chỉnh",
   "transactionTypeName": "{key, select, income{Thu nhập} expense{Chi tiêu} transfer{Chuyển khoản} borrow{Đi vay} lend{Cho vay} adjustment{Điều chỉnh số dư} other{Giao dịch}}",
+  "@transactionTypeName": {
+    "description": "Tên hiển thị cho loại giao dịch",
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
   "invalidAmount": "Số tiền không hợp lệ",
   "amountMustBePositive": "Số tiền phải lớn hơn 0",
   "insufficientBalanceShortError": "Số dư không đủ ({balance})",
+  "@insufficientBalanceShortError": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo lỗi số dư không đủ (dạng ngắn)"
+  },
   "pleaseEnterBalance": "Vui lòng nhập số dư",
   "invalidBalance": "Số dư không hợp lệ",
   "balanceCannotBeNegative": "Số dư không được âm",
@@ -148,14 +207,52 @@
   "pleaseEnterDescription": "Vui lòng nhập mô tả.",
   "descriptionTooLong": "Mô tả quá dài (tối đa 100 ký tự).",
   "fieldCannotBeEmpty": "{fieldName} không được để trống.",
+  "@fieldCannotBeEmpty": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo lỗi khi trường bị bỏ trống"
+  },
   "pleaseSelectDate": "Vui lòng chọn ngày.",
   "dateCannotBeInFuture": "Ngày không được ở tương lai.",
   "repaymentDateCannotBeBeforeTransactionDate": "Ngày trả không được trước ngày giao dịch.",
   "pleaseEnterActualBalance": "Vui lòng nhập số dư thực tế.",
   "pleaseSelectField": "Vui lòng chọn {fieldName}.",
+  "@pleaseSelectField": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo yêu cầu chọn một trường cụ thể"
+  },
   "fieldCannotBeSameAsSource": "{fieldName} không được trùng với Ví nguồn.",
+  "@fieldCannotBeSameAsSource": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    },
+    "description": "Thông báo lỗi khi trường trùng với ví nguồn"
+  },
   "cancelButton": "Hủy",
+  "@cancelButton": {
+    "description": "Nhãn cho nút hủy trong hộp thoại",
+    "type": "text"
+  },
   "confirmDeleteTransactionContent": "Bạn có chắc chắn muốn xóa giao dịch '{description}'?",
+  "@confirmDeleteTransactionContent": {
+    "description": "Thông báo xác nhận xóa giao dịch kèm mô tả",
+    "type": "text",
+    "placeholders": {
+      "description": {
+        "type": "Object",
+        "description": "Mô tả của giao dịch sẽ bị xóa"
+      }
+    }
+  },
   "transactionTypeIncome": "Thu nhập",
   "transactionTypeExpense": "Chi tiêu",
   "transactionTypeTransfer": "Chuyển khoản",
@@ -262,15 +359,50 @@
   "addTransactionsToSeeChart": "Thêm giao dịch để xem biểu đồ",
   "pleaseLoginToViewReports": "Vui lòng đăng nhập để xem báo cáo",
   "dateRangeFilter": "Lọc theo khoảng ngày",
+  "@dateRangeFilter": {
+    "description": "Tiêu đề cho phần lọc khoảng ngày trong màn hình báo cáo."
+  },
   "invalidDateRange": "Khoảng ngày không hợp lệ. Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
+  "@invalidDateRange": {
+    "description": "Thông báo lỗi khi ngày bắt đầu được chọn sau ngày kết thúc."
+  },
   "apply": "Áp dụng",
+  "@apply": {
+    "description": "Văn bản cho nút áp dụng bộ lọc khoảng ngày đã chọn."
+  },
   "addTransaction": "Thêm Giao dịch",
+  "@addTransaction": {
+    "description": "Văn bản cho nút hành động nhắc thêm giao dịch mới khi biểu đồ trống."
+  },
   "tryAgain": "Thử lại",
+  "@tryAgain": {
+    "description": "Văn bản cho nút hành động thử tải lại dữ liệu khi trạng thái trống."
+  },
   "exportCsv": "Xuất CSV",
+  "@exportCsv": {
+    "description": "Chú giải cho nút xuất dữ liệu báo cáo dưới dạng tệp CSV trong AppBar."
+  },
   "exportSuccess": "Xuất báo cáo thành công",
+  "@exportSuccess": {
+    "description": "Thông báo hiển thị khi báo cáo được xuất thành công sang tệp CSV."
+  },
   "exportFailure": "Xuất báo cáo thất bại",
+  "@exportFailure": {
+    "description": "Thông báo hiển thị khi xuất báo cáo thất bại."
+  },
   "errorLoadingReportData": "Lỗi tải dữ liệu báo cáo",
+  "@errorLoadingReportData": {
+    "description": "Thông báo hiển thị khi tải dữ liệu báo cáo thất bại."
+  },
   "welcomeUser": "Xin chào {name}",
+  "@welcomeUser": {
+    "description": "Chào người dùng bằng tên của họ",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "notificationsTooltip": "Thông báo",
   "viewAllAccounts": "Xem tất cả tài khoản",
   "spendingTrend": "Xu hướng chi tiêu",
@@ -284,6 +416,14 @@
   "addSavingsButton": "Thêm tiết kiệm",
   "spendingLimits": "Hạn mức chi tiêu",
   "monthlyLimit": "Hạn mức {month}",
+  "@monthlyLimit": {
+    "description": "Hạn mức chi tiêu cho một tháng cụ thể",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
   "viewAll": "Xem tất cả",
   "onboardingTitle1": "Theo dõi ngân sách dễ dàng",
   "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt mục tiêu tài chính.",
@@ -300,31 +440,109 @@
   "noOngoingNotes": "Không có ghi chú đang diễn ra",
   "noUpcomingNotes": "Không có ghi chú sắp tới",
   "groupNotesTitle": "Ghi chú nhóm",
+  "@groupNotesTitle": {
+    "description": "Tiêu đề cho màn hình ghi chú nhóm."
+  },
   "searchTooltip": "Tìm kiếm ghi chú",
+  "@searchTooltip": {
+    "description": "Chú giải cho biểu tượng tìm kiếm trong màn hình ghi chú nhóm."
+  },
   "filterTooltip": "Lọc ghi chú",
+  "@filterTooltip": {
+    "description": "Chú giải cho biểu tượng lọc trong màn hình ghi chú nhóm."
+  },
   "noNotesInGroup": "Chưa có ghi chú nào trong nhóm này.",
+  "@noNotesInGroup": {
+    "description": "Thông báo hiển thị khi không có ghi chú nào trong nhóm."
+  },
   "noNotesFoundSearch": "Không tìm thấy ghi chú nào cho tìm kiếm của bạn.",
+  "@noNotesFoundSearch": {
+    "description": "Thông báo hiển thị khi không có ghi chú nào khớp với truy vấn tìm kiếm."
+  },
   "addNoteTooltip": "Thêm ghi chú mới",
+  "@addNoteTooltip": {
+    "description": "Chú giải cho nút hành động nổi để thêm ghi chú mới."
+  },
   "filterNotesTitle": "Lọc ghi chú",
+  "@filterNotesTitle": {
+    "description": "Tiêu đề cho hộp thoại lọc trong màn hình ghi chú nhóm."
+  },
   "errorAddingNote": "Không thể thêm ghi chú. Vui lòng thử lại.",
+  "@errorAddingNote": {
+    "description": "Thông báo lỗi khi thêm ghi chú thất bại."
+  },
   "errorUpdatingNote": "Không thể cập nhật ghi chú. Vui lòng thử lại.",
+  "@errorUpdatingNote": {
+    "description": "Thông báo lỗi khi cập nhật ghi chú thất bại."
+  },
   "errorDeletingNote": "Không thể xóa ghi chú. Vui lòng thử lại.",
+  "@errorDeletingNote": {
+    "description": "Thông báo lỗi khi xóa ghi chú thất bại."
+  },
   "errorAddingComment": "Không thể thêm bình luận. Vui lòng thử lại.",
+  "@errorAddingComment": {
+    "description": "Thông báo lỗi khi thêm bình luận thất bại."
+  },
   "addNoteDialogTitle": "Thêm ghi chú",
+  "@addNoteDialogTitle": {
+    "description": "Tiêu đề cho hộp thoại/màn hình thêm ghi chú mới."
+  },
   "editNoteDialogTitle": "Sửa ghi chú",
+  "@editNoteDialogTitle": {
+    "description": "Tiêu đề cho hộp thoại/màn hình sửa ghi chú hiện có."
+  },
   "noteTitleLabel": "Tiêu đề",
+  "@noteTitleLabel": {
+    "description": "Nhãn cho trường nhập tiêu đề ghi chú."
+  },
   "noteTitleHint": "Nhập tiêu đề ghi chú",
+  "@noteTitleHint": {
+    "description": "Văn bản gợi ý cho trường nhập tiêu đề ghi chú."
+  },
   "noteContentLabel": "Nội dung",
+  "@noteContentLabel": {
+    "description": "Nhãn cho trường nhập nội dung ghi chú."
+  },
   "noteContentHint": "Nhập nội dung ghi chú",
+  "@noteContentHint": {
+    "description": "Văn bản gợi ý cho trường nhập nội dung ghi chú."
+  },
   "noteTagLabel": "Thẻ",
+  "@noteTagLabel": {
+    "description": "Nhãn cho trường thả xuống chọn thẻ ghi chú."
+  },
   "selectTagHint": "Chọn một thẻ",
+  "@selectTagHint": {
+    "description": "Văn bản gợi ý cho trường thả xuống chọn thẻ ghi chú."
+  },
   "noteDetailTitle": "Chi tiết ghi chú",
+  "@noteDetailTitle": {
+    "description": "Tiêu đề cho màn hình chi tiết ghi chú."
+  },
   "createdBy": "Được tạo bởi",
+  "@createdBy": {
+    "description": "Nhãn cho người tạo ghi chú."
+  },
   "commentsLabel": "Bình luận",
+  "@commentsLabel": {
+    "description": "Nhãn cho phần bình luận trong màn hình chi tiết ghi chú."
+  },
   "noComments": "Chưa có bình luận nào.",
+  "@noComments": {
+    "description": "Thông báo hiển thị khi không có bình luận nào về ghi chú."
+  },
   "addCommentLabel": "Thêm bình luận",
+  "@addCommentLabel": {
+    "description": "Nhãn cho trường nhập bình luận."
+  },
   "addCommentHint": "Nhập bình luận của bạn",
+  "@addCommentHint": {
+    "description": "Văn bản gợi ý cho trường nhập bình luận."
+  },
   "sendButton": "Gửi",
+  "@sendButton": {
+    "description": "Văn bản cho nút gửi bình luận."
+  },
   "noGroupsFound": "Không tìm thấy nhóm nào",
   "joinGroupSuggestion": "Tham gia hoặc tạo nhóm để bắt đầu thêm ghi chú",
   "createGroup": "Tạo nhóm",
@@ -352,5 +570,69 @@
   "pleaseSelectGroup": "Vui lòng chọn một nhóm để xem ghi chú.",
   "noNotesFoundSearchFilter": "Không tìm thấy ghi chú nào phù hợp với tìm kiếm/bộ lọc.",
   "tryDifferentSearchFilter": "Thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn.",
-  "loading": "Đang tải..."
+  "loading": "Đang tải...",
+  "scanBarcodeCamera": "Quét từ Camera",
+  "scanBarcodeGallery": "Quét từ Thư viện",
+  "noBarcodeFound": "Không tìm thấy mã vạch",
+  "invalidBarcodeData": "Dữ liệu mã vạch không hợp lệ",
+  "cameraPermissionDenied": "Từ chối quyền truy cập camera",
+  "imageSelectionCancelled": "Đã hủy chọn ảnh",
+  "barcodeScanError": "Đã xảy ra lỗi khi quét mã vạch",
+  "openSettingsToEnableCamera": "Vui lòng bật quyền truy cập camera trong Cài đặt",
+  "openSettingsToEnableGallery": "Vui lòng bật quyền truy cập thư viện ảnh trong Cài đặt",
+  "galleryPermissionDenied": "Từ chối quyền truy cập thư viện",
+  "@openSettingsToEnableCamera": {
+    "description": "Thông báo nhắc người dùng bật quyền truy cập camera trong Cài đặt"
+  },
+  "@openSettingsToEnableGallery": {
+    "description": "Thông báo nhắc người dùng bật quyền truy cập thư viện ảnh trong Cài đặt"
+  },
+  "@galleryPermissionDenied": {
+    "description": "Thông báo hiển thị khi quyền truy cập thư viện bị từ chối"
+  },
+  "openSettings": "Mở Cài đặt",
+  "invalidReceiptData": "Dữ liệu hóa đơn không hợp lệ",
+  "receiptScanError": "Lỗi khi quét hóa đơn",
+  "scanReceiptCamera": "Quét hóa đơn bằng camera",
+  "scanReceiptGallery": "Tải hóa đơn từ thư viện ảnh",
+  "@invalidReceiptData": {
+    "description": "Hiển thị khi dữ liệu hóa đơn không hợp lệ"
+  },
+  "@receiptScanError": {
+    "description": "Hiển thị khi có lỗi xảy ra trong quá trình quét hóa đơn"
+  },
+  "@scanReceiptCamera": {
+    "description": "Nút để quét hóa đơn bằng camera"
+  },
+  "@scanReceiptGallery": {
+    "description": "Nút để tải hóa đơn từ thư viện ảnh"
+  },"exportSuccessTo": "Báo cáo đã được xuất thành công vào {filePath}",
+  "@exportSuccessTo": {
+    "description": "Thông báo khi báo cáo được xuất thành công, bao gồm đường dẫn file",
+    "placeholders": {
+      "filePath": {
+        "type": "Object"
+      }
+    }
+  },
+  "storagePermissionDenied": "Quyền truy cập bộ nhớ bị từ chối. Vui lòng cấp quyền để lưu báo cáo.",
+  "@storagePermissionDenied": {
+    "description": "Thông báo khi quyền truy cập bộ nhớ bị từ chối"
+  },
+  "share": "Chia sẻ",
+  "@share": {
+    "description": "Nhãn cho hành động chia sẻ trong snackbar"
+  },
+  "shareReport": "Chia sẻ báo cáo tài chính của bạn",
+  "@shareReport": {
+    "description": "Văn bản sử dụng khi chia sẻ file báo cáo"
+  },
+  "exportCancelled": "Xuất báo cáo đã bị hủy",
+  "@exportCancelled": {
+    "description": "Thông báo khi người dùng hủy thao tác lưu file"
+  },
+  "selectSaveLocation": "Chọn vị trí để lưu báo cáo",
+  "@selectSaveLocation": {
+    "description": "Tiêu đề cho hộp thoại chọn vị trí lưu file"
+  }
 }

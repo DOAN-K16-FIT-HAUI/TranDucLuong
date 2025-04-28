@@ -174,7 +174,7 @@ class InputFields {
                 ? RichText(
               text: TextSpan(
                 text: '$label ',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.notoSans(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
@@ -188,13 +188,13 @@ class InputFields {
             )
                 : Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 fontSize: 16,
               ),
             ),
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: GoogleFonts.notoSans(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             border: const OutlineInputBorder(
@@ -230,7 +230,7 @@ class InputFields {
             ),
           ),
           cursorColor: theme.colorScheme.primary,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             color: theme.colorScheme.onSurface,
             fontSize: 16,
           ),
@@ -270,7 +270,7 @@ class InputFields {
             label: RichText(
               text: TextSpan(
                 text: l10n.amountLabel,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.notoSans(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
@@ -284,7 +284,7 @@ class InputFields {
             ),
             hintText: l10n.enterAmountHint,
             suffixText: _getCurrencySymbol(locale), // Sử dụng locale từ context
-            suffixStyle: GoogleFonts.poppins(
+            suffixStyle: GoogleFonts.notoSans(
               color: theme.colorScheme.onSurface,
               fontSize: 16,
             ),
@@ -320,7 +320,7 @@ class InputFields {
             ),
           ),
           cursorColor: theme.colorScheme.primary,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             color: theme.colorScheme.onSurface,
             fontSize: 16,
           ),
@@ -352,7 +352,7 @@ class InputFields {
                 ? RichText(
               text: TextSpan(
                 text: '$label ',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.notoSans(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
@@ -366,13 +366,13 @@ class InputFields {
             )
                 : Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 fontSize: 16,
               ),
             ),
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: GoogleFonts.notoSans(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             border: const OutlineInputBorder(
@@ -404,7 +404,7 @@ class InputFields {
             contentPadding:
             const EdgeInsets.symmetric(vertical: 0, horizontal: 12).copyWith(right: 0),
           ),
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             color: theme.colorScheme.onSurface,
             fontSize: 16,
           ),
@@ -471,7 +471,7 @@ class InputFields {
               ? RichText(
             text: TextSpan(
               text: '$label ',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 fontSize: 16,
               ),
@@ -485,7 +485,7 @@ class InputFields {
           )
               : Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.notoSans(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               fontSize: 16,
             ),
@@ -535,7 +535,7 @@ class InputFields {
             ),
             child: Text(
               date != null ? displayFormat.format(date) : l10n.notSelected,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 16,
                 color: date != null
                     ? theme.colorScheme.onSurface

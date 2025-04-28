@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/formatter.dart';
@@ -82,7 +81,7 @@ class ListsCards {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.notoSans(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: theme.colorScheme.onSurface,
@@ -106,7 +105,7 @@ class ListsCards {
                               symbol: currencySymbol,
                               decimalDigits: 0,
                             ).format(value),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.notoSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
@@ -267,7 +266,7 @@ class ListsCards {
                       transaction.description.isNotEmpty
                           ? transaction.description
                           : l10n.noDescription,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.notoSans(
                         fontWeight: FontWeight.w500,
                         fontSize: 14.5,
                         color: theme.colorScheme.onSurface,
@@ -278,7 +277,7 @@ class ListsCards {
                     const SizedBox(height: 3),
                     Text(
                       subtitleText,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.notoSans(
                         color: theme.hintColor,
                         fontSize: 12,
                       ),
@@ -293,7 +292,7 @@ class ListsCards {
                 children: [
                   Text(
                     amountPrefix + formattedAmount,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.notoSans(
                       color: amountColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,

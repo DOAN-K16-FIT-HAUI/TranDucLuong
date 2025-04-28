@@ -60,3 +60,10 @@ class SignInWithBiometricsRequested extends AuthEvent {
   @override
   List<Object?> get props => [context];
 }
+
+class CheckAuthStatus extends AuthEvent {
+  const CheckAuthStatus();
+
+  @override
+  List<Object?> get props => [];
+}

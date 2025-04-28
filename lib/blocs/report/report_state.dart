@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:finance_app/data/models/transaction.dart';
 import 'package:flutter/material.dart';
 
 abstract class ReportState extends Equatable {
@@ -32,24 +31,6 @@ class ReportError extends ReportState {
   final String Function(BuildContext) message;
 
   const ReportError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-
-class ReportExportSuccess extends ReportState {
-  final List<TransactionModel> transactions;
-
-  const ReportExportSuccess(this.transactions);
-
-  @override
-  List<Object?> get props => [transactions];
-}
-
-class ReportExportFailure extends ReportState {
-  final String message;
-
-  const ReportExportFailure(this.message);
 
   @override
   List<Object?> get props => [message];

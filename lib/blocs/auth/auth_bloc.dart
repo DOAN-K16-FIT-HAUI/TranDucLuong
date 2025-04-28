@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -14,13 +13,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({
     required this.authRepository,
   }) : super(AuthInitial()) {
+    // Đăng ký các sự kiện
+    on<CheckAuthStatus>(_onCheckAuthStatus);
     on<SignInRequested>(_onSignInRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<SignInWithGoogleRequested>(_onSignInWithGoogleRequested);
     on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<PasswordResetRequested>(_onPasswordResetRequested);
-    on<SignInWithBiometricsRequested>(_onSignInWithBiometricsRequested); // Thêm
+    on<SignInWithBiometricsRequested>(_onSignInWithBiometricsRequested);
+
+    // Kích hoạt kiểm tra trạng thái xác thực ngay khi khởi tạo
+    add(const CheckAuthStatus());
   }
 
   String _mapFirebaseAuthExceptionToMessage(BuildContext context, dynamic e) {
@@ -62,6 +66,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     return l10n.genericErrorWithMessage(e.toString());
   }
 
+  Future<void> _onCheckAuthStatus(
+      CheckAuthStatus event, Emitter<AuthState> emit) async {
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser != null) {
+        // Kiểm tra token còn hợp lệ
+        final idTokenResult = await firebaseUser.getIdTokenResult(true);
+        if (idTokenResult.token != null) {
+          final user = await authRepository.getCurrentUser();
+          emit(AuthAuthenticated(user: user));
+        } else {
+          emit(AuthUnauthenticated());
+        }
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    } catch (e) {
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+    }
+  }
+
   Future<void> _onSignInRequested(
       SignInRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
@@ -70,13 +96,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-      // Lưu thông tin đăng nhập vào SharedPreferences để sử dụng cho biometrics
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('lastEmail', event.email);
-      await prefs.setString('lastPassword', event.password);
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -87,7 +110,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final localAuth = LocalAuthentication();
       bool canCheckBiometrics = await localAuth.canCheckBiometrics;
       if (!canCheckBiometrics) {
-        emit(AuthFailure(error: (context) => AppLocalizations.of(context)!.biometricsNotAvailable));
+        emit(AuthFailure(
+            error: (context) =>
+            AppLocalizations.of(context)!.biometricsNotAvailable));
         return;
       }
 
@@ -100,25 +125,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (authenticated) {
-        final prefs = await SharedPreferences.getInstance();
-        final email = prefs.getString('lastEmail');
-        final password = prefs.getString('lastPassword');
-        if (email != null && password != null) {
-          final user = await authRepository.signInWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
+        // Kiểm tra trạng thái Firebase Authentication
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        if (firebaseUser != null) {
+          final user = await authRepository.getCurrentUser();
           emit(AuthAuthenticated(user: user));
         } else {
           emit(AuthFailure(
-              error: (context) => AppLocalizations.of(context)!.noSavedCredentials));
+              error: (context) =>
+              AppLocalizations.of(context)!.noSavedCredentials));
         }
       } else {
         emit(AuthFailure(
             error: (context) => AppLocalizations.of(context)!.biometricsError));
       }
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -132,7 +155,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -143,7 +167,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await authRepository.signInWithGoogle();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -154,7 +179,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await authRepository.signInWithFacebook();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -163,13 +189,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await authRepository.signOut();
-      // Xóa thông tin đăng nhập khi đăng xuất
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('lastEmail');
-      await prefs.remove('lastPassword');
       emit(AuthUnauthenticated());
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 
@@ -180,7 +203,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.sendPasswordResetEmail(email: event.email);
       emit(AuthInitial());
     } catch (e) {
-      emit(AuthFailure(error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
+      emit(AuthFailure(
+          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
 }

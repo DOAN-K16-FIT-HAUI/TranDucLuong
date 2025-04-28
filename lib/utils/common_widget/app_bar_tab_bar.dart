@@ -42,7 +42,7 @@ class AppBarTabBar {
           titleWidget ??
           Text(
             effectiveTitle,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.notoSans(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onPrimary,
@@ -76,10 +76,10 @@ class AppBarTabBar {
           controller: controller,
           labelStyle:
               labelStyle ??
-              GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
+              GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600),
           unselectedLabelStyle:
               unselectedLabelStyle ??
-              GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+              GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w500),
           labelColor: labelColor ?? theme.colorScheme.primary,
           unselectedLabelColor:
               unselectedLabelColor ??
