@@ -564,5 +564,70 @@
   "pleaseSelectGroup": "Please select a group to view notes.",
   "noNotesFoundSearchFilter": "No notes found matching your search/filter.",
   "tryDifferentSearchFilter": "Try adjusting your search or filter.",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "scanBarcodeCamera": "Scan from Camera",
+  "scanBarcodeGallery": "Scan from Gallery",
+  "noBarcodeFound": "No barcode found",
+  "invalidBarcodeData": "Invalid barcode data",
+  "cameraPermissionDenied": "Camera permission denied",
+  "imageSelectionCancelled": "Image selection cancelled",
+  "barcodeScanError": "An error occurred while scanning the barcode",
+  "openSettingsToEnableCamera": "Please enable camera access in Settings",
+  "openSettingsToEnableGallery": "Please enable gallery access in Settings",
+  "galleryPermissionDenied": "Gallery permission denied",
+  "@openSettingsToEnableCamera": {
+    "description": "Message to prompt user to enable camera access in Settings"
+  },
+  "@openSettingsToEnableGallery": {
+    "description": "Message to prompt user to enable gallery access in Settings"
+  },
+  "@galleryPermissionDenied": {
+    "description": "Message shown when gallery permission is denied"
+  },
+  "openSettings": "Open Settings",
+  "invalidReceiptData": "Invalid receipt data",
+  "receiptScanError": "Error scanning receipt",
+  "scanReceiptCamera": "Scan receipt with camera",
+  "scanReceiptGallery": "Upload receipt from gallery",
+  "@invalidReceiptData": {
+    "description": "Shown when the receipt data is not valid"
+  },
+  "@receiptScanError": {
+    "description": "Shown when there is an error during receipt scanning"
+  },
+  "@scanReceiptCamera": {
+    "description": "Button label to scan receipt using the camera"
+  },
+  "@scanReceiptGallery": {
+    "description": "Button label to pick a receipt from the image gallery"
+  },
+  "exportSuccessTo": "Report successfully exported to {filePath}",
+  "@exportSuccessTo": {
+    "description": "Message when report is successfully exported, including file path",
+    "placeholders": {
+      "filePath": {
+        "type": "Object"
+      }
+    }
+  },
+  "storagePermissionDenied": "Storage permission denied. Please grant access to save the report.",
+  "@storagePermissionDenied": {
+    "description": "Message shown when storage access is denied"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Label for share action in snackbar"
+  },
+  "shareReport": "Share your financial report",
+  "@shareReport": {
+    "description": "Text used when sharing the report file"
+  },
+  "exportCancelled": "Export cancelled",
+  "@exportCancelled": {
+    "description": "Message shown when the user cancels the file save operation"
+  },
+  "selectSaveLocation": "Select a location to save the report",
+  "@selectSaveLocation": {
+    "description": "Title for the file picker dialog"
+  }
 }

@@ -310,7 +310,7 @@ class WalletScreen extends StatelessWidget {
               symbol: _getCurrencySymbol(locale),
               decimalDigits: 0,
             ).format(tabTotalBalance),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.notoSans(
               fontSize: 30,
               fontWeight: FontWeight.bold,
               color:

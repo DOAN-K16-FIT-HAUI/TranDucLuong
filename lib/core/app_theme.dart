@@ -76,42 +76,42 @@ class AppTheme {
       foregroundColor: Colors.white,
       centerTitle: true,
       elevation: 0,
-      titleTextStyle: GoogleFonts.poppins(
+      titleTextStyle: GoogleFonts.notoSans(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
     ),
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: GoogleFonts.notoSans(
         fontSize: 24,
         fontWeight: FontWeight.bold,
         color: _textPrimaryLight,
       ),
-      displayMedium: GoogleFonts.poppins(
+      displayMedium: GoogleFonts.notoSans(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: _textPrimaryLight,
       ),
-      displaySmall: GoogleFonts.poppins(
+      displaySmall: GoogleFonts.notoSans(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: _textPrimaryLight,
       ),
-      headlineMedium: GoogleFonts.poppins(
+      headlineMedium: GoogleFonts.notoSans(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: _textPrimaryLight,
       ),
-      bodyLarge: GoogleFonts.poppins(
+      bodyLarge: GoogleFonts.notoSans(
         fontSize: 16,
         color: _textPrimaryLight,
       ),
-      bodyMedium: GoogleFonts.poppins(
+      bodyMedium: GoogleFonts.notoSans(
         fontSize: 14,
         color: _textPrimaryLight,
       ),
-      bodySmall: GoogleFonts.poppins(
+      bodySmall: GoogleFonts.notoSans(
         fontSize: 12,
         color: _textSecondaryLight,
       ),
@@ -131,7 +131,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        textStyle: GoogleFonts.poppins(
+        textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -145,7 +145,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        textStyle: GoogleFonts.poppins(
+        textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -171,11 +171,11 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: _errorLight, width: 2),
       ),
-      labelStyle: GoogleFonts.poppins(
+      labelStyle: GoogleFonts.notoSans(
         color: _textSecondaryLight,
         fontSize: 14,
       ),
-      hintStyle: GoogleFonts.poppins(
+      hintStyle: GoogleFonts.notoSans(
         color: _textSecondaryLight.withValues(alpha: 0.7),
         fontSize: 14,
       ),
@@ -184,11 +184,11 @@ class AppTheme {
       backgroundColor: _surfaceLight,
       selectedItemColor: _primaryLight,
       unselectedItemColor: _textSecondaryLight,
-      selectedLabelStyle: GoogleFonts.poppins(
+      selectedLabelStyle: GoogleFonts.notoSans(
         fontSize: 12,
         fontWeight: FontWeight.w500,
       ),
-      unselectedLabelStyle: GoogleFonts.poppins(
+      unselectedLabelStyle: GoogleFonts.notoSans(
         fontSize: 12,
       ),
       type: BottomNavigationBarType.fixed,
@@ -218,42 +218,42 @@ class AppTheme {
       foregroundColor: _textPrimaryDark,
       centerTitle: true,
       elevation: 0,
-      titleTextStyle: GoogleFonts.poppins(
+      titleTextStyle: GoogleFonts.notoSans(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: _textPrimaryDark,
       ),
     ),
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: GoogleFonts.notoSans(
         fontSize: 24,
         fontWeight: FontWeight.bold,
         color: _textPrimaryDark,
       ),
-      displayMedium: GoogleFonts.poppins(
+      displayMedium: GoogleFonts.notoSans(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: _textPrimaryDark,
       ),
-      displaySmall: GoogleFonts.poppins(
+      displaySmall: GoogleFonts.notoSans(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: _textPrimaryDark,
       ),
-      headlineMedium: GoogleFonts.poppins(
+      headlineMedium: GoogleFonts.notoSans(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: _textPrimaryDark,
       ),
-      bodyLarge: GoogleFonts.poppins(
+      bodyLarge: GoogleFonts.notoSans(
         fontSize: 16,
         color: _textPrimaryDark,
       ),
-      bodyMedium: GoogleFonts.poppins(
+      bodyMedium: GoogleFonts.notoSans(
         fontSize: 14,
         color: _textPrimaryDark,
       ),
-      bodySmall: GoogleFonts.poppins(
+      bodySmall: GoogleFonts.notoSans(
         fontSize: 12,
         color: _textSecondaryDark,
       ),
@@ -273,7 +273,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        textStyle: GoogleFonts.poppins(
+        textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -287,7 +287,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        textStyle: GoogleFonts.poppins(
+        textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -313,11 +313,11 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: _errorDark, width: 2),
       ),
-      labelStyle: GoogleFonts.poppins(
+      labelStyle: GoogleFonts.notoSans(
         color: _textSecondaryDark,
         fontSize: 14,
       ),
-      hintStyle: GoogleFonts.poppins(
+      hintStyle: GoogleFonts.notoSans(
         color: _textSecondaryDark.withValues(alpha: 0.7),
         fontSize: 14,
       ),
@@ -326,11 +326,11 @@ class AppTheme {
       backgroundColor: _surfaceDark,
       selectedItemColor: _primaryDark,
       unselectedItemColor: _textSecondaryDark,
-      selectedLabelStyle: GoogleFonts.poppins(
+      selectedLabelStyle: GoogleFonts.notoSans(
         fontSize: 12,
         fontWeight: FontWeight.w500,
       ),
-      unselectedLabelStyle: GoogleFonts.poppins(
+      unselectedLabelStyle: GoogleFonts.notoSans(
         fontSize: 12,
       ),
       type: BottomNavigationBarType.fixed,

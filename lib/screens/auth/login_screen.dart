@@ -9,7 +9,6 @@ import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,31 +24,9 @@ class LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _rememberPassword = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkBiometrics(); // Kiểm tra sinh trắc học khi màn hình khởi tạo
-  }
-
-  // Kiểm tra và tự động đăng nhập bằng sinh trắc học nếu được bật
-  Future<void> _checkBiometrics() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isBiometricsEnabled = prefs.getBool('isBiometricsEnabled') ?? false;
-    if (isBiometricsEnabled) {
-      context.read<AuthBloc>().add(SignInWithBiometricsRequested(context: context));
-    }
-  }
-
   // Hàm đăng nhập bằng email/mật khẩu
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      // Lưu thông tin đăng nhập nếu người dùng chọn "Remember Password"
-      if (_rememberPassword) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('lastEmail', _emailController.text.trim());
-        await prefs.setString('lastPassword', _passwordController.text);
-      }
-
       // Gửi sự kiện đăng nhập tới AuthBloc
       context.read<AuthBloc>().add(
         SignInRequested(
@@ -131,7 +108,7 @@ class LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 15),
                   Buttons.buildSubmitButton(context, l10n.loginButton, _login),
                   const SizedBox(height: 15),
-                  // Thêm nút đăng nhập bằng sinh trắc học
+                  // Nút đăng nhập bằng sinh trắc học
                   Center(
                     child: TextButton.icon(
                       onPressed: () {

@@ -78,4 +78,17 @@ class AuthRepository {
       rethrow; // Propagate the error to AuthBloc
     }
   }
+
+  Future<UserModel> getCurrentUser() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      throw Exception('No authenticated user');
+    }
+    // Chuyển đổi Firebase User thành UserModel của ứng dụng
+    return UserModel(
+      id: firebaseUser.uid,
+      email: firebaseUser.email ?? '',
+      // Thêm các thuộc tính khác nếu cần
+    );
+  }
 }

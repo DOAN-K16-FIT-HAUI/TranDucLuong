@@ -1,5 +1,5 @@
 import 'package:finance_app/data/models/group_note.dart';
-import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart'; // Use common app bar
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
 import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';

@@ -352,5 +352,82 @@
   "pleaseSelectGroup": "メモを表示するグループを選択してください。",
   "noNotesFoundSearchFilter": "検索/フィルターに一致するメモが見つかりません。",
   "tryDifferentSearchFilter": "検索条件やフィルターを変更してみてください。",
-  "loading": "読み込み中..."
+  "loading": "読み込み中...",
+  "scanBarcodeCamera": "カメラでスキャン",
+  "scanBarcodeGallery": "ギャラリーからスキャン",
+  "noBarcodeFound": "バーコードが見つかりません",
+  "invalidBarcodeData": "無効なバーコードデータです",
+  "@scanBarcodeCamera": {
+    "description": "Scan barcode using camera"
+  },
+  "@scanBarcodeGallery": {
+    "description": "Scan barcode from gallery"
+  },
+  "@noBarcodeFound": {
+    "description": "Message shown when no barcode is detected"
+  },
+  "@invalidBarcodeData": {
+    "description": "Message shown when barcode data is invalid"
+  },
+  "cameraPermissionDenied": "カメラの許可が拒否されました",
+  "imageSelectionCancelled": "画像の選択がキャンセルされました",
+  "barcodeScanError": "バーコードのスキャン中にエラーが発生しました",
+  "openSettingsToEnableCamera": "設定でカメラアクセスを有効にしてください",
+  "openSettingsToEnableGallery": "設定でギャラリーアクセスを有効にしてください",
+  "galleryPermissionDenied": "ギャラリーのアクセスが拒否されました",
+  "@openSettingsToEnableCamera": {
+    "description": "Message to prompt user to enable camera access in Settings"
+  },
+  "@openSettingsToEnableGallery": {
+    "description": "Message to prompt user to enable gallery access in Settings"
+  },
+  "@galleryPermissionDenied": {
+    "description": "Message shown when gallery permission is denied"
+  },
+  "openSettings": "設定を開く",
+  "invalidReceiptData": "無効なレシートデータです",
+  "receiptScanError": "レシートのスキャン中にエラーが発生しました",
+  "scanReceiptCamera": "カメラでレシートをスキャンする",
+  "scanReceiptGallery": "ギャラリーからレシートをアップロードする",
+  "@invalidReceiptData": {
+    "description": "レシートデータが無効な場合に表示される"
+  },
+  "@receiptScanError": {
+    "description": "レシートスキャン中にエラーが発生した場合に表示される"
+  },
+  "@scanReceiptCamera": {
+    "description": "カメラでレシートをスキャンするボタン"
+  },
+  "@scanReceiptGallery": {
+    "description": "ギャラリーからレシートを選択するボタン"
+  },
+  "exportSuccessTo": "{filePath} にレポートを正常にエクスポートしました",
+  "@exportSuccessTo": {
+    "description": "レポートが正常にエクスポートされたときのメッセージ。ファイルパスを含む",
+    "placeholders": {
+      "filePath": {
+        "type": "Object"
+      }
+    }
+  },
+  "storagePermissionDenied": "ストレージへのアクセスが拒否されました。レポートを保存するには許可が必要です。",
+  "@storagePermissionDenied": {
+    "description": "ストレージアクセスが拒否されたときのメッセージ"
+  },
+  "share": "共有",
+  "@share": {
+    "description": "スナックバーでの共有アクションのラベル"
+  },
+  "shareReport": "財務レポートを共有する",
+  "@shareReport": {
+    "description": "レポートファイルを共有するときに使うテキスト"
+  },
+  "exportCancelled": "エクスポートがキャンセルされました",
+  "@exportCancelled": {
+    "description": "ユーザーがファイル保存操作をキャンセルしたときのメッセージ"
+  },
+  "selectSaveLocation": "レポートの保存場所を選択してください",
+  "@selectSaveLocation": {
+    "description": "ファイルピッカーダイアログのタイトル"
+  }
 }

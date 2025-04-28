@@ -53,7 +53,7 @@ class GroupNoteBloc extends Bloc<GroupNoteEvent, GroupNoteState> {
       // Catch synchronous errors during stream setup
       emit(state.copyWith(
         isLoading: false,
-        error: (context) => AppLocalizations.of(context)!.errorLoadingData + " (Setup)",
+        error: (context) => "${AppLocalizations.of(context)!.errorLoadingData} (Setup)",
       ));
     }
   }
@@ -155,14 +155,44 @@ class GroupNoteBloc extends Bloc<GroupNoteEvent, GroupNoteState> {
     ));
   }
 
-  Future<void> _onAddComment(
-      AddComment event, Emitter<GroupNoteState> emit) async {
+  Future<void> _onAddComment(AddComment event, Emitter<GroupNoteState> emit) async {
     try {
-      // Optimistic UI update (optional): Add comment locally
+      final updatedNotes = state.notes.map((note) {
+        if (note.id == event.noteId && note.groupId == event.groupId) {
+          final updatedComments = List<CommentModel>.from(note.comments)
+            ..add(event.comment);
+          return note.copyWith(comments: updatedComments);
+        }
+        return note;
+      }).toList();
+
+      // Cập nhật filteredNotes tương ứng
+      final updatedFilteredNotes = state.filteredNotes.map((note) {
+        if (note.id == event.noteId && note.groupId == event.groupId) {
+          final updatedComments = List<CommentModel>.from(note.comments)
+            ..add(event.comment);
+          return note.copyWith(comments: updatedComments);
+        }
+        return note;
+      }).toList();
+
+      // Emit trạng thái mới với danh sách notes và filteredNotes đã cập nhật
+      emit(state.copyWith(
+        notes: updatedNotes,
+        filteredNotes: updatedFilteredNotes,
+        error: null,
+        clearError: true,
+      ));
+
+      // Gửi yêu cầu thêm bình luận tới Firestore
       await groupNoteRepository.addComment(
-          event.noteId, event.comment, event.groupId);
-      // Stream listener will update the note with the new comment
+        event.noteId,
+        event.comment,
+        event.groupId,
+      );
+      // Stream listener sẽ cập nhật lại nếu cần, nhưng UI đã hiển thị bình luận
     } catch (e) {
+      // Nếu thêm bình luận thất bại, revert trạng thái hoặc thông báo lỗi
       emit(state.copyWith(
         error: (context) => AppLocalizations.of(context)!.errorAddingComment,
       ));
