@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
-import 'package:finance_app/firebase_option.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../test_helpers.dart';
 
 void main() {
   late FirebaseAuthService authService;
@@ -10,16 +9,13 @@ void main() {
   const testPassword = 'testpassword';
 
   setUpAll(() async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await FirebaseAuth.instance.useAuthEmulator('10.0.2.2', 9099);
-
+    await initFirebase();
     authService = FirebaseAuthService();
   });
 
   setUp(() async {
     // Generate a fresh email before each test
-    testEmail = "testuser${DateTime.now().millisecondsSinceEpoch}@example.com";
+    testEmail = await generateTestEmail();
   });
 
   group('FirebaseAuthService Integration Test', () {
