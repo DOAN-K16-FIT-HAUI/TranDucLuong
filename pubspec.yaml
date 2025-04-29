@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.19.0 # For internationalization and date formatting
   fl_chart: ^0.66.2 # For creating beautiful charts
   google_fonts: ^6.2.1 # For using Google Fonts in your app
+  bloc: ^8.1.0 # For implementing the BLoC pattern
+  provider: ^6.1.3 # For state management using the Provider pattern
   dynamic_color: ^1.7.0 # For dynamic theming based on system colors
   uuid: ^4.3.3 # For generating unique identifiers
   go_router: ^14.8.1 # For declarative navigation and routing

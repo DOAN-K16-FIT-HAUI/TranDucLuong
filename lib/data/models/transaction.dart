@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart'; // Cần thiết cho DateTime parsing
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart'; // Cần thiết cho DateTime parsing
 
 class TransactionModel {
   final String id; // Firestore document ID
@@ -77,7 +78,7 @@ class TransactionModel {
     if (parsedDate == null) {
       // Xử lý trường hợp date không hợp lệ, ví dụ: dùng ngày hiện tại hoặc throw lỗi
       // Ở đây ví dụ dùng ngày hiện tại, nhưng bạn nên xem xét lại dữ liệu
-      print("Warning: Invalid date format found for transaction $id. Using current date.");
+      debugPrint("Warning: Invalid date format found for transaction $id. Using current date.");
       parsedDate = DateTime.now();
       // Hoặc: throw FormatException("Invalid date format in transaction $id");
     }

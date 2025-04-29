@@ -23,16 +23,6 @@ class DefaultConnector {
     return getInstance(FirebaseDataConnect.getInstance(config));
   }
 
-  Future<void> fetchData() async {
-    try {
-      var response = await dataConnect.getData();
-      var data = jsonDecode(response);
-      // Process the data as needed
-    } catch (e) {
-      // Handle any errors
-    }
-  }
-
   Future<void> sendData(Map<String, dynamic> data) async {
     try {
       var jsonData = jsonEncode(data);

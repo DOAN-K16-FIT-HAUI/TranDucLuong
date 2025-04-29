@@ -10,10 +10,7 @@ import 'package:finance_app/screens/auth/register_screen.dart';
 import 'package:finance_app/screens/group_note/add_edit_group_note_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_detail_screen.dart';
 import 'package:finance_app/screens/group_note/group_note_screen.dart';
-import 'package:finance_app/screens/on_boarding/on_boarding_screen.dart';
-import 'package:finance_app/screens/on_boarding/on_boarding_status.dart';
 import 'package:finance_app/screens/report/report_screen.dart';
-import 'package:finance_app/screens/splash/splash_screen.dart';
 import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/screens/transaction/transaction_list.dart';
 import 'package:finance_app/screens/transaction/transaction_screen.dart';
@@ -23,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+
 import 'app_paths.dart'; // Import AppPaths
 
 class AppRoutes {
