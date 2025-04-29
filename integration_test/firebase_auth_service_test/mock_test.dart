@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
 import 'package:mockito/mockito.dart';
-import '../test/mocks.mocks.dart';
+import '../../test/mocks.mocks.dart';
 
 void main() {
   late FirebaseAuthService authService;

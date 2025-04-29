@@ -7,7 +7,8 @@ class TransactionModel {
   final String description;
   final double amount; // Nên là double cho tiền tệ
   final DateTime date;
-  final String typeKey; // Thu nhập, Chi tiêu, Chuyển khoản, Đi vay, Cho vay, Điều chỉnh số dư
+  final String
+  typeKey; // Thu nhập, Chi tiêu, Chuyển khoản, Đi vay, Cho vay, Điều chỉnh số dư
   final String categoryKey; // Chỉ sử dụng cho 'Chi tiêu'
   // 'wallet' dùng cho Thu nhập, Chi tiêu, Đi vay, Cho vay, Điều chỉnh số dư
   // Sẽ là null hoặc rỗng đối với 'Chuyển khoản'
@@ -27,12 +28,12 @@ class TransactionModel {
     required this.date,
     required this.typeKey,
     this.categoryKey = '', // Mặc định là rỗng nếu không phải Chi tiêu
-    this.wallet,       // Có thể null
-    this.fromWallet,   // Có thể null
-    this.toWallet,     // Có thể null
-    this.lender,       // Có thể null
-    this.borrower,     // Có thể null
-    this.repaymentDate,// Có thể null
+    this.wallet, // Có thể null
+    this.fromWallet, // Có thể null
+    this.toWallet, // Có thể null
+    this.lender, // Có thể null
+    this.borrower, // Có thể null
+    this.repaymentDate, // Có thể null
     this.balanceAfter, // Có thể null
   });
 
@@ -50,7 +51,8 @@ class TransactionModel {
       'toWallet': toWallet,
       'lender': lender,
       'borrower': borrower,
-      'repaymentDate': repaymentDate != null ? Timestamp.fromDate(repaymentDate!) : null,
+      'repaymentDate':
+          repaymentDate != null ? Timestamp.fromDate(repaymentDate!) : null,
       'balanceAfter': balanceAfter,
     };
   }
@@ -78,7 +80,9 @@ class TransactionModel {
     if (parsedDate == null) {
       // Xử lý trường hợp date không hợp lệ, ví dụ: dùng ngày hiện tại hoặc throw lỗi
       // Ở đây ví dụ dùng ngày hiện tại, nhưng bạn nên xem xét lại dữ liệu
-      debugPrint("Warning: Invalid date format found for transaction $id. Using current date.");
+      debugPrint(
+        "Warning: Invalid date format found for transaction $id. Using current date.",
+      );
       parsedDate = DateTime.now();
       // Hoặc: throw FormatException("Invalid date format in transaction $id");
     }
@@ -97,7 +101,39 @@ class TransactionModel {
       lender: json['lender'] as String?,
       borrower: json['borrower'] as String?,
       repaymentDate: parseTimestamp(json['repaymentDate']),
-      balanceAfter: json['balanceAfter'] != null ? parseDouble(json['balanceAfter']) : null,
+      balanceAfter:
+          json['balanceAfter'] != null
+              ? parseDouble(json['balanceAfter'])
+              : null,
+    );
+  }
+
+  // Add copyWith method to TransactionModel if it doesn't exist
+  TransactionModel copyWith({
+    String? id,
+    String? userId,
+    String? description,
+    double? amount,
+    DateTime? date,
+    String? typeKey,
+    String? categoryKey,
+    String? wallet,
+    String? fromWallet,
+    String? toWallet,
+    double? balanceAfter,
+  }) {
+    return TransactionModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      description: description ?? this.description,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      typeKey: typeKey ?? this.typeKey,
+      categoryKey: categoryKey ?? this.categoryKey,
+      wallet: wallet ?? this.wallet,
+      fromWallet: fromWallet ?? this.fromWallet,
+      toWallet: toWallet ?? this.toWallet,
+      balanceAfter: balanceAfter ?? this.balanceAfter,
     );
   }
 }
