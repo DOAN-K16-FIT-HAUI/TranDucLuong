@@ -328,7 +328,7 @@ class AccountScreen extends StatelessWidget {
                   : const AssetImage('assets/images/default_avatar.jpg')
                       as ImageProvider,
           onBackgroundImageError: (exception, stackTrace) {
-            print('Error loading avatar: $exception');
+            debugPrint('Error loading avatar: $exception');
           },
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),

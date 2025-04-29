@@ -29,7 +29,7 @@ class WalletState {
     int? selectedTab,
     String? searchQuery,
     bool? isSearching,
-    bool? isLoading, // Thêm vào copyWith
+    bool? isLoading,
     String Function(BuildContext)? error,
   }) {
     return WalletState(
@@ -39,7 +39,7 @@ class WalletState {
       selectedTab: selectedTab ?? this.selectedTab,
       searchQuery: searchQuery ?? this.searchQuery,
       isSearching: isSearching ?? this.isSearching,
-      isLoading: isLoading ?? this.isLoading, // Cập nhật isLoading
+      isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
   }

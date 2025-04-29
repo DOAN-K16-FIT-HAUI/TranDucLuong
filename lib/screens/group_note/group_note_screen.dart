@@ -134,214 +134,237 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
   }
 
   Future<void> _createGroup(BuildContext context) async {
+    // Capture these values before any async operation
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final TextEditingController nameController = TextEditingController();
     final TextEditingController memberEmailController = TextEditingController();
     List<String> memberEmails = [];
 
+    // Use a flag to track if we should show success message after all operations
+    bool shouldShowSuccessMessage = false;
+
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (dialogContext) => StatefulBuilder(
-            builder:
-                (stfContext, stfSetState) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (stfContext, stfSetState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: theme.colorScheme.surface,
+          titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 15,
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          title: Text(
+            l10n.createGroup,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Builder(
+                  builder:
+                      (fieldCtx) => InputFields.buildTextField(
+                    controller: nameController,
+                    label: l10n.groupNameLabel,
+                    hint: l10n.groupNameHint,
+                    isRequired: true,
+                    validator:
+                        (v) => Validators.validateNotEmpty(
+                          v,
+                          fieldName: l10n.groupNameLabel,
+                          l10n: l10n,
+                        ),
                   ),
-                  backgroundColor: theme.colorScheme.surface,
-                  titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 15,
-                  ),
-                  actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  title: Text(
-                    l10n.createGroup,
-                    style: theme.textTheme.headlineMedium?.copyWith(
+                ),
+                const SizedBox(height: 16),
+                Builder(
+                  builder:
+                      (fieldCtx) => InputFields.buildTextField(
+                    controller: memberEmailController,
+                    label: l10n.addMemberEmailLabel,
+                    hint: l10n.addMemberEmailHint,
+                    keyboardType: TextInputType.emailAddress,
+                    isRequired: false,
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
                       color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Builder(
-                          builder:
-                              (fieldCtx) => InputFields.buildTextField(
-                                controller: nameController,
-                                label: l10n.groupNameLabel,
-                                hint: l10n.groupNameHint,
-                                isRequired: true,
-                                validator:
-                                    (v) => Validators.validateNotEmpty(
-                                      v,
-                                      fieldName: l10n.groupNameLabel,
-                                      l10n: l10n,
-                                    ),
-                              ),
-                        ),
-                        const SizedBox(height: 16),
-                        Builder(
-                          builder:
-                              (fieldCtx) => InputFields.buildTextField(
-                                controller: memberEmailController,
-                                label: l10n.addMemberEmailLabel,
-                                hint: l10n.addMemberEmailHint,
-                                keyboardType: TextInputType.emailAddress,
-                                isRequired: false,
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  color: theme.colorScheme.primary,
-                                  tooltip: l10n.addEmailTooltip,
-                                  onPressed: () {
-                                    final email =
-                                        memberEmailController.text
-                                            .trim()
-                                            .toLowerCase();
-                                    // SỬA LỖI VALIDATION: kiểm tra == null nghĩa là hợp lệ
-                                    if (email.isNotEmpty &&
-                                        Validators.validateEmail(email, l10n) ==
-                                            null) {
-                                      if (!memberEmails.contains(email)) {
-                                        stfSetState(() {
-                                          memberEmails.add(email);
-                                          memberEmailController.clear();
-                                        });
-                                      } else {
-                                        UtilityWidgets.showCustomSnackBar(
-                                          context: stfContext,
-                                          message: l10n.emailAlreadyAdded,
-                                        );
-                                      }
-                                    } else if (email.isNotEmpty) {
-                                      // Hiển thị lỗi trả về từ validator nếu có, hoặc lỗi mặc định
-                                      final errorMsg =
-                                          Validators.validateEmail(
-                                            email,
-                                            l10n,
-                                          ) ??
-                                          l10n.invalidEmail;
-                                      UtilityWidgets.showCustomSnackBar(
-                                        context: stfContext,
-                                        message: errorMsg,
-                                      );
-                                    }
-                                  },
-                                ),
-                              ),
-                        ),
-                        const SizedBox(height: 8),
-                        if (memberEmails.isNotEmpty)
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 4,
-                            children:
-                                memberEmails
-                                    .map(
-                                      (email) => Chip(
-                                        label: Text(
-                                          email,
-                                          style: theme.textTheme.labelSmall,
-                                        ),
-                                        onDeleted: () {
-                                          stfSetState(() {
-                                            memberEmails.remove(email);
-                                          });
-                                        },
-                                        deleteIconColor:
-                                            theme.colorScheme.error,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                          vertical: 0,
-                                        ),
-                                        visualDensity: VisualDensity.compact,
-                                        backgroundColor:
-                                            theme
-                                                .colorScheme
-                                                .surfaceContainerHighest, // Sửa thành surfaceContainerHighest cho chip nền tối
-                                      ),
-                                    )
-                                    .toList(),
-                          )
-                        else
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              l10n.addMembersInstruction,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      // SỬA LỖI withValues: dùng withOpacity
-                      child: Text(
-                        l10n.cancel,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        if (nameController.text.trim().isEmpty) {
+                      tooltip: l10n.addEmailTooltip,
+                      onPressed: () {
+                        final email =
+                            memberEmailController.text
+                                .trim()
+                                .toLowerCase();
+                        // SỬA LỖI VALIDATION: kiểm tra == null nghĩa là hợp lệ
+                        if (email.isNotEmpty &&
+                            Validators.validateEmail(email, l10n) ==
+                                null) {
+                          if (!memberEmails.contains(email)) {
+                            stfSetState(() {
+                              memberEmails.add(email);
+                              memberEmailController.clear();
+                            });
+                          } else {
+                            UtilityWidgets.showCustomSnackBar(
+                              context: stfContext,
+                              message: l10n.emailAlreadyAdded,
+                            );
+                          }
+                        } else if (email.isNotEmpty) {
+                          // Hiển thị lỗi trả về từ validator nếu có, hoặc lỗi mặc định
+                          final errorMsg =
+                              Validators.validateEmail(
+                                email,
+                                l10n,
+                              ) ??
+                              l10n.invalidEmail;
                           UtilityWidgets.showCustomSnackBar(
-                            context: dialogContext,
-                            message: l10n.groupNameRequired,
-                          );
-                          return;
-                        }
-                        // Sử dụng common loading dialog
-                        UtilityWidgets.showLoadingDialog(
-                          context,
-                          message: l10n.creatingGroup,
-                        );
-
-                        try {
-                          await _groupNoteRepo.createGroup(
-                            nameController.text.trim(),
-                            memberEmails,
-                          );
-                          if (!mounted) return;
-                          Navigator.pop(context); // Pop loading
-                          Navigator.pop(dialogContext);
-                          await _loadUserGroups();
-                          UtilityWidgets.showCustomSnackBar(
-                            context: context,
-                            message: l10n.groupCreatedSuccess,
-                          );
-                        } catch (e) {
-                          if (!mounted) return;
-                          Navigator.pop(context); // Pop loading
-                          UtilityWidgets.showCustomSnackBar(
-                            context: dialogContext,
-                            message: '${l10n.errorCreatingGroup}: $e',
-                            backgroundColor: theme.colorScheme.error,
-                            textStyle: TextStyle(
-                              color: theme.colorScheme.onError,
-                            ),
+                            context: stfContext,
+                            message: errorMsg,
                           );
                         }
                       },
-                      child: Text(
-                        l10n.create,
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
-                  ],
+                  ),
                 ),
+                const SizedBox(height: 8),
+                if (memberEmails.isNotEmpty)
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children:
+                        memberEmails
+                            .map(
+                              (email) => Chip(
+                                label: Text(
+                                  email,
+                                  style: theme.textTheme.labelSmall,
+                                ),
+                                onDeleted: () {
+                                  stfSetState(() {
+                                    memberEmails.remove(email);
+                                  });
+                                },
+                                deleteIconColor:
+                                    theme.colorScheme.error,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 0,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                                backgroundColor:
+                                    theme
+                                        .colorScheme
+                                        .surfaceContainerHighest, // Sửa thành surfaceContainerHighest cho chip nền tối
+                              ),
+                            )
+                            .toList(),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      l10n.addMembersInstruction,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                l10n.cancel,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (nameController.text.trim().isEmpty) {
+                  UtilityWidgets.showCustomSnackBar(
+                    context: dialogContext,
+                    message: l10n.groupNameRequired,
+                  );
+                  return;
+                }
+                
+                // We'll store a reference to the navigator before any async operation
+                final navigator = Navigator.of(dialogContext);
+                final scaffoldMessenger = ScaffoldMessenger.of(dialogContext);
+                
+                // Store the current context, the group name and members
+                final groupName = nameController.text.trim();
+                
+                // Show loading dialog
+                UtilityWidgets.showLoadingDialog(
+                  dialogContext,
+                  message: l10n.creatingGroup,
+                );
+
+                try {
+                  // Do the async operation
+                  await _groupNoteRepo.createGroup(
+                    groupName,
+                    memberEmails,
+                  );
+                  
+                  // Set flag to true if operation was successful
+                  shouldShowSuccessMessage = true;
+                  
+                  // Close both dialogs without using the original context
+                  navigator.pop(); // Close loading dialog
+                  navigator.pop(); // Close create group dialog
+                  
+                  // No need to check mounted here, we'll do it after the showDialog completes
+                } catch (e) {
+                  // Handle error - Navigator reference is already captured
+                  navigator.pop(); // Close loading dialog
+                  
+                  // Show error in the dialog context
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text('${l10n.errorCreatingGroup}: $e'),
+                      backgroundColor: theme.colorScheme.error,
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                l10n.create,
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+    
+    // After dialog is completely closed, check if we should reload and show message
+    if (shouldShowSuccessMessage && mounted) {
+      // Reload groups
+      await _loadUserGroups();
+      
+      // Now show the success message only if still mounted
+      if (mounted) {
+        UtilityWidgets.showCustomSnackBar(
+          context: context,
+          message: l10n.groupCreatedSuccess,
+        );
+      }
+    }
   }
 
   @override
@@ -586,7 +609,6 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
         note.content,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        // SỬA LỖI withValues: Dùng style mặc định hoặc theme.textTheme
         style: theme.textTheme.bodyMedium?.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
@@ -627,49 +649,47 @@ class _GroupNoteScreenState extends State<GroupNoteScreen> {
 
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            backgroundColor: theme.colorScheme.surface,
-            titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 15,
-            ),
-            actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            title: Text(
-              l10n.filterNotesTitle,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            // SỬA LỖI GỌI HÀM buildCategoryChips (đảm bảo hàm đã được sửa ở file utils)
-            content: UtilityWidgets.buildCategoryChips<String?>(
-              context: context,
-              categories: filterTags,
-              selectedCategory: currentFilter,
-              categoryLabelBuilder: (tag) => tag ?? l10n.all,
-              // Đảm bảo tham số này tồn tại và được dùng
-              onCategorySelected: (tag) {
-                bloc.add(FilterNotes(tag));
-                Navigator.pop(dialogContext);
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                // SỬA LỖI withValues: dùng withOpacity
-                child: Text(
-                  l10n.cancel,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-            ],
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        backgroundColor: theme.colorScheme.surface,
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 15,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        title: Text(
+          l10n.filterNotesTitle,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: theme.colorScheme.primary,
           ),
+        ),
+        // SỬA LỖI GỌI HÀM buildCategoryChips (đảm bảo hàm đã được sửa ở file utils)
+        content: UtilityWidgets.buildCategoryChips<String?>(
+          context: context,
+          categories: filterTags,
+          selectedCategory: currentFilter,
+          categoryLabelBuilder: (tag) => tag ?? l10n.all,
+          // Đảm bảo tham số này tồn tại và được dùng
+          onCategorySelected: (tag) {
+            bloc.add(FilterNotes(tag));
+            Navigator.pop(dialogContext);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

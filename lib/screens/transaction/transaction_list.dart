@@ -613,7 +613,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           );
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              Navigator.of(context).pop(); // Quay lại TransactionListScreen
+              Navigator.pop;
             }
           });
         } else {

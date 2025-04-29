@@ -177,9 +177,12 @@ class TransactionScreenState extends State<TransactionScreen> {
         }
 
         final inputImage = InputImage.fromFile(File(pickedFile.path));
-        final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
+        final RecognizedText recognizedText = await _textRecognizer
+            .processImage(inputImage);
 
-        Map<String, dynamic>? receiptData = _parseReceiptText(recognizedText.text);
+        Map<String, dynamic>? receiptData = _parseReceiptText(
+          recognizedText.text,
+        );
 
         if (receiptData == null && mounted) {
           UtilityWidgets.showCustomSnackBar(
@@ -193,7 +196,8 @@ class TransactionScreenState extends State<TransactionScreen> {
         if (receiptData != null && mounted) {
           final data = receiptData;
           setState(() {
-            if (data.containsKey('description') && data['description'] != null) {
+            if (data.containsKey('description') &&
+                data['description'] != null) {
               _descriptionController.text = data['description'].toString();
             }
             if (data.containsKey('amount') && data['amount'] != null) {
@@ -203,9 +207,11 @@ class TransactionScreenState extends State<TransactionScreen> {
               );
             }
             if (data.containsKey('date') && data['date'] != null) {
-              _selectedDate = data['date'] is DateTime
-                  ? data['date']
-                  : DateTime.tryParse(data['date'].toString()) ?? DateTime.now();
+              _selectedDate =
+                  data['date'] is DateTime
+                      ? data['date']
+                      : DateTime.tryParse(data['date'].toString()) ??
+                          DateTime.now();
               _dateError = null;
             }
             if (data.containsKey('categoryKey') &&
@@ -243,8 +249,8 @@ class TransactionScreenState extends State<TransactionScreen> {
         }
       }
     } catch (e) {
-      final l10n = AppLocalizations.of(context)!;
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         UtilityWidgets.showCustomSnackBar(
           context: context,
           message: '${l10n.receiptScanError}: $e',
@@ -311,6 +317,7 @@ class TransactionScreenState extends State<TransactionScreen> {
           result['date'] = parsedDate;
           break;
         } catch (e) {
+          debugPrint('Error parsing date: $e');
         }
       }
     }

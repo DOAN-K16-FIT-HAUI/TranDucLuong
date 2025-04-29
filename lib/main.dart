@@ -31,8 +31,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   // Kết nối với Firebase Emulator trong flavor test
-  if (FlavorConfig.isTest())
+  if (FlavorConfig.isTest()) {
     FirebaseAuth.instance.useAuthEmulator('10.0.2.2', 9099);
+  }
   debugPrint('Background message: ${message.messageId}');
 }
 
@@ -45,18 +46,18 @@ Future<void> main() async {
         throw Exception('Firebase initialization timed out');
       },
     );
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization failed: $e');
     rethrow;
   }
 
   // Kết nối với Firebase Emulator trong flavor test
   if (FlavorConfig.isTest()) {
-    print('Connecting to Firebase Emulator...');
+    debugPrint('Connecting to Firebase Emulator...');
     FirebaseAuth.instance.useAuthEmulator('10.0.2.2', 9099);
     FirebaseFirestore.instance.useFirestoreEmulator('10.0.2.2', 8080);
-    print('Emulator setup complete.');
+    debugPrint('Emulator setup complete.');
   }
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
