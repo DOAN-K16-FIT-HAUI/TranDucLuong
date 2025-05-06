@@ -5,6 +5,7 @@ import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/data/repositories/account_repository.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,10 +86,10 @@ void main() {
         accountBloc.stream,
         emitsThrough(
           predicate<AccountState>((state) {
-            print('Account state emitted: ${state.runtimeType}');
+            debugPrint('Account state emitted: ${state.runtimeType}');
             if (state is AccountLoaded) {
               final userData = state.user;
-              print('User data: name=${userData.displayName}, email=${userData.email}');
+              debugPrint('User data: name=${userData.displayName}, email=${userData.email}');
               return userData.email == testEmail && 
                      userData.displayName == testDisplayName &&
                      userData.loginMethod == 'email';
@@ -159,7 +160,7 @@ void main() {
         emitsThrough(
           predicate<AccountState>((state) {
             if (state is AccountLoaded) {
-              print('Language changed to: ${state.user.language}');
+              debugPrint('Language changed to: ${state.user.language}');
               return state.user.language == 'English';
             }
             return false;
@@ -197,7 +198,7 @@ void main() {
         emitsThrough(
           predicate<AccountState>((state) {
             if (state is AccountLoaded) {
-              print('Display name updated to: ${state.user.displayName}');
+              debugPrint('Display name updated to: ${state.user.displayName}');
               return state.user.displayName == newDisplayName;
             }
             return false;
@@ -262,7 +263,7 @@ void main() {
         accountBloc.stream,
         emitsThrough(
           predicate<AccountState>((state) {
-            print('Account state emitted: ${state.runtimeType}');
+            debugPrint('Account state emitted: ${state.runtimeType}');
             return state is AccountError;
           }),
         ),

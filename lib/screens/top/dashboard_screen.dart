@@ -88,7 +88,9 @@ class DashboardScreenState extends State<DashboardScreen> {
                 actions: [
                   BlocBuilder<NotificationBloc, NotificationState>(
                     builder: (context, state) {
-                      final hasUnread = state.notifications.any((n) => !n.isRead);
+                      final hasUnread = state.notifications.any(
+                        (n) => !n.isRead,
+                      );
                       return IconButton(
                         icon: Icon(
                           hasUnread
@@ -116,15 +118,17 @@ class DashboardScreenState extends State<DashboardScreen> {
                         );
                       }
 
-                      final wallets = [
-                        ...walletState.wallets,
-                        ...walletState.savingsWallets,
-                        ...walletState.investmentWallets,
-                      ].where((w) => w.id.isNotEmpty).toList();
+                      final wallets =
+                          [
+                            ...walletState.wallets,
+                            ...walletState.savingsWallets,
+                            ...walletState.investmentWallets,
+                          ].where((w) => w.id.isNotEmpty).toList();
 
-                      final transactions = transactionState is TransactionLoaded
-                          ? transactionState.transactions
-                          : <TransactionModel>[];
+                      final transactions =
+                          transactionState is TransactionLoaded
+                              ? transactionState.transactions
+                              : <TransactionModel>[];
 
                       return SingleChildScrollView(
                         child: Column(
@@ -135,7 +139,11 @@ class DashboardScreenState extends State<DashboardScreen> {
                               margin: const EdgeInsets.only(bottom: 100),
                               child: Column(
                                 children: [
-                                  _buildMainBalanceAndWallets(context, wallets, locale),
+                                  _buildMainBalanceAndWallets(
+                                    context,
+                                    wallets,
+                                    locale,
+                                  ),
                                   const SizedBox(height: 16),
                                   _buildChart(context, transactions),
                                   const SizedBox(height: 16),
@@ -173,15 +181,15 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildMainBalanceAndWallets(
-      BuildContext context,
-      List<Wallet> wallets,
-      Locale locale,
-      ) {
+    BuildContext context,
+    List<Wallet> wallets,
+    Locale locale,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final totalBalance = wallets.fold<double>(
       0,
-          (sum, wallet) => sum + wallet.balance,
+      (sum, wallet) => sum + wallet.balance,
     );
 
     return Container(
@@ -200,7 +208,10 @@ class DashboardScreenState extends State<DashboardScreen> {
             style: GoogleFonts.notoSans(
               fontSize: 30,
               fontWeight: FontWeight.bold,
-              color: totalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+              color:
+                  totalBalance >= 0
+                      ? AppTheme.incomeColor
+                      : AppTheme.expenseColor,
             ),
           ),
           Row(
@@ -230,9 +241,9 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildChart(
-      BuildContext context,
-      List<TransactionModel> transactions,
-      ) {
+    BuildContext context,
+    List<TransactionModel> transactions,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
@@ -242,7 +253,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     double cumulativeExpense = 0;
 
     final sortedTransactions =
-    transactions..sort((a, b) => a.date.compareTo(b.date));
+        transactions..sort((a, b) => a.date.compareTo(b.date));
 
     for (int i = 0; i < sortedTransactions.length; i++) {
       final tx = sortedTransactions[i];
@@ -344,144 +355,151 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildRecentTransactionsSection(
-      BuildContext context,
-      List<TransactionModel> transactions,
-      ) {
+    BuildContext context,
+    List<TransactionModel> transactions,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final recentTransactions = transactions.take(5).toList();
 
     return _buildSection(
       context: context,
       title: l10n.recentTransactions,
-      children: recentTransactions.isEmpty
-          ? [
-        UtilityWidgets.buildEmptyState(
-          context: context,
-          message: l10n.noTransactionsYet,
-          suggestion: l10n.addFirstTransactionHint,
-          icon: Icons.receipt_long_outlined,
-          actionText: l10n.addTransactionButton,
-          onActionPressed: () => AppRoutes.navigateToTransaction(context),
-        ),
-      ]
-          : recentTransactions
-          .map(
-            (tx) => ListsCards.buildTransactionListItem(
-          context: context,
-          transaction: tx,
-        ),
-      )
-          .toList(),
+      children:
+          recentTransactions.isEmpty
+              ? [
+                UtilityWidgets.buildEmptyState(
+                  context: context,
+                  message: l10n.noTransactionsYet,
+                  suggestion: l10n.addFirstTransactionHint,
+                  icon: Icons.receipt_long_outlined,
+                  actionText: l10n.addTransactionButton,
+                  onActionPressed:
+                      () => AppRoutes.navigateToTransaction(context),
+                ),
+              ]
+              : recentTransactions
+                  .map(
+                    (tx) => ListsCards.buildTransactionListItem(
+                      context: context,
+                      transaction: tx,
+                    ),
+                  )
+                  .toList(),
       onTap: () => AppRoutes.navigateToTransactionList(context),
     );
   }
 
   Widget _buildLoansSection(
-      BuildContext context,
-      List<TransactionModel> transactions,
-      ) {
+    BuildContext context,
+    List<TransactionModel> transactions,
+  ) {
     final l10n = AppLocalizations.of(context)!;
-    final loans = transactions
-        .where((tx) => tx.typeKey == 'borrow' || tx.typeKey == 'lend')
-        .take(3)
-        .toList();
+    final loans =
+        transactions
+            .where((tx) => tx.typeKey == 'borrow' || tx.typeKey == 'lend')
+            .take(3)
+            .toList();
 
     return _buildSection(
       context: context,
       title: l10n.loans,
-      children: loans.isEmpty
-          ? [
-        UtilityWidgets.buildEmptyState(
-          context: context,
-          message: l10n.noLoansYet,
-          suggestion: l10n.addLoanHint,
-          icon: Icons.account_balance_outlined,
-          actionText: l10n.addTransactionButton,
-          onActionPressed: () => AppRoutes.navigateToTransaction(context),
-        ),
-      ]
-          : loans
-          .map(
-            (tx) => ListsCards.buildTransactionListItem(
-          context: context,
-          transaction: tx,
-        ),
-      )
-          .toList(),
+      children:
+          loans.isEmpty
+              ? [
+                UtilityWidgets.buildEmptyState(
+                  context: context,
+                  message: l10n.noLoansYet,
+                  suggestion: l10n.addLoanHint,
+                  icon: Icons.account_balance_outlined,
+                  actionText: l10n.addTransactionButton,
+                  onActionPressed:
+                      () => AppRoutes.navigateToTransaction(context),
+                ),
+              ]
+              : loans
+                  .map(
+                    (tx) => ListsCards.buildTransactionListItem(
+                      context: context,
+                      transaction: tx,
+                    ),
+                  )
+                  .toList(),
       onTap: () {},
     );
   }
 
   Widget _buildSavingsSection(
-      BuildContext context,
-      List<Wallet> savingsWallets,
-      ) {
+    BuildContext context,
+    List<Wallet> savingsWallets,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     return _buildSection(
       context: context,
       title: l10n.savings,
-      children: savingsWallets.isEmpty
-          ? [
-        UtilityWidgets.buildEmptyState(
-          context: context,
-          message: l10n.noSavingsYet,
-          suggestion: l10n.addSavingsHint,
-          icon: Icons.savings_outlined,
-          actionText: l10n.addSavingsButton,
-          onActionPressed: () => AppRoutes.navigateToWallet(context),
-        ),
-      ]
-          : savingsWallets.take(3).map((wallet) {
-        return ListsCards.buildItemCard(
-          context: context,
-          item: wallet,
-          itemKey: ValueKey(wallet.id),
-          title: wallet.name,
-          value: wallet.balance.toDouble(),
-          icon: wallet.icon,
-          valueLocale: Localizations.localeOf(context).toString(),
-          valuePrefix: '',
-          onTap: () => AppRoutes.navigateToWallet(context),
-        );
-      }).toList(),
+      children:
+          savingsWallets.isEmpty
+              ? [
+                UtilityWidgets.buildEmptyState(
+                  context: context,
+                  message: l10n.noSavingsYet,
+                  suggestion: l10n.addSavingsHint,
+                  icon: Icons.savings_outlined,
+                  actionText: l10n.addSavingsButton,
+                  onActionPressed: () => AppRoutes.navigateToWallet(context),
+                ),
+              ]
+              : savingsWallets.take(3).map((wallet) {
+                return ListsCards.buildItemCard(
+                  context: context,
+                  item: wallet,
+                  itemKey: ValueKey(wallet.id),
+                  title: wallet.name,
+                  value: wallet.balance.toDouble(),
+                  icon: wallet.icon,
+                  valueLocale: Localizations.localeOf(context).toString(),
+                  valuePrefix: '',
+                  onTap: () => AppRoutes.navigateToWallet(context),
+                );
+              }).toList(),
       onTap: () => AppRoutes.navigateToWallet(context),
     );
   }
 
   Widget _buildInvestmentsSection(
-      BuildContext context,
-      List<Wallet> investmentWallets,
-      ) {
+    BuildContext context,
+    List<Wallet> investmentWallets,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     return _buildSection(
       context: context,
       title: l10n.tabInvestments,
-      children: investmentWallets.isEmpty
-          ? [
-        UtilityWidgets.buildEmptyState(
-          context: context,
-          message: l10n.noSavingsYet,
-          suggestion: l10n.addSavingsHint,
-          icon: Icons.trending_up_outlined,
-          actionText: l10n.addWalletButton,
-          onActionPressed: () => AppRoutes.navigateToWallet(context),
-        ),
-      ]
-          : investmentWallets.take(3).map((wallet) {
-        return ListsCards.buildItemCard(
-          context: context,
-          item: wallet,
-          itemKey: ValueKey(wallet.id),
-          title: wallet.name,
-          value: wallet.balance.toDouble(),
-          icon: wallet.icon,
-          valueLocale: Localizations.localeOf(context).toString(),
-          valuePrefix: '',
-          onTap: () => AppRoutes.navigateToWallet(context),
-        );
-      }).toList(),
+      children:
+          investmentWallets.isEmpty
+              ? [
+                UtilityWidgets.buildEmptyState(
+                  context: context,
+                  message: l10n.noInvestmentsYet,
+                  suggestion: l10n.addInvestmentsHint,
+                  icon: Icons.trending_up_outlined,
+                  actionText: l10n.addInvestmentsButton,
+                  onActionPressed: () => AppRoutes.navigateToWallet(context),
+                ),
+              ]
+              : investmentWallets.take(3).map((wallet) {
+                return ListsCards.buildItemCard(
+                  context: context,
+                  item: wallet,
+                  itemKey: ValueKey(wallet.id),
+                  title: wallet.name,
+                  value: wallet.balance.toDouble(),
+                  icon: wallet.icon,
+                  valueLocale: Localizations.localeOf(context).toString(),
+                  valuePrefix: '',
+                  onTap: () => AppRoutes.navigateToWallet(context),
+                );
+              }).toList(),
       onTap: () => AppRoutes.navigateToWallet(context),
     );
   }

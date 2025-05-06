@@ -414,6 +414,9 @@
   "noSavingsYet": "Chưa có khoản tiết kiệm nào",
   "addSavingsHint": "Thêm khoản tiết kiệm để quản lý tài chính",
   "addSavingsButton": "Thêm tiết kiệm",
+  "noInvestmentsYet": "Chưa có khoản đầu tư nào",
+  "addInvestmentsHint": "Thêm khoản đầu tư để quản lý tài chính",
+  "addInvestmentsButton": "Thêm đầu tư",
   "spendingLimits": "Hạn mức chi tiêu",
   "monthlyLimit": "Hạn mức {month}",
   "@monthlyLimit": {
@@ -634,5 +637,8 @@
   "selectSaveLocation": "Chọn vị trí để lưu báo cáo",
   "@selectSaveLocation": {
     "description": "Tiêu đề cho hộp thoại chọn vị trí lưu file"
-  }
+  },
+  "notificationsTitle": "Thông báo",
+  "notificationsTooltipMarkAllRead": "Đánh dấu tất cả là đã đọc",
+  "notificationsEmptyMessage": "Chưa có thông báo nào"
 }

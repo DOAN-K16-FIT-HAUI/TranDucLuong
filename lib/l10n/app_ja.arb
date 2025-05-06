@@ -282,6 +282,9 @@
   "noSavingsYet": "まだ貯蓄がありません",
   "addSavingsHint": "貯蓄を追加して財務を管理します",
   "addSavingsButton": "貯蓄を追加",
+  "noInvestmentsYet": "まだ投資がありません",
+  "addInvestmentsHint": "投資を追加して財務を管理しましょう",
+  "addInvestmentsButton": "投資を追加",
   "spendingLimits": "支出制限",
   "monthlyLimit": "{month}の制限",
   "viewAll": "すべて表示",
@@ -429,5 +432,8 @@
   "selectSaveLocation": "レポートの保存場所を選択してください",
   "@selectSaveLocation": {
     "description": "ファイルピッカーダイアログのタイトル"
-  }
+  },
+  "notificationsTitle": "通知",
+  "notificationsTooltipMarkAllRead": "すべてを既読にする",
+  "notificationsEmptyMessage": "通知はまだありません"
 }

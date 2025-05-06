@@ -408,6 +408,9 @@
   "noSavingsYet": "No savings yet",
   "addSavingsHint": "Add savings to manage your finances",
   "addSavingsButton": "Add Savings",
+  "noInvestmentsYet": "No investments yet",
+  "addInvestmentsHint": "Add an investment to manage your finances",
+  "addInvestmentsButton": "Add Investment",
   "spendingLimits": "Spending Limits",
   "monthlyLimit": "{month} Limit",
   "@monthlyLimit": {
@@ -629,5 +632,8 @@
   "selectSaveLocation": "Select a location to save the report",
   "@selectSaveLocation": {
     "description": "Title for the file picker dialog"
-  }
+  },
+  "notificationsTitle": "Notifications",
+  "notificationsTooltipMarkAllRead": "Mark all as read",
+  "notificationsEmptyMessage": "No notifications yet"
 }

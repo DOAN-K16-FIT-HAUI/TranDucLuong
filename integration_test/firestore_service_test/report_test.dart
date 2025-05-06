@@ -9,6 +9,7 @@ import 'package:finance_app/data/repositories/wallet_repository.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_helpers.dart';
@@ -72,7 +73,7 @@ void main() {
         walletBloc.stream,
         emitsThrough(
           predicate<WalletState>((state) {
-            print(
+            debugPrint(
               'Wallet state emitted: wallets=${state.wallets.map((w) => w.name).toList()}',
             );
             return state.wallets.any((w) => w.name == 'Main Wallet');
@@ -144,7 +145,7 @@ void main() {
         emitsThrough(
           predicate<ReportState>((state) {
             if (state is ReportLoaded) {
-              print(
+              debugPrint(
                 'Report state emitted: categoryExpenses=${state.categoryExpenses}, '
                 'dailyBalances=${state.dailyBalances}, '
                 'transactionTypeTotals=${state.transactionTypeTotals}',
@@ -202,7 +203,7 @@ void main() {
         reportBloc.stream,
         emitsThrough(
           predicate<ReportState>((state) {
-            print('Report state emitted: ${state.runtimeType}');
+            debugPrint('Report state emitted: ${state.runtimeType}');
             return state is ReportError;
           }),
         ),
@@ -244,7 +245,7 @@ void main() {
         reportBloc.stream,
         emitsThrough(
           predicate<ReportState>((state) {
-            print('Report state emitted: ${state.runtimeType}');
+            debugPrint('Report state emitted: ${state.runtimeType}');
             return state is ReportLoaded &&
                 state.categoryExpenses.isEmpty &&
                 state.dailyBalances.values.every((balance) => balance == 0.0) &&

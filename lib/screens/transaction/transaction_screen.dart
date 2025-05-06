@@ -22,6 +22,7 @@ import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
@@ -829,7 +830,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                     ),
                     showBackButton: true,
                     backIcon: Icons.arrow_back,
-                    onBackPressed: () => AppRoutes.navigateToDashboard(context),
+                    onBackPressed: () => context.pop(),
                     actions: [
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),

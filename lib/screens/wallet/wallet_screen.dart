@@ -380,7 +380,6 @@ class WalletScreen extends StatelessWidget {
         icon: Icons.account_balance_wallet_outlined,
         onActionPressed:
             state.isSearching ? null : () => _showAddWalletDialog(context),
-        actionText: state.isSearching ? null : l10n.addWalletButton,
       );
     } else {
       return ListsCards.buildTabContent<Wallet>(

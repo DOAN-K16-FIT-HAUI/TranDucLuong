@@ -2,8 +2,6 @@ import 'package:finance_app/blocs/account/account_bloc.dart';
 import 'package:finance_app/blocs/account/account_event.dart';
 import 'package:finance_app/blocs/account/account_state.dart';
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
-import 'package:finance_app/blocs/app_notification/notification_event.dart';
-import 'package:finance_app/blocs/app_notification/notification_state.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/blocs/report/report_bloc.dart';
@@ -15,7 +13,6 @@ import 'package:finance_app/blocs/transaction/transaction_state.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/blocs/wallet/wallet_state.dart';
-import 'package:finance_app/data/models/app_notification.dart';
 import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
@@ -258,8 +255,7 @@ void main() {
         description: 'Monthly Salary',
         amount: 5000,
         date: DateTime.now().subtract(const Duration(days: 5)),
-        typeKey:
-            'Thu nhập', // Changed from 'income' to 'Thu nhập' to match app's expected type
+        typeKey: 'income',
         categoryKey: 'Salary',
         wallet: 'Personal Cash',
       );
@@ -294,8 +290,7 @@ void main() {
         description: 'Grocery Shopping',
         amount: 1000,
         date: DateTime.now().subtract(const Duration(days: 2)),
-        typeKey:
-            'Chi tiêu', // Changed from 'expense' to 'Chi tiêu' to match app's expected type
+        typeKey: 'expense',
         categoryKey: 'Food',
         wallet: 'Personal Cash',
       );
@@ -330,8 +325,7 @@ void main() {
         description: 'Transfer to Bank',
         amount: 1500,
         date: DateTime.now(),
-        typeKey:
-            'Chuyển khoản', // Changed from 'transfer' to 'Chuyển khoản' to match app's expected type
+        typeKey: 'transfer',
         categoryKey: 'Transfer',
         fromWallet: 'Personal Cash',
         toWallet: 'Bank Account',
@@ -418,7 +412,7 @@ void main() {
         description: 'Test Salary',
         amount: 3000.0,
         date: DateTime.now().subtract(const Duration(days: 5)),
-        typeKey: 'Thu nhập',
+        typeKey: 'income',
         categoryKey: 'Salary',
         wallet: 'Personal Cash',
       );
@@ -428,7 +422,7 @@ void main() {
         description: 'Test Food',
         amount: 500.0,
         date: DateTime.now().subtract(const Duration(days: 3)),
-        typeKey: 'Chi tiêu',
+        typeKey: 'expense',
         categoryKey: 'Food',
         wallet: 'Personal Cash',
       );

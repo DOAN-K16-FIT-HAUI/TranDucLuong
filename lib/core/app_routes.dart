@@ -21,7 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
-import 'app_paths.dart'; // Import AppPaths
+import 'app_paths.dart';
 
 class AppRoutes {
   static const String loginRoute = 'login';
@@ -37,7 +37,7 @@ class AppRoutes {
   static const String addEditGroupNoteRoute = 'add-edit-group-note';
   static const String groupNoteDetailRoute = 'group-note-detail';
   static const String reportRoute = 'report';
-  static const String barcodeScannerRoute = 'barcode-scanner'; // Thêm route
+  static const String barcodeScannerRoute = 'barcode-scanner';
 
   static final router = GoRouter(
     initialLocation: AppPaths.loginPath,
