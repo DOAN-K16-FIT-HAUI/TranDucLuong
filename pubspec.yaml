@@ -43,7 +43,6 @@ dependencies:
 
   # UI and Formatting
   intl: ^0.19.0 # For internationalization and date formatting
-  fl_chart: ^0.66.2 # For creating beautiful charts
   google_fonts: ^6.2.1 # For using Google Fonts in your app
   bloc: ^8.1.0 # For implementing the BLoC pattern
   provider: ^6.1.3 # For state management using the Provider pattern
@@ -52,6 +51,7 @@ dependencies:
   go_router: ^14.8.1 # For declarative navigation and routing
   flutter_spinkit: ^5.2.1 # For loading spinners and animations
   csv: ^6.0.0 # For working with CSV files
+  syncfusion_flutter_charts: ^29.1.41 # For advanced charting capabilities
 
   # Dependency Injection
   get_it: ^8.0.3 # For dependency injection and service locator pattern

@@ -18,7 +18,7 @@ import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/decorations.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -60,123 +60,153 @@ class DashboardScreenState extends State<DashboardScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, authState) {
-        if (authState is! AuthAuthenticated) {
-          return UtilityWidgets.buildEmptyState(
-            context: context,
-            message: l10n.pleaseLoginToViewReports,
-            suggestion: l10n.loginNow,
-            onActionPressed: () {
-              // Navigate to login screen
-            },
-            icon: Icons.lock_outline,
-            actionText: l10n.loginTitle,
-          );
-        }
-
-        return BlocBuilder<LocalizationBloc, LocalizationState>(
-          builder: (context, localizationState) {
-            final locale = localizationState.locale;
-
-            return Scaffold(
-              backgroundColor: theme.colorScheme.surface,
-              appBar: AppBarTabBar.buildAppBar(
-                context: context,
-                title: l10n.welcomeUser(authState.user.displayName ?? ''),
-                showBackButton: false,
-                actions: [
-                  BlocBuilder<NotificationBloc, NotificationState>(
-                    builder: (context, state) {
-                      final hasUnread = state.notifications.any(
-                        (n) => !n.isRead,
-                      );
-                      return IconButton(
-                        icon: Icon(
-                          hasUnread
-                              ? Icons.notifications
-                              : Icons.notifications_outlined,
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                        tooltip: l10n.notificationsTooltip,
-                        onPressed: () {
-                          AppRoutes.navigateToAppNotification(context);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-              body: BlocBuilder<WalletBloc, WalletState>(
-                builder: (context, walletState) {
-                  return BlocBuilder<TransactionBloc, TransactionState>(
-                    builder: (context, transactionState) {
-                      if (walletState.isLoading ||
-                          transactionState is TransactionLoading) {
-                        return UtilityWidgets.buildLoadingIndicator(
-                          context: context,
-                        );
-                      }
-
-                      final wallets =
-                          [
-                            ...walletState.wallets,
-                            ...walletState.savingsWallets,
-                            ...walletState.investmentWallets,
-                          ].where((w) => w.id.isNotEmpty).toList();
-
-                      final transactions =
-                          transactionState is TransactionLoaded
-                              ? transactionState.transactions
-                              : <TransactionModel>[];
-
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(16.0),
-                              margin: const EdgeInsets.only(bottom: 100),
-                              child: Column(
-                                children: [
-                                  _buildMainBalanceAndWallets(
-                                    context,
-                                    wallets,
-                                    locale,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildChart(context, transactions),
-                                  const SizedBox(height: 16),
-                                  _buildRecentTransactionsSection(
-                                    context,
-                                    transactions,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildLoansSection(context, transactions),
-                                  const SizedBox(height: 16),
-                                  _buildSavingsSection(
-                                    context,
-                                    walletState.savingsWallets,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildInvestmentsSection(
-                                    context,
-                                    walletState.investmentWallets,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            );
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TransactionBloc, TransactionState>(
+          listener: (context, state) {
+            if (state is TransactionSuccess) {
+              // Tải lại dữ liệu khi thêm/xóa/sửa giao dịch
+              final authState = context.read<AuthBloc>().state;
+              if (authState is AuthAuthenticated) {
+                context.read<WalletBloc>().add(LoadWallets());
+                context.read<TransactionBloc>().add(
+                  LoadTransactions(authState.user.id),
+                );
+              }
+            }
           },
-        );
-      },
+        ),
+      ],
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, authState) {
+          if (authState is! AuthAuthenticated) {
+            return UtilityWidgets.buildEmptyState(
+              context: context,
+              message: l10n.pleaseLoginToViewReports,
+              suggestion: l10n.loginNow,
+              onActionPressed: () {
+                AppRoutes.navigateToLogin(context);
+              },
+              icon: Icons.lock_outline,
+              actionText: l10n.loginTitle,
+            );
+          }
+
+          return BlocBuilder<LocalizationBloc, LocalizationState>(
+            builder: (context, localizationState) {
+              final locale = localizationState.locale;
+
+              return Scaffold(
+                backgroundColor: theme.colorScheme.surface,
+                appBar: AppBarTabBar.buildAppBar(
+                  context: context,
+                  title: l10n.appTitle,
+                  showBackButton: false,
+                  actions: [
+                    BlocBuilder<NotificationBloc, NotificationState>(
+                      builder: (context, state) {
+                        final hasUnread = state.notifications.any(
+                          (n) => !n.isRead,
+                        );
+                        return IconButton(
+                          icon: Icon(
+                            hasUnread
+                                ? Icons.notifications
+                                : Icons.notifications_outlined,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                          tooltip: l10n.notificationsTooltip,
+                          onPressed: () {
+                            AppRoutes.navigateToAppNotification(context);
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                body: BlocBuilder<WalletBloc, WalletState>(
+                  builder: (context, walletState) {
+                    return BlocBuilder<TransactionBloc, TransactionState>(
+                      builder: (context, transactionState) {
+                        if (walletState.isLoading ||
+                            transactionState is TransactionLoading) {
+                          return UtilityWidgets.buildLoadingIndicator(
+                            context: context,
+                          );
+                        }
+
+                        final wallets =
+                            [
+                              ...walletState.wallets,
+                              ...walletState.savingsWallets,
+                              ...walletState.investmentWallets,
+                            ].where((w) => w.id.isNotEmpty).toList();
+
+                        final transactions =
+                            transactionState is TransactionLoaded
+                                ? transactionState.transactions
+                                : <TransactionModel>[];
+
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            final authState = context.read<AuthBloc>().state;
+                            if (authState is AuthAuthenticated) {
+                              context.read<WalletBloc>().add(LoadWallets());
+                              context.read<TransactionBloc>().add(
+                                LoadTransactions(authState.user.id),
+                              );
+                            }
+                          },
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  margin: const EdgeInsets.only(bottom: 100),
+                                  child: Column(
+                                    children: [
+                                      _buildMainBalanceAndWallets(
+                                        context,
+                                        wallets,
+                                        locale,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      _buildChart(context, transactions),
+                                      const SizedBox(height: 16),
+                                      _buildRecentTransactionsSection(
+                                        context,
+                                        transactions,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      _buildLoansSection(context, transactions),
+                                      const SizedBox(height: 16),
+                                      _buildSavingsSection(
+                                        context,
+                                        walletState.savingsWallets,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      _buildInvestmentsSection(
+                                        context,
+                                        walletState.investmentWallets,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -247,8 +277,8 @@ class DashboardScreenState extends State<DashboardScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    List<FlSpot> incomeSpots = [];
-    List<FlSpot> expenseSpots = [];
+    // Create data points for the chart
+    List<ChartData> chartData = [];
     double cumulativeIncome = 0;
     double cumulativeExpense = 0;
 
@@ -261,92 +291,136 @@ class DashboardScreenState extends State<DashboardScreen> {
 
       if (tx.typeKey == 'income' || tx.typeKey == 'borrow') {
         cumulativeIncome += amount / 1000000;
-        incomeSpots.add(FlSpot(i.toDouble(), cumulativeIncome));
-        expenseSpots.add(FlSpot(i.toDouble(), cumulativeExpense));
       } else if (tx.typeKey == 'expense' ||
           tx.typeKey == 'lend' ||
           tx.typeKey == 'transfer') {
         cumulativeExpense += amount.abs() / 1000000;
-        expenseSpots.add(FlSpot(i.toDouble(), cumulativeExpense));
-        incomeSpots.add(FlSpot(i.toDouble(), cumulativeIncome));
       }
+
+      chartData.add(
+        ChartData(i, cumulativeIncome, cumulativeExpense, '${i + 1}'),
+      );
     }
 
-    if (incomeSpots.isEmpty) incomeSpots.add(const FlSpot(0, 0));
-    if (expenseSpots.isEmpty) expenseSpots.add(const FlSpot(0, 0));
+    // Add initial point if there are no transactions
+    if (chartData.isEmpty) {
+      chartData.add(ChartData(0, 0, 0, 'G1'));
+    }
 
     return Container(
-      height: 200,
+      height: 220,
       padding: const EdgeInsets.all(16),
       decoration: Decorations.boxDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           UtilityWidgets.buildLabel(context: context, text: l10n.spendingTrend),
-          const SizedBox(height: 8),
           Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: true),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          '${value.toInt()}M',
-                          style: GoogleFonts.notoSans(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.6,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          'G${value.toInt() + 1}',
-                          style: GoogleFonts.notoSans(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.6,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
+            child: SfCartesianChart(
+              palette: [AppTheme.incomeColor, AppTheme.expenseColor],
+              margin: EdgeInsets.zero,
+              primaryXAxis: CategoryAxis(
+                majorGridLines: const MajorGridLines(width: 0),
+                labelStyle: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontSize: 10,
+                  fontFamily: 'Noto Sans',
                 ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: incomeSpots,
-                    isCurved: true,
-                    color: AppTheme.incomeColor,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(show: false),
-                  ),
-                  LineChartBarData(
-                    spots: expenseSpots,
-                    isCurved: true,
-                    color: AppTheme.expenseColor,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(show: false),
-                  ),
-                ],
+                axisLine: const AxisLine(width: 0),
+                majorTickLines: const MajorTickLines(width: 0),
               ),
+              primaryYAxis: NumericAxis(
+                labelFormat: '{value}M',
+                axisLine: const AxisLine(width: 0),
+                majorTickLines: const MajorTickLines(width: 0),
+                majorGridLines: MajorGridLines(
+                  width: 0.5,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                  dashArray: const <double>[3, 3],
+                ),
+                labelStyle: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontSize: 10,
+                  fontFamily: 'Noto Sans',
+                ),
+              ),
+              plotAreaBorderWidth: 0,
+              tooltipBehavior: TooltipBehavior(
+                enable: true,
+                animationDuration: 150,
+                color: theme.colorScheme.surface,
+                textStyle: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontFamily: 'Noto Sans',
+                ),
+              ),
+              legend: Legend(
+                isVisible: true,
+                position: LegendPosition.bottom,
+                overflowMode: LegendItemOverflowMode.wrap,
+                textStyle: GoogleFonts.notoSans(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              series: <CartesianSeries>[
+                SplineAreaSeries<ChartData, String>(
+                  name: l10n.incomeType,
+                  dataSource: chartData,
+                  xValueMapper: (ChartData data, _) => data.label,
+                  yValueMapper: (ChartData data, _) => data.income,
+                  color: AppTheme.incomeColor.withValues(alpha: 0.8),
+                  borderWidth: 2,
+                  borderColor: AppTheme.incomeColor,
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.incomeColor.withValues(alpha: 0.5),
+                      AppTheme.incomeColor.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  markerSettings: MarkerSettings(
+                    isVisible: true,
+                    height: 4,
+                    width: 4,
+                    shape: DataMarkerType.circle,
+                    borderWidth: 1,
+                    borderColor: AppTheme.incomeColor,
+                    color: theme.colorScheme.surface,
+                  ),
+                  animationDuration: 1200,
+                  animationDelay: 150,
+                ),
+                SplineAreaSeries<ChartData, String>(
+                  name: l10n.expenseType,
+                  dataSource: chartData,
+                  xValueMapper: (ChartData data, _) => data.label,
+                  yValueMapper: (ChartData data, _) => data.expense,
+                  color: AppTheme.expenseColor.withValues(alpha: 0.8),
+                  borderWidth: 2,
+                  borderColor: AppTheme.expenseColor,
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.expenseColor.withValues(alpha: 0.5),
+                      AppTheme.expenseColor.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  markerSettings: MarkerSettings(
+                    isVisible: true,
+                    height: 4,
+                    width: 4,
+                    shape: DataMarkerType.circle,
+                    borderWidth: 1,
+                    borderColor: AppTheme.expenseColor,
+                    color: theme.colorScheme.surface,
+                  ),
+                  animationDuration: 1200,
+                  animationDelay: 300,
+                ),
+              ],
             ),
           ),
         ],
@@ -359,13 +433,17 @@ class DashboardScreenState extends State<DashboardScreen> {
     List<TransactionModel> transactions,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    final recentTransactions = transactions.take(5).toList();
+    // Sort by date in descending order (newest first) and then take the most recent 5
+    final recentTransactions = List<TransactionModel>.from(transactions)
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    final topFiveTransactions = recentTransactions.take(5).toList();
 
     return _buildSection(
       context: context,
       title: l10n.recentTransactions,
       children:
-          recentTransactions.isEmpty
+          topFiveTransactions.isEmpty
               ? [
                 UtilityWidgets.buildEmptyState(
                   context: context,
@@ -377,7 +455,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       () => AppRoutes.navigateToTransaction(context),
                 ),
               ]
-              : recentTransactions
+              : topFiveTransactions
                   .map(
                     (tx) => ListsCards.buildTransactionListItem(
                       context: context,
@@ -394,17 +472,20 @@ class DashboardScreenState extends State<DashboardScreen> {
     List<TransactionModel> transactions,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    // Sort loans by date in descending order (newest first)
     final loans =
         transactions
             .where((tx) => tx.typeKey == 'borrow' || tx.typeKey == 'lend')
-            .take(3)
-            .toList();
+            .toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
+
+    final recentLoans = loans.take(3).toList();
 
     return _buildSection(
       context: context,
       title: l10n.loans,
       children:
-          loans.isEmpty
+          recentLoans.isEmpty
               ? [
                 UtilityWidgets.buildEmptyState(
                   context: context,
@@ -416,7 +497,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       () => AppRoutes.navigateToTransaction(context),
                 ),
               ]
-              : loans
+              : recentLoans
                   .map(
                     (tx) => ListsCards.buildTransactionListItem(
                       context: context,
@@ -540,4 +621,14 @@ class DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
+}
+
+// Class for chart data
+class ChartData {
+  final int index;
+  final double income;
+  final double expense;
+  final String label;
+
+  ChartData(this.index, this.income, this.expense, this.label);
 }

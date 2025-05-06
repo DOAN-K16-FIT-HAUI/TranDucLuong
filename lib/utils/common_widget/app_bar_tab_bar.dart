@@ -66,10 +66,13 @@ class AppBarTabBar {
     Color? unselectedLabelColor,
     Color? indicatorColor,
     Color? backgroundColor,
+    bool noBottomGap = false, // Add new parameter to control bottom gap
   }) {
     final theme = Theme.of(context);
     return PreferredSize(
-      preferredSize: const Size.fromHeight(kTextTabBarHeight),
+      preferredSize: Size.fromHeight(
+        noBottomGap ? kTextTabBarHeight - 1 : kTextTabBarHeight,
+      ),
       child: Material(
         color: backgroundColor ?? theme.colorScheme.surface,
         child: TabBar(
@@ -85,11 +88,30 @@ class AppBarTabBar {
               unselectedLabelColor ??
               theme.colorScheme.onSurface.withValues(alpha: 0.7),
           indicatorColor: indicatorColor ?? theme.colorScheme.primary,
-          indicatorWeight: 2.5,
+          indicatorWeight:
+              3, // Slightly thicker indicator for better visibility
+          indicatorSize:
+              TabBarIndicatorSize
+                  .label, // Makes the indicator match the label width
           onTap: onTabChanged,
-          tabs: tabTitles.map((title) => Tab(text: title)).toList(),
+          tabs:
+              tabTitles
+                  .map(
+                    (title) => Tab(
+                      text: title,
+                      height:
+                          noBottomGap
+                              ? kTextTabBarHeight - 10
+                              : kTextTabBarHeight,
+                    ),
+                  )
+                  .toList(),
           tabAlignment: TabAlignment.fill,
-          dividerColor: theme.dividerColor.withValues(alpha: 0.5),
+          dividerColor:
+              noBottomGap
+                  ? Colors.transparent
+                  : theme.dividerColor.withValues(alpha: 0.5),
+          padding: noBottomGap ? EdgeInsets.zero : null,
         ),
       ),
     );
