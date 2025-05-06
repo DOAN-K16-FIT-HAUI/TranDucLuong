@@ -32,7 +32,7 @@ class AccountScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBarTabBar.buildAppBar(
           context: context,
-          title: l10n.appTitle,
+          title: l10n.settingsTitle,
           showBackButton: false,
         ),
         body: BlocListener<AccountBloc, AccountState>(

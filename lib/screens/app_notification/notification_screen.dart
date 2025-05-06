@@ -1,7 +1,6 @@
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_event.dart';
 import 'package:finance_app/blocs/app_notification/notification_state.dart';
-import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/app_notification.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
@@ -11,6 +10,8 @@ import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationScreen extends StatelessWidget {
@@ -18,6 +19,7 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create:
           (context) => NotificationBloc(
@@ -27,8 +29,8 @@ class NotificationScreen extends StatelessWidget {
         backgroundColor: AppTheme.lightTheme.colorScheme.surface,
         appBar: AppBarTabBar.buildAppBar(
           context: context,
-          title: 'Thông báo',
-          onBackPressed: () => AppRoutes.navigateToDashboard(context),
+          title: l10n.notificationsTitle,
+          onBackPressed: () => context.pop(),
           actions: [
             BlocBuilder<NotificationBloc, NotificationState>(
               builder: (context, state) {
@@ -37,7 +39,7 @@ class NotificationScreen extends StatelessWidget {
                     Icons.done_all,
                     color: AppTheme.lightTheme.colorScheme.surface,
                   ),
-                  tooltip: 'Đánh dấu tất cả là đã đọc',
+                  tooltip: l10n.notificationsTooltipMarkAllRead,
                   onPressed:
                       () => context.read<NotificationBloc>().add(
                         MarkAllNotificationsAsRead(),
@@ -50,12 +52,14 @@ class NotificationScreen extends StatelessWidget {
         body: BlocBuilder<NotificationBloc, NotificationState>(
           builder: (context, state) {
             if (!state.isInitialized) {
-              return Center(child: UtilityWidgets.buildLoadingIndicator(context: context));
+              return Center(
+                child: UtilityWidgets.buildLoadingIndicator(context: context),
+              );
             }
             if (state.notifications.isEmpty) {
               return Center(
                 child: Text(
-                  'Chưa có thông báo nào',
+                  l10n.notificationsEmptyMessage,
                   style: GoogleFonts.notoSans(
                     fontSize: 16,
                     color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
@@ -102,7 +106,6 @@ class NotificationScreen extends StatelessWidget {
         value: 0,
         icon: Icons.notifications,
         iconColor: colorScheme.primary,
-        margin: const EdgeInsets.only(top: 8),
         subtitle: Text(
           notification.body,
           style: GoogleFonts.notoSans(

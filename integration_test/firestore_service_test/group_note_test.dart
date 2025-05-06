@@ -4,6 +4,7 @@ import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/data/services/firebase_auth_service.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
@@ -125,7 +126,7 @@ void main() {
           groupNoteBloc.stream,
           emitsThrough(
             predicate<GroupNoteState>((state) {
-              print('Notes length: ${state.notes.length}');
+              debugPrint('Notes length: ${state.notes.length}');
               return state.isLoading == false &&
                   state.notes.isNotEmpty &&
                   state.notes.any(
@@ -256,7 +257,7 @@ void main() {
         groupNoteBloc.stream,
         emitsThrough(
           predicate<GroupNoteState>((state) {
-            print('Notes loaded: ${state.notes.length}');
+            debugPrint('Notes loaded: ${state.notes.length}');
             return state.notes.length == 2;
           }),
         ),
@@ -270,7 +271,7 @@ void main() {
         groupNoteBloc.stream,
         emitsThrough(
           predicate<GroupNoteState>((state) {
-            print('Filtered notes: ${state.filteredNotes.length}');
+            debugPrint('Filtered notes: ${state.filteredNotes.length}');
             return state.filteredNotes.length == 1 &&
                 state.filteredNotes.first.title == 'Expense Note';
           }),
@@ -453,7 +454,7 @@ void main() {
               (note) => note.id == noteId,
               orElse: () => testNote,
             );
-            print('Comments count: ${noteWithComment.comments.length}');
+            debugPrint('Comments count: ${noteWithComment.comments.length}');
             return noteWithComment.comments.isNotEmpty &&
                 noteWithComment.comments.first.content ==
                     'This is a test comment';
@@ -474,7 +475,7 @@ void main() {
         groupNoteBloc.stream,
         emitsThrough(
           predicate<GroupNoteState>((state) {
-            print('Group note state emitted: ${state.error != null}');
+            debugPrint('Group note state emitted: ${state.error != null}');
             return state.error != null;
           }),
         ),
