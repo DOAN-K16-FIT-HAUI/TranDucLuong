@@ -1,4 +1,4 @@
-package com.io.ziblox.finance_app
+package com.io.ziblox.financial_app
 
 import io.flutter.embedding.android.FlutterActivity
 

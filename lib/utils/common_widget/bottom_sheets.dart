@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class BottomSheets {
   /// Creates a standard bottom sheet with fixed header, scrollable content, and fixed footer
@@ -29,7 +28,7 @@ class BottomSheets {
             borderRadius ?? BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Container(
+        return SizedBox(
           height: effectiveHeight,
           child: Column(
             children: [
@@ -44,7 +43,7 @@ class BottomSheets {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       spreadRadius: 1,
                       blurRadius: 1,
                       offset: const Offset(0, 1),
@@ -76,7 +75,7 @@ class BottomSheets {
                   color: theme.colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       spreadRadius: 1,
                       blurRadius: 1,
                       offset: const Offset(0, -1),

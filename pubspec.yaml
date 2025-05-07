@@ -80,3 +80,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/ # Directory for storing image assets
+flutter_intl:
+  enabled: true

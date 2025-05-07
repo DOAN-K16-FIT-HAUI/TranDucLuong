@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.io.ziblox.finance_app"
+    namespace = "com.io.ziblox.financial_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.io.ziblox.finance_app"
+        applicationId = "com.io.ziblox.financial_app"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

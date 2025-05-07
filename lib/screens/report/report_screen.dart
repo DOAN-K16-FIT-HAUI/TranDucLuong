@@ -178,7 +178,7 @@ class _ReportScreenState extends State<ReportScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 16,
                 ),
               ),
@@ -538,7 +538,7 @@ class _ReportScreenState extends State<ReportScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest
-                          .withOpacity(0.3),
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: theme.dividerColor),
                     ),

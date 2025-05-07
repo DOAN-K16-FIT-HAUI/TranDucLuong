@@ -1,85 +1,42 @@
 {
   "project_info": {
-    "project_number": "409487606543",
-    "project_id": "financial-management-eb5b1",
-    "storage_bucket": "financial-management-eb5b1.firebasestorage.app"
+    "project_number": "604592554761",
+    "project_id": "financial-management-b7043",
+    "storage_bucket": "financial-management-b7043.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:409487606543:android:4d8de12693609338d5747a",
+        "mobilesdk_app_id": "1:604592554761:android:e1aa37ad84eed38a4349d8",
         "android_client_info": {
-          "package_name": "com.example.financial_manager_v1"
+          "package_name": "com.io.ziblox.financial_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "409487606543-146ova5lfqqif2hsqs3j9mfn2s2chfu4.apps.googleusercontent.com",
+          "client_id": "604592554761-g62kienaac9nvthj78vphedukcltmdeg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.financial_manager_v1",
+            "package_name": "com.io.ziblox.financial_app",
             "certificate_hash": "340e3ef2f8af67b50824cefcf774c343ed9989c0"
           }
         },
         {
-          "client_id": "409487606543-hkds0t15kqjvr8tdid43so2jdmo0us2r.apps.googleusercontent.com",
+          "client_id": "604592554761-l0cfrccm3urapg7fccdnebvoh98b3ecs.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAEN-zmCBQ4xS23V7TKHJ5kevjzVTibHKM"
+          "current_key": "AIzaSyC07XF3NY7uH5RpGTeSwI5wz_kKuQfidGU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "409487606543-hkds0t15kqjvr8tdid43so2jdmo0us2r.apps.googleusercontent.com",
+              "client_id": "604592554761-l0cfrccm3urapg7fccdnebvoh98b3ecs.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "409487606543-g4k0825quk5ekdm3hkblqocmd97n21c7.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.financialManagerV1"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:409487606543:android:2bdc3b659c031bc8d5747a",
-        "android_client_info": {
-          "package_name": "com.io.ziblox.finance_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "409487606543-hkds0t15kqjvr8tdid43so2jdmo0us2r.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAEN-zmCBQ4xS23V7TKHJ5kevjzVTibHKM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "409487606543-hkds0t15kqjvr8tdid43so2jdmo0us2r.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "409487606543-g4k0825quk5ekdm3hkblqocmd97n21c7.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.financialManagerV1"
-              }
             }
           ]
         }

@@ -242,7 +242,7 @@
     "type": "text",
     "placeholders": {
       "description": {
-        "type": "Object",
+        "type": "String",
         "description": "The description of the transaction to be deleted"
       }
     }
@@ -393,7 +393,7 @@
     "description": "Greets the user with their name",
     "placeholders": {
       "name": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },
@@ -609,7 +609,7 @@
     "description": "Message when report is successfully exported, including file path",
     "placeholders": {
       "filePath": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },

@@ -1,4 +1,24 @@
 {
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "financial-management-b7043",
+          "appId": "1:604592554761:android:e1aa37ad84eed38a4349d8",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "financial-management-b7043",
+          "configurations": {
+            "android": "1:604592554761:android:e1aa37ad84eed38a4349d8",
+            "ios": "1:604592554761:ios:7164f78c15134ca84349d8"
+          }
+        }
+      }
+    }
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"

@@ -409,7 +409,7 @@
     "description": "レポートが正常にエクスポートされたときのメッセージ。ファイルパスを含む",
     "placeholders": {
       "filePath": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },

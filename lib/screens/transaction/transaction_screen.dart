@@ -143,17 +143,14 @@ class TransactionScreenState extends State<TransactionScreen> {
     try {
       PermissionStatus permissionStatus;
       String permissionDeniedMessage;
-      String openSettingsMessage;
       final l10n = AppLocalizations.of(context)!;
 
       if (source == 'camera') {
         permissionStatus = await Permission.camera.request();
         permissionDeniedMessage = l10n.cameraPermissionDenied;
-        openSettingsMessage = l10n.openSettingsToEnableCamera;
       } else if (source == 'gallery') {
         permissionStatus = await Permission.photos.request();
         permissionDeniedMessage = l10n.galleryPermissionDenied;
-        openSettingsMessage = l10n.openSettingsToEnableGallery;
       } else {
         return;
       }

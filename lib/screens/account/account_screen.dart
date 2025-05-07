@@ -50,7 +50,7 @@ class AccountScreen extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 behavior: SnackBarBehavior.floating,
               );
-            } else if (state is AccountLoggedOut) {
+            } else if (state is AccountLoggedOut || state is AccountDeleted) {
               AppRoutes.navigateToLogin(context);
             }
           },

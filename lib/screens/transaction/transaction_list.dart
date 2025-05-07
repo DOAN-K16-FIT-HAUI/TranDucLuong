@@ -11,6 +11,7 @@ import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/bottom_sheets.dart';
 import 'package:finance_app/utils/common_widget/dialogs.dart';
 import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
@@ -25,7 +26,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:finance_app/utils/common_widget/bottom_sheets.dart';
 
 class TransactionListScreen extends StatefulWidget {
   const TransactionListScreen({super.key});
@@ -107,11 +107,6 @@ class _TransactionListScreenState extends State<TransactionListScreen>
 
   String _mapCategoryKeyToLocalized(String key, AppLocalizations l10n) {
     return _categoryMap[key] ?? key;
-  }
-
-  // Add method to map transaction type key to localized string
-  String _mapTypeKeyToLocalized(String key, AppLocalizations l10n) {
-    return _transactionTypeMap[key] ?? key;
   }
 
   Map<String, List<TransactionModel>> _groupTransactions(
@@ -929,12 +924,14 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           ) {
             if (localizedType == l10n.transactionTypeIncome) return "income";
             if (localizedType == l10n.transactionTypeExpense) return "expense";
-            if (localizedType == l10n.transactionTypeTransfer)
+            if (localizedType == l10n.transactionTypeTransfer) {
               return "transfer";
+            }
             if (localizedType == l10n.transactionTypeBorrow) return "borrow";
             if (localizedType == l10n.transactionTypeLend) return "lend";
-            if (localizedType == l10n.transactionTypeAdjustment)
+            if (localizedType == l10n.transactionTypeAdjustment) {
               return "adjustment";
+            }
             return localizedType; // Fallback
           }
 

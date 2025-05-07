@@ -1,26 +1,89 @@
 {
   "@@locale": "vi",
   "appTitle": "Ứng dụng Tài chính",
+  "@appTitle": {
+    "description": "Tên của ứng dụng hiển thị trên thanh tiêu đề"
+  },
   "settingsTitle": "Cài đặt chung",
+  "@settingsTitle": {
+    "description": "Tiêu đề cho màn hình cài đặt chung"
+  },
   "passwordChangedSuccess": "Đổi mật khẩu thành công!",
+  "@passwordChangedSuccess": {
+    "description": "Thông báo hiển thị khi đổi mật khẩu thành công"
+  },
   "personalInfo": "Thông tin cá nhân",
+  "@personalInfo": {
+    "description": "Tiêu đề cho phần thông tin cá nhân trong cài đặt"
+  },
   "defaultUser": "Người dùng",
+  "@defaultUser": {
+    "description": "Tên hiển thị mặc định cho người dùng"
+  },
   "appearance": "Giao diện",
+  "@appearance": {
+    "description": "Tiêu đề cho phần cài đặt giao diện"
+  },
   "darkMode": "Chế độ tối",
+  "@darkMode": {
+    "description": "Nhãn cho cài đặt chế độ tối"
+  },
   "language": "Ngôn ngữ",
+  "@language": {
+    "description": "Nhãn cho cài đặt ngôn ngữ"
+  },
   "selectLanguageError": "Vui lòng chọn một ngôn ngữ",
+  "@selectLanguageError": {
+    "description": "Thông báo lỗi khi không chọn ngôn ngữ"
+  },
   "security": "Bảo mật & Quyền riêng tư",
+  "@security": {
+    "description": "Tiêu đề cho phần cài đặt bảo mật"
+  },
   "changePassword": "Đổi mật khẩu",
+  "@changePassword": {
+    "description": "Nhãn cho nút đổi mật khẩu"
+  },
   "biometrics": "Sinh trắc học",
+  "@biometrics": {
+    "description": "Nhãn cho cài đặt sinh trắc học"
+  },
   "deleteAccount": "Xóa tài khoản",
+  "@deleteAccount": {
+    "description": "Nhãn cho nút xóa tài khoản"
+  },
   "deleteAccountConfirm": "Bạn có chắc chắn muốn xóa tài khoản không?",
+  "@deleteAccountConfirm": {
+    "description": "Thông báo xác nhận trước khi xóa tài khoản"
+  },
   "actionCannotBeUndone": "Hành động này không thể hoàn tác.",
+  "@actionCannotBeUndone": {
+    "description": "Cảnh báo cho các hành động không thể hoàn tác"
+  },
   "changePasswordTitle": "Đổi mật khẩu",
+  "@changePasswordTitle": {
+    "description": "Tiêu đề cho màn hình đổi mật khẩu"
+  },
   "confirm": "Xác nhận",
+  "@confirm": {
+    "description": "Nhãn cho nút xác nhận"
+  },
   "oldPassword": "Mật khẩu cũ",
+  "@oldPassword": {
+    "description": "Nhãn cho trường nhập mật khẩu cũ"
+  },
   "enterOldPassword": "Nhập mật khẩu cũ",
+  "@enterOldPassword": {
+    "description": "Gợi ý cho trường nhập mật khẩu cũ"
+  },
   "newPassword": "Mật khẩu mới",
+  "@newPassword": {
+    "description": "Nhãn cho trường nhập mật khẩu mới"
+  },
   "enterNewPassword": "Nhập mật khẩu mới",
+  "@enterNewPassword": {
+    "description": "Gợi ý cho trường nhập mật khẩu mới"
+  },
   "passwordMinLength": "Mật khẩu phải dài ít nhất 6 ký tự",
   "confirmNewPassword": "Xác nhận mật khẩu mới",
   "enterConfirmPassword": "Xác nhận mật khẩu mới",
@@ -248,7 +311,7 @@
     "type": "text",
     "placeholders": {
       "description": {
-        "type": "Object",
+        "type": "String",
         "description": "Mô tả của giao dịch sẽ bị xóa"
       }
     }
@@ -399,7 +462,7 @@
     "description": "Chào người dùng bằng tên của họ",
     "placeholders": {
       "name": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },
@@ -615,7 +678,7 @@
     "description": "Thông báo khi báo cáo được xuất thành công, bao gồm đường dẫn file",
     "placeholders": {
       "filePath": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },
@@ -653,6 +716,9 @@
   "lowestAmount": "Số tiền thấp nhất",
   "filterLabel": "Bộ lọc",
   "sortLabel": "Sắp xếp",
+  "@sortLabel": {
+    "description": "Nhãn cho phần sắp xếp trong giao diện người dùng"
+  },
   "resetFilters": "Đặt lại bộ lọc",
   "@resetFilters": {
     "description": "Văn bản cho nút đặt lại tất cả các bộ lọc đã áp dụng"

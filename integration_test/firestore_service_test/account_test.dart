@@ -308,10 +308,7 @@ void main() {
         email: testEmail,
         password: testPassword,
       );
-      
-      // Store the user ID to verify deletion
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      
+    
       // Load account data first
       accountBloc.add(LoadAccountDataEvent());
       
