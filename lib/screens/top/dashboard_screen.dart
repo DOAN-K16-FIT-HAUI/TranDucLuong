@@ -505,7 +505,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                   )
                   .toList(),
-      onTap: () {},
+      onTap: () => AppRoutes.navigateToTransactionList(context),
     );
   }
 

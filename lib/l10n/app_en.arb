@@ -635,5 +635,32 @@
   },
   "notificationsTitle": "Notifications",
   "notificationsTooltipMarkAllRead": "Mark all as read",
-  "notificationsEmptyMessage": "No notifications yet"
+  "notificationsEmptyMessage": "No notifications yet",
+  "filterByType": "Filter by Type",
+  "allTransactions": "All Transactions",
+  "showFiltersTooltip": "Show filters",
+  "hideFiltersTooltip": "Hide filters",
+  "sortBy": "Sort by",
+  "newest": "Newest",
+  "oldest": "Oldest",
+  "highestAmount": "Highest Amount",
+  "lowestAmount": "Lowest Amount",
+  "filterLabel": "Filter",
+  "sortLabel": "Sort",
+  "resetFilters": "Reset Filters",
+  "@resetFilters": {
+    "description": "Text for the button to reset all applied filters"
+  },
+  "applyFilter": "Apply Filter",
+  "@applyFilter": {
+    "description": "Text for button to apply selected filters"
+  },
+  "sortTooltip": "Sort",
+  "@sortTooltip": {
+    "description": "Tooltip for the sort button"
+  },
+  "applySort": "Apply Sort",
+  "@applySort": {
+    "description": "Text for button to apply selected sort order"
+  }
 }

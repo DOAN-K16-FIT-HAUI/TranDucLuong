@@ -609,7 +609,8 @@
   },
   "@scanReceiptGallery": {
     "description": "Nút để tải hóa đơn từ thư viện ảnh"
-  },"exportSuccessTo": "Báo cáo đã được xuất thành công vào {filePath}",
+  },
+  "exportSuccessTo": "Báo cáo đã được xuất thành công vào {filePath}",
   "@exportSuccessTo": {
     "description": "Thông báo khi báo cáo được xuất thành công, bao gồm đường dẫn file",
     "placeholders": {
@@ -640,5 +641,32 @@
   },
   "notificationsTitle": "Thông báo",
   "notificationsTooltipMarkAllRead": "Đánh dấu tất cả là đã đọc",
-  "notificationsEmptyMessage": "Chưa có thông báo nào"
+  "notificationsEmptyMessage": "Chưa có thông báo nào",
+  "filterByType": "Lọc theo loại",
+  "allTransactions": "Tất cả giao dịch",
+  "showFiltersTooltip": "Hiện bộ lọc",
+  "hideFiltersTooltip": "Ẩn bộ lọc",
+  "sortBy": "Sắp xếp theo",
+  "newest": "Mới nhất",
+  "oldest": "Cũ nhất",
+  "highestAmount": "Số tiền cao nhất",
+  "lowestAmount": "Số tiền thấp nhất",
+  "filterLabel": "Bộ lọc",
+  "sortLabel": "Sắp xếp",
+  "resetFilters": "Đặt lại bộ lọc",
+  "@resetFilters": {
+    "description": "Văn bản cho nút đặt lại tất cả các bộ lọc đã áp dụng"
+  },
+  "applyFilter": "Áp dụng bộ lọc",
+  "@applyFilter": {
+    "description": "Văn bản cho nút áp dụng bộ lọc đã chọn"
+  },
+  "sortTooltip": "Sắp xếp",
+  "@sortTooltip": {
+    "description": "Chú giải cho nút sắp xếp"
+  },
+  "applySort": "Áp dụng sắp xếp",
+  "@applySort": {
+    "description": "Văn bản cho nút áp dụng thứ tự sắp xếp đã chọn"
+  }
 }

@@ -272,7 +272,7 @@ class ListsCards {
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             children: [
               CircleAvatar(
@@ -330,14 +330,18 @@ class ListsCards {
                     textAlign: TextAlign.end,
                   ),
                   if (menuItems != null && onMenuSelected != null) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 4), // Reduced space
                     PopupMenuButton<String>(
+                      padding: EdgeInsets.zero, // Remove padding
+                      iconSize: 20, // Slightly smaller icon
+                      splashRadius: 20, // Smaller splash effect
+                      tooltip: '', // Remove tooltip to reduce hover area
                       icon: Icon(
                         Icons.more_vert,
                         color: theme.colorScheme.onSurface.withValues(
                           alpha: 0.6,
                         ),
-                        size: 22,
+                        size: 20, // Slightly smaller icon size
                       ),
                       offset: const Offset(0, 35),
                       shape: RoundedRectangleBorder(

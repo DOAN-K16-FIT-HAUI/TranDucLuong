@@ -435,5 +435,32 @@
   },
   "notificationsTitle": "通知",
   "notificationsTooltipMarkAllRead": "すべてを既読にする",
-  "notificationsEmptyMessage": "通知はまだありません"
+  "notificationsEmptyMessage": "通知はまだありません",
+  "filterByType": "種類でフィルター",
+  "allTransactions": "すべての取引",
+  "showFiltersTooltip": "フィルターを表示",
+  "hideFiltersTooltip": "フィルターを隠す",
+  "sortBy": "並び替え",
+  "newest": "最新順",
+  "oldest": "古い順",
+  "highestAmount": "金額の高い順",
+  "lowestAmount": "金額の低い順",
+  "filterLabel": "フィルター",
+  "sortLabel": "並び替え",
+  "resetFilters": "フィルターをリセット",
+  "@resetFilters": {
+    "description": "適用されたすべてのフィルターをリセットするボタンのテキスト"
+  },
+  "applyFilter": "フィルターを適用",
+  "@applyFilter": {
+    "description": "選択したフィルターを適用するボタンのテキスト"
+  },
+  "sortTooltip": "並べ替え",
+  "@sortTooltip": {
+    "description": "並べ替えボタンのツールチップ"
+  },
+  "applySort": "並べ替えを適用",
+  "@applySort": {
+    "description": "選択した並べ替え順序を適用するボタンのテキスト"
+  }
 }

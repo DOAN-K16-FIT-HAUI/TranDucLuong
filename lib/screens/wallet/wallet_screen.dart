@@ -570,14 +570,18 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.wallet.name);
-    balanceController = TextEditingController(
-      text: Formatter.formatCurrency(
-        widget.wallet.balance.toDouble(),
-        locale: Localizations.localeOf(context),
-      ),
-    );
+    balanceController = TextEditingController();
     formKey = GlobalKey<FormState>();
     selectedIcon = widget.wallet.icon;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    balanceController.text = Formatter.formatCurrency(
+      widget.wallet.balance.toDouble(),
+      locale: Localizations.localeOf(context),
+    );
   }
 
   @override

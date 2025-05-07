@@ -25,6 +25,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:finance_app/utils/common_widget/bottom_sheets.dart';
 
 class TransactionListScreen extends StatefulWidget {
   const TransactionListScreen({super.key});
@@ -42,8 +43,14 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   bool _isSearching = false;
   String _searchQuery = '';
 
+  // Change from single selection to multi-selection for type filters
+  List<String> _selectedTypeFilters = [];
+  String _sortOrder = 'newest'; // 'newest', 'oldest', 'highest', 'lowest'
+
   // Map ánh xạ giữa categoryKey và giá trị dịch
   Map<String, String> _categoryMap = {};
+  // Add map for transaction types
+  Map<String, String> _transactionTypeMap = {};
 
   @override
   void initState() {
@@ -86,10 +93,25 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       'gift': l10n.categoryGift,
       'other': l10n.categoryOther,
     };
+
+    // Add transaction type map
+    _transactionTypeMap = {
+      'income': l10n.transactionTypeIncome,
+      'expense': l10n.transactionTypeExpense,
+      'transfer': l10n.transactionTypeTransfer,
+      'borrow': l10n.transactionTypeBorrow,
+      'lend': l10n.transactionTypeLend,
+      'adjustment': l10n.transactionTypeAdjustment,
+    };
   }
 
   String _mapCategoryKeyToLocalized(String key, AppLocalizations l10n) {
     return _categoryMap[key] ?? key;
+  }
+
+  // Add method to map transaction type key to localized string
+  String _mapTypeKeyToLocalized(String key, AppLocalizations l10n) {
+    return _transactionTypeMap[key] ?? key;
   }
 
   Map<String, List<TransactionModel>> _groupTransactions(
@@ -138,6 +160,35 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           (t.fromWallet?.toLowerCase().contains(queryLower) ?? false) ||
           (t.toWallet?.toLowerCase().contains(queryLower) ?? false);
     }).toList();
+  }
+
+  // Update method to filter transactions by multiple types
+  List<TransactionModel> _filterTransactionsByType(
+    List<TransactionModel> transactions,
+    List<String> typeFilters,
+  ) {
+    if (typeFilters.isEmpty) return transactions;
+
+    return transactions.where((t) => typeFilters.contains(t.typeKey)).toList();
+  }
+
+  // Add method to sort transactions
+  List<TransactionModel> _sortTransactions(
+    List<TransactionModel> transactions,
+    String sortOrder,
+  ) {
+    switch (sortOrder) {
+      case 'newest':
+        return transactions..sort((a, b) => b.date.compareTo(a.date));
+      case 'oldest':
+        return transactions..sort((a, b) => a.date.compareTo(b.date));
+      case 'highest':
+        return transactions..sort((a, b) => b.amount.compareTo(a.amount));
+      case 'lowest':
+        return transactions..sort((a, b) => a.amount.compareTo(b.amount));
+      default:
+        return transactions..sort((a, b) => b.date.compareTo(a.date));
+    }
   }
 
   Widget _buildGroupedListView(
@@ -260,6 +311,113 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     );
   }
 
+  // Update the bottom sheet for filtering with multi-selection support
+  void _showFilterBottomSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final typeItems =
+        _transactionTypeMap.entries
+            .map((entry) => MapEntry(entry.key, entry.value))
+            .toList();
+
+    // Use the fixed height bottom sheet
+    BottomSheets.showStandardBottomSheet(
+      context: context,
+      height: screenHeight * 0.7, // Set to 70% of screen height
+      header: BottomSheets.buildHeaderRow(
+        context: context,
+        title: l10n.filterByType,
+        actionText: l10n.resetFilters,
+        onActionPressed: () {
+          setState(() {
+            _selectedTypeFilters = [];
+          });
+          Navigator.pop(context);
+        },
+      ),
+      content: StatefulBuilder(
+        builder: (context, setModalState) {
+          return BottomSheets.buildMultiSelectionList<String>(
+            context: context,
+            selectedItems: _selectedTypeFilters,
+            items: typeItems,
+            onItemToggled: (item, checked) {
+              setModalState(() {
+                if (checked) {
+                  if (!_selectedTypeFilters.contains(item)) {
+                    _selectedTypeFilters.add(item);
+                  }
+                } else {
+                  _selectedTypeFilters.remove(item);
+                }
+              });
+            },
+          );
+        },
+      ),
+      footer: BottomSheets.buildBottomSheetButton(
+        context: context,
+        text: l10n.applyFilter,
+        onPressed: () {
+          setState(() {
+            // Apply the filters when closing the bottom sheet
+            _selectedTypeFilters = List.from(_selectedTypeFilters);
+          });
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  // Updated sort bottom sheet with fixed height
+  void _showSortBottomSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final sortOptions = [
+      MapEntry('newest', l10n.newest),
+      MapEntry('oldest', l10n.oldest),
+      MapEntry('highest', l10n.highestAmount),
+      MapEntry('lowest', l10n.lowestAmount),
+    ];
+
+    // Use the fixed height bottom sheet
+    BottomSheets.showStandardBottomSheet(
+      context: context,
+      height: screenHeight * 0.5, // Set to 50% of screen height
+      header: BottomSheets.buildHeaderRow(
+        context: context,
+        title: l10n.sortBy,
+        centerTitle: true,
+      ),
+      content: StatefulBuilder(
+        builder: (context, setModalState) {
+          return BottomSheets.buildRadioSelectionList<String>(
+            context: context,
+            groupValue: _sortOrder,
+            items: sortOptions,
+            onItemSelected: (value) {
+              if (value != null) {
+                setModalState(() {
+                  _sortOrder = value;
+                });
+              }
+            },
+          );
+        },
+      ),
+      footer: BottomSheets.buildBottomSheetButton(
+        context: context,
+        text: l10n.applySort,
+        onPressed: () {
+          setState(() {});
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   void _showEditDialog(BuildContext context, TransactionModel transaction) {
     final l10n = AppLocalizations.of(context)!;
     final formKey = GlobalKey<FormState>();
@@ -271,7 +429,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           Formatter.currencyInputFormatter
               .formatEditUpdate(
                 const TextEditingValue(text: ''),
-                TextEditingValue(text: transaction.amount.toString()),
+                TextEditingValue(text: transaction.amount.toInt().toString()),
               )
               .text,
     );
@@ -281,7 +439,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               ? Formatter.currencyInputFormatter
                   .formatEditUpdate(
                     const TextEditingValue(text: ''),
-                    TextEditingValue(text: transaction.balanceAfter.toString()),
+                    TextEditingValue(
+                      text: transaction.balanceAfter!.toInt().toString(),
+                    ),
                   )
                   .text
               : '',
@@ -822,7 +982,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           );
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              Navigator.pop;
+              Navigator.pop(context);
             }
           });
         } else {
@@ -904,6 +1064,19 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                           backgroundColor:
                               Theme.of(context).colorScheme.primaryContainer,
                           actions: [
+                            // Filter button using common widget
+                            BottomSheets.buildFilterButton(
+                              context: context,
+                              tooltip: l10n.filterTooltip,
+                              onPressed: _showFilterBottomSheet,
+                            ),
+                            // Sort button using common widget
+                            BottomSheets.buildSortButton(
+                              context: context,
+                              tooltip: l10n.sortTooltip,
+                              onPressed: _showSortBottomSheet,
+                            ),
+                            // Search button
                             IconButton(
                               icon: Icon(
                                 _isSearching ? Icons.close : Icons.search,
@@ -933,6 +1106,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                               context: context,
                             ),
                           ),
+                        // Search field
                         if (_isSearching)
                           Padding(
                             padding: const EdgeInsets.all(16),
@@ -942,6 +1116,67 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                               onChanged:
                                   (value) =>
                                       setState(() => _searchQuery = value),
+                            ),
+                          ),
+                        // Show active filters indicators using common widget
+                        if (_selectedTypeFilters.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 16.0,
+                              right: 16.0,
+                              bottom: 8.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children:
+                                        _selectedTypeFilters.map((filter) {
+                                          return BottomSheets.buildFilterChip(
+                                            context: context,
+                                            label:
+                                                _transactionTypeMap[filter] ??
+                                                filter,
+                                            onDeleted: () {
+                                              setState(() {
+                                                _selectedTypeFilters.remove(
+                                                  filter,
+                                                );
+                                              });
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        // Show sorting indicator
+                        if (_sortOrder != 'newest')
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${l10n.sortLabel}: ',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  _sortOrder == 'oldest'
+                                      ? l10n.oldest
+                                      : _sortOrder == 'highest'
+                                      ? l10n.highestAmount
+                                      : l10n.lowestAmount,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ),
                         if (!(state is TransactionLoading ||
@@ -1008,21 +1243,37 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     Locale locale,
   ) {
     if (state is TransactionLoaded) {
-      final transactions = _filterTransactions(_searchQuery, state.transactions)
-        ..sort((a, b) => b.date.compareTo(a.date));
+      // First filter by search query
+      var transactions = _filterTransactions(_searchQuery, state.transactions);
+
+      // Then filter by transaction type using the updated multi-selection method
+      transactions = _filterTransactionsByType(
+        transactions,
+        _selectedTypeFilters,
+      );
+
+      // Finally sort transactions
+      transactions = _sortTransactions(transactions, _sortOrder);
+
       if (transactions.isEmpty) {
         return UtilityWidgets.buildEmptyState(
           context: context,
           message:
-              _isSearching
+              _isSearching || _selectedTypeFilters.isNotEmpty
                   ? l10n.noMatchingTransactions
                   : l10n.noTransactionsYet,
-          suggestion: _isSearching ? null : l10n.addFirstTransactionHint,
+          suggestion:
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
+                  ? null
+                  : l10n.addFirstTransactionHint,
           onActionPressed:
-              _isSearching
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
                   ? null
                   : () => AppRoutes.navigateToTransaction(context),
-          actionText: _isSearching ? null : l10n.addTransactionButton,
+          actionText:
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
+                  ? null
+                  : l10n.addTransactionButton,
         );
       }
       return _buildGroupedListView(
