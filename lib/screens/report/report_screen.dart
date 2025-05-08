@@ -4,7 +4,7 @@ import 'package:finance_app/blocs/report/report_bloc.dart';
 import 'package:finance_app/blocs/report/report_event.dart';
 import 'package:finance_app/blocs/report/report_state.dart';
 import 'package:finance_app/core/app_theme.dart';
-import 'package:finance_app/data/models/report_models.dart';
+import 'package:finance_app/data/models/report.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';

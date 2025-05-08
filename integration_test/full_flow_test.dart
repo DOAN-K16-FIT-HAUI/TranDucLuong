@@ -429,10 +429,26 @@ void main() {
 
       debugPrint('Created additional test transactions for report');
 
+      // Wait a moment to ensure transactions are properly saved
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Verify user is still authenticated
+      final currentUser = FirebaseAuth.instance.currentUser;
+      debugPrint('Current user ID before report: ${currentUser?.uid}');
+      if (currentUser == null || currentUser.uid.isEmpty) {
+        // Re-authenticate if needed
+        await authService.signInWithEmailAndPassword(
+          email: testEmail,
+          password: testNewPassword.isEmpty ? testPassword : testNewPassword,
+        );
+        debugPrint('Re-authenticated user before report generation');
+      }
+
       // Load report data
       debugPrint('Loading report data...');
       reportBloc.add(
-        LoadReportData(
+        FetchReportData(
+          // Changed to FetchReportData to match the event in report_bloc.dart
           userId: testUserId,
           startDate: startDate,
           endDate: endDate,
@@ -444,7 +460,7 @@ void main() {
       debugPrint('User ID: $testUserId');
       debugPrint('Date range: $startDate to $endDate');
 
-      // Wait for report with much less strict expectations
+      // Wait for report with relaxed expectations
       await expectLater(
         reportBloc.stream,
         emitsThrough(
@@ -452,15 +468,26 @@ void main() {
             if (state is ReportLoaded) {
               // Print all details for debugging
               debugPrint('Report loaded with:');
-              debugPrint('- Category expenses: ${state.categoryExpenses}');
-              debugPrint(
-                '- Transaction type totals: ${state.transactionTypeTotals}',
-              );
-              debugPrint('- Daily balances: ${state.dailyBalances}');
+              debugPrint('- Category data: ${state.categoryData.length} items');
+              debugPrint('- Balance data: ${state.balanceData.length} items');
+              debugPrint('- Type data: ${state.typeData.length} items');
+              debugPrint('- Total income: ${state.totalIncome}');
+              debugPrint('- Total expenses: ${state.totalExpenses}');
 
-              // Accept any loaded report, even if it has empty data
-              // The important thing is that the report loaded without errors
-              return true;
+              // Check if we have any transaction data
+              bool hasTransactionData =
+                  state.categoryData.isNotEmpty ||
+                  state.typeData.isNotEmpty ||
+                  state.totalIncome > 0 ||
+                  state.totalExpenses > 0;
+
+              // Note: balanceData will have entries for each day even without transactions
+
+              return hasTransactionData;
+            }
+            if (state is ReportError) {
+              debugPrint('Error loading report: ${state.message}');
+              return false;
             }
             return false;
           }),
