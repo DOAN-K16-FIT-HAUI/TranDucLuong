@@ -1,6 +1,6 @@
 import 'package:finance_app/blocs/report/report_event.dart';
 import 'package:finance_app/blocs/report/report_state.dart';
-import 'package:finance_app/data/models/report_models.dart';
+import 'package:finance_app/data/models/report.dart';
 import 'package:finance_app/data/repositories/report_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

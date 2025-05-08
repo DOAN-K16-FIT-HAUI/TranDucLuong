@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_app/data/models/report_models.dart';
+import 'package:finance_app/data/models/report.dart';
 
 abstract class ReportState extends Equatable {
   const ReportState();
