@@ -734,5 +734,52 @@
   "applySort": "Áp dụng sắp xếp",
   "@applySort": {
     "description": "Văn bản cho nút áp dụng thứ tự sắp xếp đã chọn"
-  }
+  },
+  "importFailure": "Nhập dữ liệu thất bại: {error}",
+  "@importFailure": {
+    "description": "Hiển thị khi thao tác nhập dữ liệu thất bại",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Lỗi mạng"
+      }
+    }
+  },
+  "importSuccessMessage": "Đã nhập thành công {count} giao dịch",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "exportReportToCSV": "Xuất báo cáo ra CSV",
+  "importTransactionsFromCSV": "Nhập giao dịch từ CSV",
+  "filePickerError": "Không thể chọn tệp",
+  "exportSuccessTitle": "Xuất thành công",
+  "exportSuccessMessage": "Báo cáo của bạn đã được xuất thành công.",
+  "okButton": "OK",
+  "exportShareMessage": "Đây là báo cáo giao dịch bạn đã xuất.",
+  "shareButton": "Chia sẻ",
+  "permissionRequired": "Yêu cầu quyền truy cập",
+  "storagePermissionExplanation": "Ứng dụng cần quyền truy cập bộ nhớ để nhập và xuất tệp.",
+  "fileLocationHelpText": "Đây là nơi lưu các tệp đã xuất.",
+  "openLocation": "Mở vị trí",
+  "fileStorageLocation": "Tệp được lưu tại: {location}",
+  "@fileStorageLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String",
+        "example": "/storage/emulated/0/Download"
+      }
+    }
+  },
+  "fileNotFoundError": "Không tìm thấy tệp",
+  "cannotOpenLocation": "Không thể mở vị trí tệp",
+  "fileLocationExplanation": "Tệp đã được lưu, nhưng chúng tôi không thể mở vị trí của nó trực tiếp. Bạn có thể chia sẻ tệp hoặc tự tìm theo đường dẫn bên dưới.",
+  "manuallyFindAt": "Tệp nằm tại:",
+  "closeButton": "Đóng",
+  "cannotOpenDirectly": "Không thể mở tệp này trực tiếp",
+  "exportedReport": "Báo cáo tài chính đã xuất",
+  "saveReportAs": "Lưu báo cáo thành",
+  "chooseSaveLocation": "Chọn vị trí lưu file",
+  "saveLocationCancelled": "Đã hủy chọn vị trí lưu, sử dụng vị trí mặc định"
 }

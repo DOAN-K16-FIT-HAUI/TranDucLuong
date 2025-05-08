@@ -662,5 +662,51 @@
   "applySort": "Apply Sort",
   "@applySort": {
     "description": "Text for button to apply selected sort order"
-  }
+  },
+  "importFailure": "Import failed: {error}",
+  "@importFailure": {
+    "description": "Displayed when an import operation fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network timeout"
+      }
+    }
+  },
+  "importSuccessMessage": "Successfully imported {count} transactions",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "exportReportToCSV": "Export report to CSV",
+  "importTransactionsFromCSV": "Import transactions from CSV",
+  "filePickerError": "Failed to pick a file",
+  "exportSuccessTitle": "Export Successful",
+  "exportSuccessMessage": "Your report has been exported successfully.",
+  "okButton": "OK",
+  "exportShareMessage": "Here is your exported transaction report.",
+  "shareButton": "Share",
+  "permissionRequired": "Permission Required",
+  "storagePermissionExplanation": "This app needs storage access to import and export files.",
+  "fileLocationHelpText": "This is where your exported files are saved.",
+  "openLocation": "Open Location",
+  "fileStorageLocation": "File stored in: {location}",
+  "@fileStorageLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "fileNotFoundError": "The file could not be found",
+  "cannotOpenLocation": "Cannot open file location",
+  "fileLocationExplanation": "The file has been saved, but we couldn't open its location directly. You can share the file or manually locate it using the path below.",
+  "manuallyFindAt": "File is located at:",
+  "closeButton": "Close",
+  "cannotOpenDirectly": "This file cannot be opened directly",
+  "exportedReport": "Exported Finance Report",
+  "saveReportAs": "Save report as",
+  "chooseSaveLocation": "Choose save location",
+  "saveLocationCancelled": "Save location selection cancelled, using default location"
 }

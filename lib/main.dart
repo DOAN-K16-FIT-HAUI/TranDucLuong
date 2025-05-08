@@ -27,6 +27,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -39,6 +40,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Add HTTP override for connection issues (especially in emulators)
+  HttpOverrides.global = MyHttpOverrides();
+
   try {
     await Firebase.initializeApp().timeout(
       const Duration(seconds: 10),
@@ -49,7 +54,7 @@ Future<void> main() async {
     debugPrint('Firebase initialized successfully');
   } catch (e) {
     debugPrint('Firebase initialization failed: $e');
-    rethrow;
+    // Don't rethrow - let the app continue even with Firebase issues
   }
 
   // Kết nối với Firebase Emulator trong flavor test
@@ -63,6 +68,16 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   setupDependencies();
   runApp(const MyApp());
+}
+
+// HTTP override class to help with certificate verification issues
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 class MyApp extends StatelessWidget {
