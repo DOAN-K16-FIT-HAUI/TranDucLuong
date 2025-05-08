@@ -25,11 +25,11 @@ class UtilityWidgets {
           hintText: hintText,
           hintStyle: GoogleFonts.notoSans(
             fontSize: 15,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sửa thành withOpacity
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sửa thành withOpacity
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             size: 22,
           ),
           border: InputBorder.none,
@@ -72,49 +72,60 @@ class UtilityWidgets {
               style: GoogleFonts.notoSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Sửa thành withOpacity
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
           ),
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
-          children: categories.map((category) {
-            final bool isSelected = selectedCategory == category;
-            final String label = categoryLabelBuilder?.call(category) ?? (category == null ? l10n.all : category.toString());
+          children:
+              categories.map((category) {
+                final bool isSelected = selectedCategory == category;
+                final String label =
+                    categoryLabelBuilder?.call(category) ??
+                    (category == null ? l10n.all : category.toString());
 
-            return ChoiceChip(
-              label: Text(label),
-              labelStyle: GoogleFonts.notoSans(
-                fontSize: 13,
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.8), // Sửa thành withOpacity
-              ),
-              selected: isSelected,
-              onSelected: (bool selected) {
-                if (selected) {
-                  onCategorySelected(category);
-                }
-              },
-              selectedColor: theme.colorScheme.primary.withValues(alpha: 0.12), // Sửa thành withOpacity
-              backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // Sửa thành withOpacity
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.dividerColor,
-                  width: isSelected ? 1.0 : 0.8,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 6,
-              ),
-              showCheckmark: false,
-            );
-          }).toList(),
+                return ChoiceChip(
+                  label: Text(label),
+                  labelStyle: GoogleFonts.notoSans(
+                    fontSize: 13,
+                    color:
+                        isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface.withValues(
+                              alpha: 0.8,
+                            ),
+                  ),
+                  selected: isSelected,
+                  onSelected: (bool selected) {
+                    if (selected) {
+                      onCategorySelected(category);
+                    }
+                  },
+                  selectedColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.12,
+                  ),
+                  backgroundColor: theme.colorScheme.surface.withValues(
+                    alpha: 0.5,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color:
+                          isSelected
+                              ? theme.colorScheme.primary
+                              : theme.dividerColor,
+                      width: isSelected ? 1.0 : 0.8,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  showCheckmark: false,
+                );
+              }).toList(),
         ),
       ],
     );
@@ -173,7 +184,7 @@ class UtilityWidgets {
               message,
               style: GoogleFonts.notoSans(
                 fontSize: 17,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Sửa thành withOpacity
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -192,9 +203,9 @@ class UtilityWidgets {
               const SizedBox(height: 30),
               ElevatedButton.icon(
                 icon:
-                actionIcon != null
-                    ? Icon(actionIcon, size: 18)
-                    : const SizedBox.shrink(),
+                    actionIcon != null
+                        ? Icon(actionIcon, size: 18)
+                        : const SizedBox.shrink(),
                 label: Text(actionText),
                 onPressed: onActionPressed,
                 style: ElevatedButton.styleFrom(
@@ -288,7 +299,11 @@ class UtilityWidgets {
         ),
         duration: duration,
         behavior: behavior,
-        backgroundColor: backgroundColor ?? Theme.of(context).snackBarTheme.backgroundColor, // Sử dụng theme snackbar
+        backgroundColor:
+            backgroundColor ??
+            Theme.of(
+              context,
+            ).snackBarTheme.backgroundColor, // Sử dụng theme snackbar
         action: action,
       ),
     );

@@ -10,12 +10,14 @@ class ListsCards {
   static Widget buildTabContent<T>({
     required BuildContext context,
     required List<T> items,
-    required Widget Function(BuildContext context, T item, int index) itemBuilder,
+    required Widget Function(BuildContext context, T item, int index)
+    itemBuilder,
   }) {
     return ListView.builder(
       padding: const EdgeInsets.all(16).copyWith(bottom: 80),
       itemCount: items.length,
-      itemBuilder: (context, index) => itemBuilder(context, items[index], index),
+      itemBuilder:
+          (context, index) => itemBuilder(context, items[index], index),
     );
   }
 
@@ -33,20 +35,22 @@ class ListsCards {
     List<PopupMenuItem<String>>? menuItems,
     void Function(String)? onMenuSelected,
     Widget? subtitle,
-    EdgeInsetsGeometry margin = const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
-    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
+      horizontal: 12.0,
+      vertical: 10.0,
+    ),
     Color? backgroundColor,
     void Function()? onTap, // Thêm tham số onTap
   }) {
     final theme = Theme.of(context);
     final locale = valueLocale ?? Intl.getCurrentLocale();
-    final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    final currencySymbol =
+        NumberFormat.simpleCurrency(locale: locale).currencySymbol;
 
     return GestureDetector(
       onTap: onTap, // Gán sự kiện onTap
       child: Container(
         key: itemKey,
-        margin: margin,
         decoration: BoxDecoration(
           color: backgroundColor ?? theme.cardColor,
           borderRadius: BorderRadius.circular(10),
@@ -64,7 +68,9 @@ class ListsCards {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+                    color: (iconColor ?? theme.colorScheme.primary).withValues(
+                      alpha: 0.1,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -108,7 +114,11 @@ class ListsCards {
                         style: GoogleFonts.notoSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: amountColor ?? (value >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor),
+                          color:
+                              amountColor ??
+                              (value >= 0
+                                  ? AppTheme.incomeColor
+                                  : AppTheme.expenseColor),
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -200,60 +210,80 @@ class ListsCards {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final iconData = ListsCards.getTransactionIcon(context, transaction.typeKey);
+    final iconData = ListsCards.getTransactionIcon(
+      context,
+      transaction.typeKey,
+    );
     final amountColor = ListsCards.getAmountColor(context, transaction.typeKey);
-    final amountPrefix = ListsCards.getAmountPrefix(context, transaction.typeKey);
+    final amountPrefix = ListsCards.getAmountPrefix(
+      context,
+      transaction.typeKey,
+    );
 
-    final formattedAmount = transaction.typeKey == "adjustment" && transaction.balanceAfter != null
-        ? Formatter.formatCurrency(transaction.balanceAfter!, locale: Localizations.localeOf(context))
-        : Formatter.formatCurrency(transaction.amount, locale: Localizations.localeOf(context));
-    final formattedTime = Formatter.formatTime(transaction.date, locale: Localizations.localeOf(context));
+    final formattedAmount =
+        transaction.typeKey == "adjustment" && transaction.balanceAfter != null
+            ? Formatter.formatCurrency(
+              transaction.balanceAfter!,
+              locale: Localizations.localeOf(context),
+            )
+            : Formatter.formatCurrency(
+              transaction.amount,
+              locale: Localizations.localeOf(context),
+            );
+    final formattedTime = Formatter.formatTime(
+      transaction.date,
+      locale: Localizations.localeOf(context),
+    );
 
     String subtitleText = '$formattedTime • ${transaction.wallet ?? ''}';
-    if (transaction.typeKey == "expense" && transaction.categoryKey.isNotEmpty) {
-      subtitleText = '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
-    } else if (transaction.typeKey == "income" && transaction.categoryKey.isNotEmpty) {
-      subtitleText = '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
+    if (transaction.typeKey == "expense" &&
+        transaction.categoryKey.isNotEmpty) {
+      subtitleText =
+          '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
+    } else if (transaction.typeKey == "income" &&
+        transaction.categoryKey.isNotEmpty) {
+      subtitleText =
+          '$formattedTime • ${getLocalizedCategory(context, transaction.categoryKey)}';
     } else if (transaction.typeKey == "transfer") {
       subtitleText =
-      '$formattedTime • ${transaction.fromWallet ?? '?'} → ${transaction.toWallet ?? '?'}';
+          '$formattedTime • ${transaction.fromWallet ?? '?'} → ${transaction.toWallet ?? '?'}';
     } else if (transaction.typeKey == "borrow" && transaction.lender != null) {
-      subtitleText = '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}';
+      subtitleText =
+          '$formattedTime • ${l10n.borrowFrom}: ${transaction.lender}';
     } else if (transaction.typeKey == "lend" && transaction.borrower != null) {
       subtitleText = '$formattedTime • ${l10n.lendTo}: ${transaction.borrower}';
-    } else if (transaction.typeKey == "adjustment" && transaction.wallet != null) {
+    } else if (transaction.typeKey == "adjustment" &&
+        transaction.wallet != null) {
       transaction.balanceAfter != null
-          ? Formatter.formatCurrency(transaction.balanceAfter!, locale: Localizations.localeOf(context))
+          ? Formatter.formatCurrency(
+            transaction.balanceAfter!,
+            locale: Localizations.localeOf(context),
+          )
           : '';
       subtitleText = '$formattedTime • ${transaction.wallet}';
     }
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: theme.dividerColor.withValues(alpha: 0.5),
-          width: 0.05,
-        ),
-      ),
+      elevation: 0,
       color: theme.cardColor,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: iconData['backgroundColor']?.withValues(alpha: 0.15) ??
+                backgroundColor:
+                    iconData['backgroundColor']?.withValues(alpha: 0.15) ??
                     theme.colorScheme.primary.withValues(alpha: 0.15),
                 child: Icon(
                   iconData['icon'],
-                  color: iconData['backgroundColor'] ?? theme.colorScheme.primary,
+                  color:
+                      iconData['backgroundColor'] ?? theme.colorScheme.primary,
                   size: 18,
                 ),
               ),
@@ -300,12 +330,18 @@ class ListsCards {
                     textAlign: TextAlign.end,
                   ),
                   if (menuItems != null && onMenuSelected != null) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 4), // Reduced space
                     PopupMenuButton<String>(
+                      padding: EdgeInsets.zero, // Remove padding
+                      iconSize: 20, // Slightly smaller icon
+                      splashRadius: 20, // Smaller splash effect
+                      tooltip: '', // Remove tooltip to reduce hover area
                       icon: Icon(
                         Icons.more_vert,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        size: 22,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
+                        size: 20, // Slightly smaller icon size
                       ),
                       offset: const Offset(0, 35),
                       shape: RoundedRectangleBorder(
@@ -326,7 +362,10 @@ class ListsCards {
     );
   }
 
-  static Map<String, dynamic> getTransactionIcon(BuildContext context, String typeKey) {
+  static Map<String, dynamic> getTransactionIcon(
+    BuildContext context,
+    String typeKey,
+  ) {
     switch (typeKey) {
       case "income":
         return {
@@ -349,20 +388,14 @@ class ListsCards {
           'backgroundColor': AppTheme.borrowColor,
         };
       case "lend":
-        return {
-          'icon': Icons.call_made,
-          'backgroundColor': AppTheme.lendColor,
-        };
+        return {'icon': Icons.call_made, 'backgroundColor': AppTheme.lendColor};
       case "adjustment":
         return {
           'icon': Icons.tune,
           'backgroundColor': AppTheme.adjustmentColor,
         };
       default:
-        return {
-          'icon': Icons.help_outline,
-          'backgroundColor': Colors.grey,
-        };
+        return {'icon': Icons.help_outline, 'backgroundColor': Colors.grey};
     }
   }
 

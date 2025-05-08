@@ -32,7 +32,7 @@ class AccountScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBarTabBar.buildAppBar(
           context: context,
-          title: l10n.appTitle,
+          title: l10n.settingsTitle,
           showBackButton: false,
         ),
         body: BlocListener<AccountBloc, AccountState>(
@@ -50,7 +50,7 @@ class AccountScreen extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 behavior: SnackBarBehavior.floating,
               );
-            } else if (state is AccountLoggedOut) {
+            } else if (state is AccountLoggedOut || state is AccountDeleted) {
               AppRoutes.navigateToLogin(context);
             }
           },
@@ -328,7 +328,7 @@ class AccountScreen extends StatelessWidget {
                   : const AssetImage('assets/images/default_avatar.jpg')
                       as ImageProvider,
           onBackgroundImageError: (exception, stackTrace) {
-            print('Error loading avatar: $exception');
+            debugPrint('Error loading avatar: $exception');
           },
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),

@@ -7,6 +7,7 @@ import 'package:finance_app/utils/validators.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class AddEditGroupNoteScreen extends StatefulWidget {
   final GroupNoteModel? note;
@@ -69,6 +70,7 @@ class _AddEditGroupNoteScreenState extends State<AddEditGroupNoteScreen> {
         context: context,
         title: isEdit ? l10n.editNoteDialogTitle : l10n.addNoteDialogTitle,
         showBackButton: true,
+        onBackPressed: () => context.pop(),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

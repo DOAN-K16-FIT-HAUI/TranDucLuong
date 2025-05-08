@@ -78,19 +78,28 @@ class WalletScreen extends StatelessWidget {
             body: BlocBuilder<WalletBloc, WalletState>(
               builder: (context, state) {
                 final tabController = DefaultTabController.of(context);
-                if (tabController.index != state.selectedTab) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted(context)) {
-                      try {
-                        if (tabController.index != state.selectedTab) {
+
+                // Listen to tab controller changes from swipe
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted(context)) {
+                    try {
+                      if (tabController.index != state.selectedTab) {
+                        if (tabController.animation?.isCompleted ?? false) {
+                          // Update state when tab is changed by swiping
+                          context.read<WalletBloc>().add(
+                            TabChanged(tabController.index),
+                          );
+                        } else {
+                          // Only animate programmatically if the tab change
+                          // was initiated through button press, not swipe
                           tabController.animateTo(state.selectedTab);
                         }
-                      } catch (e) {
-                        debugPrint("Error animating TabController: $e");
                       }
+                    } catch (e) {
+                      debugPrint("Error handling TabController: $e");
                     }
-                  });
-                }
+                  }
+                });
 
                 final filteredWalletsTab0 = _getFilteredListForTab(state, 0);
                 final filteredWalletsTab1 = _getFilteredListForTab(state, 1);
@@ -380,15 +389,20 @@ class WalletScreen extends StatelessWidget {
         icon: Icons.account_balance_wallet_outlined,
         onActionPressed:
             state.isSearching ? null : () => _showAddWalletDialog(context),
-        actionText: state.isSearching ? null : l10n.addWalletButton,
       );
     } else {
-      return ListsCards.buildTabContent<Wallet>(
-        context: context,
-        items: items,
-        itemBuilder:
-            (ctx, wallet, index) =>
-                _buildWalletCard(ctx, wallet, type, index, locale),
+      return RefreshIndicator(
+        onRefresh: () async {
+          context.read<WalletBloc>().add(LoadWallets());
+          return;
+        },
+        child: ListsCards.buildTabContent<Wallet>(
+          context: context,
+          items: items,
+          itemBuilder:
+              (ctx, wallet, index) =>
+                  _buildWalletCard(ctx, wallet, type, index, locale),
+        ),
       );
     }
   }
@@ -556,14 +570,18 @@ class _EditWalletDialogState extends State<_EditWalletDialog> {
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.wallet.name);
-    balanceController = TextEditingController(
-      text: Formatter.formatCurrency(
-        widget.wallet.balance.toDouble(),
-        locale: Localizations.localeOf(context),
-      ),
-    );
+    balanceController = TextEditingController();
     formKey = GlobalKey<FormState>();
     selectedIcon = widget.wallet.icon;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    balanceController.text = Formatter.formatCurrency(
+      widget.wallet.balance.toDouble(),
+      locale: Localizations.localeOf(context),
+    );
   }
 
   @override

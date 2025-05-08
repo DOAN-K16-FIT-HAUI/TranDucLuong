@@ -4,38 +4,66 @@ import 'package:finance_app/blocs/report/report_bloc.dart';
 import 'package:finance_app/blocs/report/report_event.dart';
 import 'package:finance_app/blocs/report/report_state.dart';
 import 'package:finance_app/core/app_theme.dart';
+import 'package:finance_app/data/models/report_models.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
-import 'package:finance_app/utils/common_widget/decorations.dart';
-import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
 
   @override
-  ReportScreenState createState() => ReportScreenState();
+  State<ReportScreen> createState() => _ReportScreenState();
 }
 
-class ReportScreenState extends State<ReportScreen>
+class _ReportScreenState extends State<ReportScreen>
     with SingleTickerProviderStateMixin {
-  DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
-  DateTime _endDate = DateTime.now();
   late TabController _tabController;
-  String _selectedChartType = 'category';
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadReportData();
+
+    // Set initial date range to the current month
+    final now = DateTime.now();
+    _startDate = DateTime(now.year, now.month, 1);
+    _endDate = DateTime(
+      now.year,
+      now.month + 1,
+      0,
+    ); // Correct way to get last day of current month
+
+    // Wait for the widget to be fully built before dispatching events
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadReportData();
+      }
+    });
+  }
+
+  void _loadReportData() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated &&
+        _startDate != null &&
+        _endDate != null) {
+      context.read<ReportBloc>().add(
+        FetchReportData(
+          userId: authState.user.id,
+          startDate: _startDate!,
+          endDate: _endDate!,
+        ),
+      );
+    }
   }
 
   @override
@@ -44,590 +72,605 @@ class ReportScreenState extends State<ReportScreen>
     super.dispose();
   }
 
-  void _loadReportData() {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is AuthAuthenticated) {
-      if (_startDate.isAfter(_endDate)) {
-        UtilityWidgets.showCustomSnackBar(
-          context: context,
-          message: AppLocalizations.of(context)!.invalidDateRange,
-          backgroundColor: Theme.of(context).colorScheme.error,
-          textStyle: GoogleFonts.notoSans(
-            color: Theme.of(context).colorScheme.onError,
-            fontSize: 14,
-          ),
-        );
-        return;
-      }
-      context.read<ReportBloc>().add(
-        LoadReportData(
-          userId: authState.user.id,
-          startDate: _startDate,
-          endDate: _endDate,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, authState) {
-          if (authState is! AuthAuthenticated) {
-            return UtilityWidgets.buildEmptyState(
-              context: context,
-              message: l10n.pleaseLoginToViewReports,
-              suggestion: l10n.loginNow,
-              onActionPressed: () {
-                // Navigate to login screen
-              },
-              icon: Icons.lock_outline,
-              actionText: l10n.loginTitle,
-            );
-          }
-
-          return Column(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        return Scaffold(
+          backgroundColor: theme.colorScheme.surface,
+          appBar: AppBarTabBar.buildAppBar(
+            context: context,
+            title: l10n.reportsTitle,
+            showBackButton: false,
+            backgroundColor: theme.colorScheme.primaryContainer,
+          ),
+          body: Column(
             children: [
-              AppBarTabBar.buildAppBar(
+              const SizedBox(height: 16),
+              _buildDateRangeSelector(context),
+              const SizedBox(height: 12),
+              AppBarTabBar.buildTabBar(
                 context: context,
-                title: l10n.reportsTitle,
-                showBackButton: false,
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                elevation: 4,
-                actions: [
+                tabTitles: [
+                  l10n.categoryChart,
+                  l10n.balanceChart,
+                  l10n.typeChart,
                 ],
+                controller: _tabController,
+                onTabChanged: (index) {
+                  // No need to handle tab change here as we're using TabBarView
+                },
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                padding: const EdgeInsets.all(16),
-                decoration: Decorations.boxDecoration(context),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    UtilityWidgets.buildLabel(
-                      context: context,
-                      text: l10n.dateRangeFilter,
+                    _buildCategoryChart(context),
+                    _buildBalanceChart(context),
+                    _buildTransactionTypeChart(context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDateRangeSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final dateFormat = DateFormat('dd/MM/yyyy');
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.dateRangeFilter,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _selectDate(context, isStart: true),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: theme.dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: InputFields.buildDatePickerField(
-                            context: context,
-                            date: _startDate,
-                            label: l10n.startDateLabel,
-                            onTap: (picked) {
-                              if (picked != null && mounted) {
-                                setState(() {
-                                  _startDate = picked;
-                                });
-                              }
-                            },
-                            isRequired: true,
-                          ),
+                        Icon(
+                          Icons.calendar_today,
+                          size: 18,
+                          color: theme.colorScheme.primary,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: InputFields.buildDatePickerField(
-                            context: context,
-                            date: _endDate,
-                            label: l10n.endDateLabel,
-                            onTap: (picked) {
-                              if (picked != null && mounted) {
-                                setState(() {
-                                  _endDate = picked;
-                                });
-                              }
-                            },
-                            isRequired: true,
+                          child: Text(
+                            _startDate != null
+                                ? dateFormat.format(_startDate!)
+                                : l10n.notSelected,
+                            style: theme.textTheme.bodyMedium,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Buttons.buildSubmitButton(
-                      context,
-                      l10n.apply,
-                      _loadReportData,
-                      backgroundColor: theme.colorScheme.primary,
-                      textColor: theme.colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 16,
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _selectDate(context, isStart: false),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: Decorations.boxDecoration(context),
-                child: AppBarTabBar.buildTabBar(
-                  context: context,
-                  tabTitles: [
-                    l10n.categoryChart,
-                    l10n.balanceChart,
-                    l10n.typeChart,
-                  ],
-                  onTabChanged: (index) {
-                    setState(() {
-                      _selectedChartType = ['category', 'balance', 'type'][index];
-                    });
-                  },
-                  controller: _tabController,
-                  indicatorColor: theme.colorScheme.primary,
-                  labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(
-                    alpha: 0.6,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: theme.dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _endDate != null
+                                ? dateFormat.format(_endDate!)
+                                : l10n.notSelected,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  labelStyle: GoogleFonts.notoSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: BlocBuilder<ReportBloc, ReportState>(
-                  key: ValueKey(_selectedChartType),
-                  builder: (context, state) {
-                    if (state is ReportLoading) {
-                      return UtilityWidgets.buildLoadingIndicator(
-                        context: context,
-                        color: theme.colorScheme.primary,
-                      );
-                    } else if (state is ReportError) {
-                      return UtilityWidgets.buildErrorState(
-                        context: context,
-                        message: state.message,
-                        onRetry: _loadReportData,
-                        icon: Icons.error_outline,
-                        iconColor: theme.colorScheme.error,
-                      );
-                    } else if (state is ReportLoaded) {
-                      return _buildChartContent(context, state, l10n);
-                    }
-                    return UtilityWidgets.buildEmptyState(
-                      context: context,
-                      message: l10n.noDataAvailable,
-                      suggestion: l10n.selectDifferentDateRange,
-                      icon: Icons.bar_chart_outlined,
-                      actionText: l10n.tryAgain,
-                      onActionPressed: _loadReportData,
-                    );
-                  },
                 ),
               ),
             ],
-          );
-        },
+          ),
+          const SizedBox(height: 8),
+          Buttons.buildSubmitButton(
+            context,
+            l10n.apply,
+            (_startDate != null && _endDate != null)
+                ? () {
+                  if (_startDate!.isAfter(_endDate!)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.invalidDateRange),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  } else {
+                    _loadReportData();
+                  }
+                }
+                : () {},
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildChartContent(
-      BuildContext context,
-      ReportLoaded state,
-      AppLocalizations l10n,
-      ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        decoration: Decorations.boxDecoration(context),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            UtilityWidgets.buildLabel(
-              context: context,
-              text: _selectedChartType == 'category'
-                  ? l10n.categoryChart
-                  : _selectedChartType == 'balance'
-                  ? l10n.balanceChart
-                  : l10n.typeChart,
-            ),
-            const SizedBox(height: 16),
-            switch (_selectedChartType) {
-              'category' => _buildPieChart(
-                context,
-                state.categoryExpenses,
-                l10n,
-              ),
-              'balance' => _buildLineChart(context, state.dailyBalances, l10n),
-              'type' => _buildBarChart(
-                context,
-                state.transactionTypeTotals,
-                l10n,
-              ),
-              _ => const SizedBox.shrink(),
-            },
-          ],
-        ),
-      ),
+  Future<void> _selectDate(
+    BuildContext context, {
+    required bool isStart,
+  }) async {
+    final firstDate = DateTime(2020);
+    final lastDate = DateTime.now();
+    final initialDate =
+        isStart
+            ? (_startDate != null && _startDate!.isBefore(lastDate)
+                ? _startDate!
+                : lastDate)
+            : (_endDate != null && _endDate!.isBefore(lastDate)
+                ? _endDate!
+                : lastDate);
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
-  }
 
-  Widget _buildPieChart(
-      BuildContext context,
-      Map<String, double> data,
-      AppLocalizations l10n,
-      ) {
-    final theme = Theme.of(context);
-    final total = data.values.fold(0.0, (sum, value) => sum + value);
-
-    if (total == 0) {
-      return UtilityWidgets.buildEmptyState(
-        context: context,
-        message: l10n.noExpenseData,
-        suggestion: l10n.addTransactionsToSeeChart,
-        icon: Icons.pie_chart_outline,
-        actionText: l10n.addTransaction,
-        onActionPressed: () {
-          // Navigate to transaction creation screen
-        },
-      );
+    if (selectedDate != null) {
+      setState(() {
+        if (isStart) {
+          _startDate = selectedDate;
+        } else {
+          _endDate = selectedDate;
+        }
+      });
     }
+  }
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 220,
-          child: PieChart(
-            PieChartData(
-              sections: data.entries.toList().asMap().entries.map((entry) {
-                final index = entry.key;
-                final value = entry.value.value;
-                return PieChartSectionData(
-                  color: AppTheme.categoryColors[index % AppTheme.categoryColors.length],
-                  value: value,
-                  title: '${(value / total * 100).toStringAsFixed(1)}%',
-                  radius: 80,
-                  titleStyle: GoogleFonts.notoSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+  Widget _buildCategoryChart(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return BlocBuilder<ReportBloc, ReportState>(
+      builder: (context, state) {
+        if (state is ReportLoading) {
+          return Center(
+            child: UtilityWidgets.buildLoadingIndicator(context: context),
+          );
+        }
+
+        if (state is ReportError) {
+          return UtilityWidgets.buildErrorState(
+            context: context,
+            message: state.message,
+            onRetry: _loadReportData,
+          );
+        }
+
+        if (state is ReportLoaded && state.categoryData.isNotEmpty) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SfCircularChart(
+                legend: Legend(
+                  isVisible: true,
+                  position: LegendPosition.bottom,
+                  overflowMode: LegendItemOverflowMode.wrap,
+                ),
+                series: <CircularSeries>[
+                  PieSeries<CategoryDataPoint, String>(
+                    dataSource: state.categoryData,
+                    xValueMapper:
+                        (CategoryDataPoint data, _) =>
+                            ListsCards.getLocalizedCategory(
+                              context,
+                              data.category,
+                            ),
+                    yValueMapper: (CategoryDataPoint data, _) => data.amount,
+                    dataLabelMapper:
+                        (CategoryDataPoint data, _) =>
+                            '${((data.amount / state.totalExpenses) * 100).toStringAsFixed(1)}%',
+                    dataLabelSettings: DataLabelSettings(
+                      isVisible: true,
+                      labelPosition: ChartDataLabelPosition.outside,
+                      connectorLineSettings: const ConnectorLineSettings(
+                        type: ConnectorType.curve,
+                        length: '15%',
+                      ),
+                      textStyle: GoogleFonts.notoSans(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    enableTooltip: true,
+                    pointColorMapper:
+                        (CategoryDataPoint data, _) =>
+                            _getCategoryColor(data.category),
                   ),
-                  titlePositionPercentageOffset: 0.6,
-                );
-              }).toList(),
-              sectionsSpace: 2,
-              centerSpaceRadius: 40,
+                ],
+                tooltipBehavior: TooltipBehavior(
+                  enable: true,
+                  format: 'point.x: point.y',
+                ),
+                palette: const [
+                  Color(0xFF4CAF50), // Green
+                  Color(0xFF2196F3), // Blue
+                  Color(0xFFFF9800), // Orange
+                  Color(0xFFE91E63), // Pink
+                  Color(0xFF9C27B0), // Purple
+                  Color(0xFFFF5722), // Deep Orange
+                  Color(0xFF673AB7), // Deep Purple
+                  Color(0xFF3F51B5), // Indigo
+                  Color(0xFF009688), // Teal
+                  Color(0xFF795548), // Brown
+                ],
+              ),
             ),
+          );
+        }
+
+        // Show empty state when no data
+        return _buildEmptyChartState(
+          context,
+          l10n.noExpenseData,
+          Icons.pie_chart_outline,
+        );
+      },
+    );
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'food':
+        return const Color(0xFF4CAF50); // Green
+      case 'living':
+        return const Color(0xFF2196F3); // Blue
+      case 'transport':
+        return const Color(0xFFFF9800); // Orange
+      case 'health':
+        return const Color(0xFFE91E63); // Pink
+      case 'shopping':
+        return const Color(0xFF9C27B0); // Purple
+      case 'entertainment':
+        return const Color(0xFFFF5722); // Deep Orange
+      case 'education':
+        return const Color(0xFF673AB7); // Deep Purple
+      case 'bills':
+        return const Color(0xFF3F51B5); // Indigo
+      case 'gift':
+        return const Color(0xFF009688); // Teal
+      case 'other':
+        return const Color(0xFF795548); // Brown
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildBalanceChart(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return BlocBuilder<ReportBloc, ReportState>(
+      builder: (context, state) {
+        if (state is ReportLoading) {
+          return Center(
+            child: UtilityWidgets.buildLoadingIndicator(context: context),
+          );
+        }
+
+        if (state is ReportError) {
+          return UtilityWidgets.buildErrorState(
+            context: context,
+            message: state.message,
+            onRetry: _loadReportData,
+          );
+        }
+
+        if (state is ReportLoaded && state.balanceData.isNotEmpty) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                height: 300, // Fixed height for the chart
+                child: SfCartesianChart(
+                  primaryXAxis: DateTimeAxis(
+                    dateFormat: DateFormat('dd/MM'),
+                    intervalType: DateTimeIntervalType.auto,
+                    majorGridLines: const MajorGridLines(width: 0),
+                  ),
+                  primaryYAxis: NumericAxis(
+                    numberFormat: NumberFormat.compact(),
+                    axisLine: const AxisLine(width: 0),
+                    majorTickLines: const MajorTickLines(size: 0),
+                  ),
+                  legend: Legend(
+                    isVisible: true,
+                    position: LegendPosition.bottom,
+                  ),
+                  tooltipBehavior: TooltipBehavior(enable: true),
+                  series: <CartesianSeries>[
+                    LineSeries<BalanceDataPoint, DateTime>(
+                      name: l10n.totalBalance,
+                      dataSource: state.balanceData,
+                      xValueMapper: (BalanceDataPoint data, _) => data.date,
+                      yValueMapper: (BalanceDataPoint data, _) => data.balance,
+                      markerSettings: const MarkerSettings(isVisible: true),
+                      color: theme.colorScheme.primary,
+                    ),
+                  ],
+                  zoomPanBehavior: ZoomPanBehavior(
+                    enablePanning: true,
+                    zoomMode: ZoomMode.x,
+                    enablePinching: true,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Show empty state when no data
+        return _buildEmptyChartState(
+          context,
+          l10n.noBalanceData,
+          Icons.show_chart,
+        );
+      },
+    );
+  }
+
+  Widget _buildTransactionTypeChart(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return BlocBuilder<ReportBloc, ReportState>(
+      builder: (context, state) {
+        if (state is ReportLoading) {
+          return Center(
+            child: UtilityWidgets.buildLoadingIndicator(context: context),
+          );
+        }
+
+        if (state is ReportError) {
+          return UtilityWidgets.buildErrorState(
+            context: context,
+            message: state.message,
+            onRetry: _loadReportData,
+          );
+        }
+
+        if (state is ReportLoaded && state.typeData.isNotEmpty) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 300, // Fixed height for the chart
+                    child: SfCartesianChart(
+                      plotAreaBorderWidth: 0,
+                      primaryXAxis: CategoryAxis(
+                        majorGridLines: const MajorGridLines(width: 0),
+                        labelStyle: GoogleFonts.notoSans(fontSize: 12),
+                      ),
+                      primaryYAxis: NumericAxis(
+                        numberFormat: NumberFormat.compact(),
+                        axisLine: const AxisLine(width: 0),
+                        majorTickLines: const MajorTickLines(size: 0),
+                      ),
+                      legend: Legend(
+                        isVisible: true,
+                        position: LegendPosition.bottom,
+                        overflowMode: LegendItemOverflowMode.wrap,
+                      ),
+                      tooltipBehavior: TooltipBehavior(enable: true),
+                      series: <CartesianSeries>[
+                        ColumnSeries<TypeDataPoint, String>(
+                          dataSource: state.typeData,
+                          xValueMapper:
+                              (TypeDataPoint data, _) =>
+                                  ListsCards.getLocalizedType(
+                                    context,
+                                    data.type,
+                                  ),
+                          yValueMapper: (TypeDataPoint data, _) => data.amount,
+                          pointColorMapper:
+                              (TypeDataPoint data, _) =>
+                                  _getTransactionTypeColor(data.type),
+                          name: l10n.totalAmountPaidLabel,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Summary section below chart
+                  Container(
+                    margin: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSummaryRow(
+                          context,
+                          l10n.totalIncomeLabel,
+                          state.totalIncome,
+                          AppTheme.incomeColor,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSummaryRow(
+                          context,
+                          l10n.totalExpenseLabel,
+                          state.totalExpenses,
+                          AppTheme.expenseColor,
+                        ),
+                        const Divider(height: 16),
+                        _buildSummaryRow(
+                          context,
+                          l10n.remainingAmountLabel,
+                          state.totalIncome - state.totalExpenses,
+                          (state.totalIncome - state.totalExpenses) >= 0
+                              ? AppTheme.incomeColor
+                              : AppTheme.expenseColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Show empty state when no data
+        return _buildEmptyChartState(
+          context,
+          l10n.noTransactionData,
+          Icons.bar_chart,
+        );
+      },
+    );
+  }
+
+  Widget _buildSummaryRow(
+    BuildContext context,
+    String label,
+    double amount,
+    Color color,
+  ) {
+    final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context);
+    final formatter = NumberFormat.currency(
+      locale: locale.toString(),
+      symbol: _getCurrencySymbol(locale),
+      decimalDigits: 0,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          children: data.entries.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final category = entry.value.key;
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: AppTheme.categoryColors[index % AppTheme.categoryColors.length],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  ListsCards.getLocalizedCategory(context, category),
-                  style: GoogleFonts.notoSans(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
+        Text(
+          formatter.format(amount),
+          style: GoogleFonts.notoSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildLineChart(
-      BuildContext context,
-      Map<DateTime, double> data,
-      AppLocalizations l10n,
-      ) {
-    final theme = Theme.of(context);
-
-    if (data.isEmpty) {
-      return UtilityWidgets.buildEmptyState(
-        context: context,
-        message: l10n.noBalanceData,
-        suggestion: l10n.addTransactionsToSeeChart,
-        icon: Icons.show_chart_outlined,
-        actionText: l10n.addTransaction,
-        onActionPressed: () {
-          // Navigate to transaction creation screen
-        },
-      );
+  String _getCurrencySymbol(Locale locale) {
+    switch (locale.languageCode) {
+      case 'vi':
+        return '₫';
+      case 'ja':
+        return '¥';
+      case 'en':
+      default:
+        return '\$';
     }
-
-    final sortedDates = data.keys.toList()..sort();
-    final minBalance = data.values.fold<double>(
-      double.infinity,
-          (min, v) => v < min ? v : min,
-    );
-    final maxBalance = data.values.fold<double>(
-      -double.infinity,
-          (max, v) => v > max ? v : max,
-    );
-
-    return SizedBox(
-      height: 320,
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: true,
-            horizontalInterval: (maxBalance - minBalance) / 5,
-            verticalInterval: sortedDates.length > 10 ? sortedDates.length / 5 : 1,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                strokeWidth: 1,
-              );
-            },
-            getDrawingVerticalLine: (value) {
-              return FlLine(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 48,
-                interval: (maxBalance - minBalance) / 5,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    NumberFormat.compact().format(value),
-                    style: GoogleFonts.notoSans(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                    ),
-                    textAlign: TextAlign.right,
-                  );
-                },
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 36,
-                interval: sortedDates.length > 10 ? sortedDates.length / 5 : 1,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= sortedDates.length) {
-                    return const SizedBox.shrink();
-                  }
-                  final date = sortedDates[value.toInt()];
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      DateFormat('dd/MM').format(date),
-                      style: GoogleFonts.notoSans(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.8,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border.all(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-          ),
-          minY: minBalance - (minBalance.abs() * 0.1),
-          maxY: maxBalance + (maxBalance.abs() * 0.1),
-          lineBarsData: [
-            LineChartBarData(
-              spots: sortedDates.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), data[entry.value]!);
-              }).toList(),
-              isCurved: true,
-              curveSmoothness: 0.35,
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.primary.withValues(alpha: 0.8),
-                  theme.colorScheme.secondary.withValues(alpha: 0.8),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              barWidth: 4,
-              dotData: FlDotData(
-                show: true,
-                getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                  radius: 5,
-                  color: theme.colorScheme.primary,
-                  strokeWidth: 2,
-                  strokeColor: theme.colorScheme.onPrimary,
-                ),
-              ),
-              belowBarData: BarAreaData(
-                show: true,
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.3),
-                    theme.colorScheme.secondary.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
-  Widget _buildBarChart(
-      BuildContext context,
-      Map<String, Map<String, dynamic>> data,
-      AppLocalizations l10n,
-      ) {
-    final theme = Theme.of(context);
-
-    if (data.isEmpty) {
-      return UtilityWidgets.buildEmptyState(
-        context: context,
-        message: l10n.noTransactionData,
-        suggestion: l10n.addTransactionsToSeeChart,
-        icon: Icons.bar_chart_outlined,
-        actionText: l10n.addTransaction,
-        onActionPressed: () {
-          // Navigate to transaction creation screen
-        },
-      );
+  Color _getTransactionTypeColor(String type) {
+    switch (type) {
+      case 'income':
+        return AppTheme.incomeColor;
+      case 'expense':
+        return AppTheme.expenseColor;
+      case 'transfer':
+        return AppTheme.transferColor;
+      case 'borrow':
+        return AppTheme.borrowColor;
+      case 'lend':
+        return AppTheme.lendColor;
+      case 'adjustment':
+        return AppTheme.adjustmentColor;
+      default:
+        return Colors.grey;
     }
+  }
 
-    final maxAmount = data.values.fold<double>(
-      0,
-          (max, v) => (v['amount'] as double) > max ? v['amount'] as double : max,
-    );
+  Widget _buildEmptyChartState(
+    BuildContext context,
+    String message,
+    IconData icon,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
 
-    return SizedBox(
-      height: 360,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxAmount + (maxAmount * 0.1),
-          barGroups: data.entries.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final value = entry.value.value['amount'] as double;
-            final color = entry.value.value['color'] as Color;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: value,
-                  color: color,
-                  width: 16,
-                  borderRadius: BorderRadius.circular(4),
-                  backDrawRodData: BackgroundBarChartRodData(
-                    show: true,
-                    toY: maxAmount + (maxAmount * 0.1),
-                    color: theme.colorScheme.onSurface.withValues(
-                      alpha: 0.05,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 48,
-                interval: maxAmount / 5,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    NumberFormat.compact().format(value),
-                    style: GoogleFonts.notoSans(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                    ),
-                    textAlign: TextAlign.right,
-                  );
-                },
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 60,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= data.keys.length) {
-                    return const SizedBox.shrink();
-                  }
-                  final type = data.keys.toList()[value.toInt()];
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Transform.rotate(
-                      angle: -45 * 3.14159 / 180,
-                      child: Text(
-                        ListsCards.getLocalizedType(context, type),
-                        style: GoogleFonts.notoSans(
-                          fontSize: 11,
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.8,
-                          ),
-                        ),
-                        textAlign: TextAlign.right,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            horizontalInterval: maxAmount / 5,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border.all(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-          ),
-        ),
-      ),
+    return UtilityWidgets.buildEmptyState(
+      context: context,
+      message: message,
+      suggestion: l10n.selectDifferentDateRange,
+      icon: icon,
+      iconSize: 70,
+      actionText: l10n.addTransactionTooltip,
+      actionIcon: Icons.add,
+      onActionPressed: () {
+        Navigator.pop(context);
+        // This would navigate to add transaction screen in a real app
+      },
     );
   }
 }

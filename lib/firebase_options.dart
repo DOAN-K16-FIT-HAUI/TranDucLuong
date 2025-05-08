@@ -19,7 +19,7 @@ class DefaultFirebaseOptions {
     if (kIsWeb) {
       throw UnsupportedError(
         'DefaultFirebaseOptions have not been configured for web - '
-            'you can reconfigure this by running the FlutterFire CLI again.',
+        'you can reconfigure this by running the FlutterFire CLI again.',
       );
     }
     switch (defaultTargetPlatform) {
@@ -30,17 +30,17 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
+          'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
+          'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
+          'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -50,21 +50,22 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAEN-zmCBQ4xS23V7TKHJ5kevjzVTibHKM',
-    appId: '1:409487606543:android:2bdc3b659c031bc8d5747a',
-    messagingSenderId: '409487606543',
-    projectId: 'financial-management-eb5b1',
-    storageBucket: 'financial-management-eb5b1.firebasestorage.app',
+    apiKey: 'AIzaSyC07XF3NY7uH5RpGTeSwI5wz_kKuQfidGU',
+    appId: '1:604592554761:android:e1aa37ad84eed38a4349d8',
+    messagingSenderId: '604592554761',
+    projectId: 'financial-management-b7043',
+    storageBucket: 'financial-management-b7043.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAz9YC9xKnpEqJ8dcnrHt-doAHuCOSZFpw',
-    appId: '1:409487606543:ios:98f53a824ef44b7ed5747a',
-    messagingSenderId: '409487606543',
-    projectId: 'financial-management-eb5b1',
-    storageBucket: 'financial-management-eb5b1.firebasestorage.app',
-    androidClientId: '409487606543-146ova5lfqqif2hsqs3j9mfn2s2chfu4.apps.googleusercontent.com',
-    iosClientId: '409487606543-jo4img71k3c181ff1b0f7e9fpqc9bkni.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAayQRYOTHXZrdtGCnrywzKW9T-v2U1Lcs',
+    appId: '1:604592554761:ios:7164f78c15134ca84349d8',
+    messagingSenderId: '604592554761',
+    projectId: 'financial-management-b7043',
+    storageBucket: 'financial-management-b7043.firebasestorage.app',
+    androidClientId: '604592554761-g62kienaac9nvthj78vphedukcltmdeg.apps.googleusercontent.com',
+    iosClientId: '604592554761-6i5kmokl066ak8vqpm42lu8gr90c7g22.apps.googleusercontent.com',
     iosBundleId: 'com.io.ziblox.financeApp',
   );
+
 }

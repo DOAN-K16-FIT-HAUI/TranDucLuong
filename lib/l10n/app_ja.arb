@@ -282,6 +282,9 @@
   "noSavingsYet": "まだ貯蓄がありません",
   "addSavingsHint": "貯蓄を追加して財務を管理します",
   "addSavingsButton": "貯蓄を追加",
+  "noInvestmentsYet": "まだ投資がありません",
+  "addInvestmentsHint": "投資を追加して財務を管理しましょう",
+  "addInvestmentsButton": "投資を追加",
   "spendingLimits": "支出制限",
   "monthlyLimit": "{month}の制限",
   "viewAll": "すべて表示",
@@ -406,7 +409,7 @@
     "description": "レポートが正常にエクスポートされたときのメッセージ。ファイルパスを含む",
     "placeholders": {
       "filePath": {
-        "type": "Object"
+        "type": "String"
       }
     }
   },
@@ -429,5 +432,35 @@
   "selectSaveLocation": "レポートの保存場所を選択してください",
   "@selectSaveLocation": {
     "description": "ファイルピッカーダイアログのタイトル"
+  },
+  "notificationsTitle": "通知",
+  "notificationsTooltipMarkAllRead": "すべてを既読にする",
+  "notificationsEmptyMessage": "通知はまだありません",
+  "filterByType": "種類でフィルター",
+  "allTransactions": "すべての取引",
+  "showFiltersTooltip": "フィルターを表示",
+  "hideFiltersTooltip": "フィルターを隠す",
+  "sortBy": "並び替え",
+  "newest": "最新順",
+  "oldest": "古い順",
+  "highestAmount": "金額の高い順",
+  "lowestAmount": "金額の低い順",
+  "filterLabel": "フィルター",
+  "sortLabel": "並び替え",
+  "resetFilters": "フィルターをリセット",
+  "@resetFilters": {
+    "description": "適用されたすべてのフィルターをリセットするボタンのテキスト"
+  },
+  "applyFilter": "フィルターを適用",
+  "@applyFilter": {
+    "description": "選択したフィルターを適用するボタンのテキスト"
+  },
+  "sortTooltip": "並べ替え",
+  "@sortTooltip": {
+    "description": "並べ替えボタンのツールチップ"
+  },
+  "applySort": "並べ替えを適用",
+  "@applySort": {
+    "description": "選択した並べ替え順序を適用するボタンのテキスト"
   }
 }

@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:local_auth/local_auth.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -21,8 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<PasswordResetRequested>(_onPasswordResetRequested);
-    on<SignInWithBiometricsRequested>(_onSignInWithBiometricsRequested);
-
+    
     // Kích hoạt kiểm tra trạng thái xác thực ngay khi khởi tạo
     add(const CheckAuthStatus());
   }
@@ -102,49 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
     }
   }
-
-  Future<void> _onSignInWithBiometricsRequested(
-      SignInWithBiometricsRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      final localAuth = LocalAuthentication();
-      bool canCheckBiometrics = await localAuth.canCheckBiometrics;
-      if (!canCheckBiometrics) {
-        emit(AuthFailure(
-            error: (context) =>
-            AppLocalizations.of(context)!.biometricsNotAvailable));
-        return;
-      }
-
-      bool authenticated = await localAuth.authenticate(
-        localizedReason: AppLocalizations.of(event.context)!.biometricsReason,
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
-
-      if (authenticated) {
-        // Kiểm tra trạng thái Firebase Authentication
-        final firebaseUser = FirebaseAuth.instance.currentUser;
-        if (firebaseUser != null) {
-          final user = await authRepository.getCurrentUser();
-          emit(AuthAuthenticated(user: user));
-        } else {
-          emit(AuthFailure(
-              error: (context) =>
-              AppLocalizations.of(context)!.noSavedCredentials));
-        }
-      } else {
-        emit(AuthFailure(
-            error: (context) => AppLocalizations.of(context)!.biometricsError));
-      }
-    } catch (e) {
-      emit(AuthFailure(
-          error: (context) => _mapFirebaseAuthExceptionToMessage(context, e)));
-    }
-  }
-
+  
   Future<void> _onSignUpRequested(
       SignUpRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());

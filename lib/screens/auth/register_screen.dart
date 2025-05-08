@@ -39,7 +39,8 @@ class RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface, // Hỗ trợ theme động
+      backgroundColor:
+          Theme.of(context).colorScheme.surface, // Hỗ trợ theme động
       appBar: AppBarTabBar.buildAppBar(
         context: context,
         title: l10n.registerTitle,
@@ -69,20 +70,25 @@ class RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
-                  InputFields.buildEmailField(controller: _emailController),
+                  InputFields.buildEmailField(
+                    controller: _emailController,
+                    key: const Key('register_email_field'),
+                  ),
                   const SizedBox(height: 15),
                   InputFields.buildPasswordField(
                     _passwordController,
                     _isPasswordVisible,
-                        () => setState(() {
+                    () => setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     }),
+                    key: const Key('register_password_field'),
                   ),
                   const SizedBox(height: 15),
                   Buttons.buildSubmitButton(
                     context,
                     l10n.createAccountButton,
                     _register,
+                    key: const Key('register_submit_button'),
                   ),
                   const SizedBox(height: 15),
                   Center(
@@ -101,13 +107,17 @@ class RegisterScreenState extends State<RegisterScreen> {
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
-                              decoration: TextDecoration.underline, // Thêm gạch chân
+                              decoration:
+                                  TextDecoration.underline, // Thêm gạch chân
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => AppRoutes.navigateToLogin(context),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap =
+                                      () => AppRoutes.navigateToLogin(context),
                           ),
                         ],
                       ),
+                      key: const Key('register_login_link'),
                     ),
                   ),
                 ],

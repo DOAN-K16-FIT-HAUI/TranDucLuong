@@ -1,14 +1,15 @@
 import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/data/models/group_note.dart';
-import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart'; // Use common AppBar
-import 'package:finance_app/utils/common_widget/buttons.dart'; // Use common Buttons
-import 'package:finance_app/utils/common_widget/input_fields.dart'; // Use common InputFields
+import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/buttons.dart';
+import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
 import 'package:finance_app/utils/formatter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class GroupNoteDetailScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
     final noteState = context.watch<GroupNoteBloc>().state;
 
     final currentNote = noteState.notes.firstWhere(
-          (n) => n.id == widget.note.id && n.groupId == widget.note.groupId,
+      (n) => n.id == widget.note.id && n.groupId == widget.note.groupId,
       orElse: () => widget.note,
     );
 
@@ -48,6 +49,7 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
         context: context,
         title: l10n.noteDetailTitle,
         showBackButton: true,
+        onBackPressed: () => context.pop(),
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -58,7 +60,7 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
             children: [
               Text(
                 currentNote.title,
-                style: theme.textTheme.displayMedium, // Use theme style
+                style: theme.textTheme.displayMedium,
               ),
               const SizedBox(height: 8),
               Text(
@@ -75,23 +77,36 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
 
               if (currentNote.tags.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Wrap( // Keep Wrap
+                Wrap(
+                  // Keep Wrap
                   spacing: 8,
                   runSpacing: 4,
-                  children: currentNote.tags
-                      .map(
-                        (tag) => Chip(
-                      label: Text(tag, style: theme.textTheme.labelSmall),
-                      backgroundColor: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
-                      side: BorderSide.none,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    ),
-                  )
-                      .toList(),
+                  children:
+                      currentNote.tags
+                          .map(
+                            (tag) => Chip(
+                              label: Text(
+                                tag,
+                                style: theme.textTheme.labelSmall,
+                              ),
+                              backgroundColor: theme
+                                  .colorScheme
+                                  .secondaryContainer
+                                  .withValues(alpha: 0.5),
+                              side: BorderSide.none,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                            ),
+                          )
+                          .toList(),
                 ),
               ],
               const SizedBox(height: 16),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.5)), // Keep Divider
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.5),
+              ), // Keep Divider
               const SizedBox(height: 16),
               Text(
                 currentNote.content,
@@ -120,7 +135,8 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context);
 
-    final comments = note.comments..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final comments =
+        note.comments..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     if (comments.isEmpty) {
       return Padding(
@@ -133,30 +149,33 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
       );
     }
 
-    return ListView.separated( // Keep ListView
+    return ListView.separated(
+      // Keep ListView
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: comments.length,
-      separatorBuilder: (context, index) => Divider(
-        color: theme.dividerColor.withValues(alpha: 0.3),
-        height: 1,
-        indent: 16,
-        endIndent: 16,
-      ),
+      separatorBuilder:
+          (context, index) => Divider(
+            color: theme.dividerColor.withValues(alpha: 0.3),
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
       itemBuilder: (context, index) {
         final comment = comments[index];
-        // Keep ListTile, styled by theme
         return ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
-          title: Text(
-            comment.content,
-            style: theme.textTheme.bodyMedium,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 4.0,
+            horizontal: 0,
           ),
+          title: Text(comment.content, style: theme.textTheme.bodyMedium),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               '${comment.userId.substring(0, 6)}... • ${DateFormat.yMd(locale.toString()).add_jm().format(comment.createdAt)}',
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
             ),
           ),
         );
@@ -169,7 +188,8 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
-      child: Row( // Keep Row
+      child: Row(
+        // Keep Row
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
@@ -203,7 +223,10 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      UtilityWidgets.showCustomSnackBar(context: context, message: l10n.userNotLoggedInError);
+      UtilityWidgets.showCustomSnackBar(
+        context: context,
+        message: l10n.userNotLoggedInError,
+      );
       return;
     }
 

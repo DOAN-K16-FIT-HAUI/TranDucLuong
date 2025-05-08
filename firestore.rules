@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // TRANSACTIONS
+    match /transactions/{transactionId} {
+      allow read, write: if isUserAuthenticated() && request.auth.uid == resource.data.userId;
+      allow create: if isUserAuthenticated() && request.auth.uid == request.resource.data.userId;
+    }
+
+    // USERS + subcollections
+    match /users/{userId} {
+      allow read, update: if isUserAuthenticated() && request.auth.uid == userId;
+      allow create: if isUserAuthenticated();
+      allow delete: if false;
+
+      match /wallets/{walletId} {
+        allow read, write: if isUserAuthenticated() && request.auth.uid == userId;
+      }
+
+      match /groupMemberships/{groupId} {
+        // Chỉ user đó mới được đọc/ghi vào danh sách group của mình
+        // Thử tách create ra xem có khác biệt không
+        allow create: if isUserAuthenticated() && request.auth.uid == userId;
+        allow read, update, delete: if isUserAuthenticated() && request.auth.uid == userId;
+        // Hoặc giữ allow read, write như cũ cũng được
+        // allow read, write: if isUserAuthenticated() && request.auth.uid == userId;
+      }
+    }
+
+    // GROUPS + subcollections
+    match /groups/{groupId} {
+      allow create: if isUserAuthenticated();
+      allow read: if isUserAuthenticated() && isGroupActiveMember(groupId);
+      allow update: if isUserAuthenticated() && isGroupAdmin(groupId);
+      allow delete: if false;
+
+      // SUB: MEMBERS
+      match /members/{memberDocId} {
+        allow read: if isUserAuthenticated() && (isGroupAdmin(groupId) || isGroupActiveMember(groupId));
+        // **Rule CREATE cho member**
+        allow create: if isUserAuthenticated();
+        // **Rule UPDATE cho member**
+        allow update: if isUserAuthenticated() && isGroupAdmin(groupId);
+        // **Rule DELETE cho member**
+        allow delete: if isUserAuthenticated() && isGroupAdmin(groupId);
+      }
+
+      // SUB: NOTES
+      match /notes/{noteId} {
+        allow read: if isUserAuthenticated() && isGroupActiveMember(groupId);
+        allow create: if isUserAuthenticated()
+                      && isGroupActiveMember(groupId)
+                      && request.resource.data.createdBy == request.auth.uid;
+        allow update, delete: if isUserAuthenticated()
+                              && isGroupActiveMember(groupId)
+                              && (isOwner(resource.data.createdBy) || isGroupAdmin(groupId));
+      }
+    }
+
+    // Mặc định cấm
+     match /{document=**} {
+       allow read, write: if false;
+     }
+
+    // ==== HELPER FUNCTIONS ====
+    function isUserAuthenticated() {
+      // Thêm kiểm tra provider nếu cần, nhưng thường uid là đủ
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isGroupAdmin(groupId) {
+      // Phải check group tồn tại VÀ adminIds là list TRƯỚC KHI dùng `in`
+      let groupDocPath = /databases/$(database)/documents/groups/$(groupId);
+      return isUserAuthenticated() &&
+             exists(groupDocPath) &&
+             get(groupDocPath).data.adminIds is list &&
+             request.auth.uid in get(groupDocPath).data.adminIds;
+    }
+
+    function isOwner(userId) {
+      return isUserAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isGroupActiveMember(groupId) {
+      let memberPath = /databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid);
+      // Phải check member doc tồn tại TRƯỚC KHI đọc status
+      return isUserAuthenticated() &&
+             exists(memberPath) &&
+             get(memberPath).data.status == 'active';
+    }
+  }
+}

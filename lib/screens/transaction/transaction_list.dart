@@ -11,6 +11,7 @@ import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
+import 'package:finance_app/utils/common_widget/bottom_sheets.dart';
 import 'package:finance_app/utils/common_widget/dialogs.dart';
 import 'package:finance_app/utils/common_widget/input_fields.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
@@ -22,6 +23,7 @@ import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -41,8 +43,14 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   bool _isSearching = false;
   String _searchQuery = '';
 
+  // Change from single selection to multi-selection for type filters
+  List<String> _selectedTypeFilters = [];
+  String _sortOrder = 'newest'; // 'newest', 'oldest', 'highest', 'lowest'
+
   // Map ánh xạ giữa categoryKey và giá trị dịch
   Map<String, String> _categoryMap = {};
+  // Add map for transaction types
+  Map<String, String> _transactionTypeMap = {};
 
   @override
   void initState() {
@@ -85,6 +93,16 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       'gift': l10n.categoryGift,
       'other': l10n.categoryOther,
     };
+
+    // Add transaction type map
+    _transactionTypeMap = {
+      'income': l10n.transactionTypeIncome,
+      'expense': l10n.transactionTypeExpense,
+      'transfer': l10n.transactionTypeTransfer,
+      'borrow': l10n.transactionTypeBorrow,
+      'lend': l10n.transactionTypeLend,
+      'adjustment': l10n.transactionTypeAdjustment,
+    };
   }
 
   String _mapCategoryKeyToLocalized(String key, AppLocalizations l10n) {
@@ -92,7 +110,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Map<String, List<TransactionModel>> _groupTransactions(
-      List<TransactionModel> transactions, int type, Locale locale) {
+    List<TransactionModel> transactions,
+    int type,
+    Locale locale,
+  ) {
     final grouped = <String, List<TransactionModel>>{};
     for (final transaction in transactions) {
       String key;
@@ -115,29 +136,71 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   List<TransactionModel> _filterTransactions(
-      String query, List<TransactionModel> transactions) {
+    String query,
+    List<TransactionModel> transactions,
+  ) {
     if (query.isEmpty) return transactions;
     final l10n = AppLocalizations.of(context)!;
     return transactions.where((t) {
       final queryLower = query.toLowerCase();
-      final categoryDisplay = t.categoryKey.isNotEmpty ? _mapCategoryKeyToLocalized(t.categoryKey, l10n) : '';
+      final categoryDisplay =
+          t.categoryKey.isNotEmpty
+              ? _mapCategoryKeyToLocalized(t.categoryKey, l10n)
+              : '';
       return t.description.toLowerCase().contains(queryLower) ||
           t.typeKey.toLowerCase().contains(queryLower) ||
-          (t.categoryKey.isNotEmpty && categoryDisplay.toLowerCase().contains(queryLower)) ||
+          (t.categoryKey.isNotEmpty &&
+              categoryDisplay.toLowerCase().contains(queryLower)) ||
           (t.wallet?.toLowerCase().contains(queryLower) ?? false) ||
           (t.fromWallet?.toLowerCase().contains(queryLower) ?? false) ||
           (t.toWallet?.toLowerCase().contains(queryLower) ?? false);
     }).toList();
   }
 
-  Widget _buildGroupedListView(Map<String, List<TransactionModel>> groupedData,
-      AppLocalizations l10n, Locale locale) {
+  // Update method to filter transactions by multiple types
+  List<TransactionModel> _filterTransactionsByType(
+    List<TransactionModel> transactions,
+    List<String> typeFilters,
+  ) {
+    if (typeFilters.isEmpty) return transactions;
+
+    return transactions.where((t) => typeFilters.contains(t.typeKey)).toList();
+  }
+
+  // Add method to sort transactions
+  List<TransactionModel> _sortTransactions(
+    List<TransactionModel> transactions,
+    String sortOrder,
+  ) {
+    switch (sortOrder) {
+      case 'newest':
+        return transactions..sort((a, b) => b.date.compareTo(a.date));
+      case 'oldest':
+        return transactions..sort((a, b) => a.date.compareTo(b.date));
+      case 'highest':
+        return transactions..sort((a, b) => b.amount.compareTo(a.amount));
+      case 'lowest':
+        return transactions..sort((a, b) => a.amount.compareTo(b.amount));
+      default:
+        return transactions..sort((a, b) => b.date.compareTo(a.date));
+    }
+  }
+
+  Widget _buildGroupedListView(
+    Map<String, List<TransactionModel>> groupedData,
+    AppLocalizations l10n,
+    Locale locale,
+  ) {
     if (groupedData.isEmpty) {
       return UtilityWidgets.buildEmptyState(
         context: context,
-        message: _isSearching ? l10n.noMatchingTransactions : l10n.noTransactionsYet,
+        message:
+            _isSearching ? l10n.noMatchingTransactions : l10n.noTransactionsYet,
         suggestion: _isSearching ? null : l10n.addFirstTransactionHint,
-        onActionPressed: _isSearching ? null : () => AppRoutes.navigateToTransaction(context),
+        onActionPressed:
+            _isSearching
+                ? null
+                : () => AppRoutes.navigateToTransaction(context),
         actionText: _isSearching ? null : l10n.addTransactionButton,
       );
     }
@@ -145,7 +208,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     final groupKeys = groupedData.keys.toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0).copyWith(bottom: 80),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8.0,
+        horizontal: 16.0,
+      ).copyWith(bottom: 80),
       itemCount: groupKeys.length,
       itemBuilder: (context, index) {
         final groupKey = groupKeys[index];
@@ -156,7 +222,12 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             .where((t) => t.typeKey == 'income' || t.typeKey == 'borrow')
             .fold(0.0, (sum, t) => sum + t.amount);
         double groupExpense = groupTransactions
-            .where((t) => t.typeKey == 'expense' || t.typeKey == 'lend' || t.typeKey == 'transfer')
+            .where(
+              (t) =>
+                  t.typeKey == 'expense' ||
+                  t.typeKey == 'lend' ||
+                  t.typeKey == 'transfer',
+            )
             .fold(0.0, (sum, t) => sum + t.amount);
         double groupNet = groupIncome - groupExpense;
 
@@ -176,18 +247,26 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                   style: GoogleFonts.notoSans(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
-                    color: groupNet >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                    color:
+                        groupNet >= 0
+                            ? AppTheme.incomeColor
+                            : AppTheme.expenseColor,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            ...groupTransactions.map((t) => ListsCards.buildTransactionListItem(
-              context: context,
-              transaction: t,
-              menuItems: MenuActions.buildEditDeleteMenuItems(context: context),
-              onMenuSelected: (result) => _handleMenuAction(context, result, t),
-            )),
+            ...groupTransactions.map(
+              (t) => ListsCards.buildTransactionListItem(
+                context: context,
+                transaction: t,
+                menuItems: MenuActions.buildEditDeleteMenuItems(
+                  context: context,
+                ),
+                onMenuSelected:
+                    (result) => _handleMenuAction(context, result, t),
+              ),
+            ),
             if (index < groupKeys.length - 1)
               Divider(
                 height: 16,
@@ -213,7 +292,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   void _handleMenuAction(
-      BuildContext context, String result, TransactionModel transaction) {
+    BuildContext context,
+    String result,
+    TransactionModel transaction,
+  ) {
     MenuActions.handleEditDeleteActions(
       context: context,
       action: result,
@@ -224,29 +306,155 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     );
   }
 
+  // Update the bottom sheet for filtering with multi-selection support
+  void _showFilterBottomSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final typeItems =
+        _transactionTypeMap.entries
+            .map((entry) => MapEntry(entry.key, entry.value))
+            .toList();
+
+    // Use the fixed height bottom sheet
+    BottomSheets.showStandardBottomSheet(
+      context: context,
+      height: screenHeight * 0.7, // Set to 70% of screen height
+      header: BottomSheets.buildHeaderRow(
+        context: context,
+        title: l10n.filterByType,
+        actionText: l10n.resetFilters,
+        onActionPressed: () {
+          setState(() {
+            _selectedTypeFilters = [];
+          });
+          Navigator.pop(context);
+        },
+      ),
+      content: StatefulBuilder(
+        builder: (context, setModalState) {
+          return BottomSheets.buildMultiSelectionList<String>(
+            context: context,
+            selectedItems: _selectedTypeFilters,
+            items: typeItems,
+            onItemToggled: (item, checked) {
+              setModalState(() {
+                if (checked) {
+                  if (!_selectedTypeFilters.contains(item)) {
+                    _selectedTypeFilters.add(item);
+                  }
+                } else {
+                  _selectedTypeFilters.remove(item);
+                }
+              });
+            },
+          );
+        },
+      ),
+      footer: BottomSheets.buildBottomSheetButton(
+        context: context,
+        text: l10n.applyFilter,
+        onPressed: () {
+          setState(() {
+            // Apply the filters when closing the bottom sheet
+            _selectedTypeFilters = List.from(_selectedTypeFilters);
+          });
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  // Updated sort bottom sheet with fixed height
+  void _showSortBottomSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final sortOptions = [
+      MapEntry('newest', l10n.newest),
+      MapEntry('oldest', l10n.oldest),
+      MapEntry('highest', l10n.highestAmount),
+      MapEntry('lowest', l10n.lowestAmount),
+    ];
+
+    // Use the fixed height bottom sheet
+    BottomSheets.showStandardBottomSheet(
+      context: context,
+      height: screenHeight * 0.5, // Set to 50% of screen height
+      header: BottomSheets.buildHeaderRow(
+        context: context,
+        title: l10n.sortBy,
+        centerTitle: true,
+      ),
+      content: StatefulBuilder(
+        builder: (context, setModalState) {
+          return BottomSheets.buildRadioSelectionList<String>(
+            context: context,
+            groupValue: _sortOrder,
+            items: sortOptions,
+            onItemSelected: (value) {
+              if (value != null) {
+                setModalState(() {
+                  _sortOrder = value;
+                });
+              }
+            },
+          );
+        },
+      ),
+      footer: BottomSheets.buildBottomSheetButton(
+        context: context,
+        text: l10n.applySort,
+        onPressed: () {
+          setState(() {});
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   void _showEditDialog(BuildContext context, TransactionModel transaction) {
     final l10n = AppLocalizations.of(context)!;
     final formKey = GlobalKey<FormState>();
-    final descriptionController = TextEditingController(text: transaction.description);
+    final descriptionController = TextEditingController(
+      text: transaction.description,
+    );
     final amountController = TextEditingController(
-      text: Formatter.currencyInputFormatter
-          .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: transaction.amount.toString()))
-          .text,
+      text:
+          Formatter.currencyInputFormatter
+              .formatEditUpdate(
+                const TextEditingValue(text: ''),
+                TextEditingValue(text: transaction.amount.toInt().toString()),
+              )
+              .text,
     );
     final balanceAfterController = TextEditingController(
-      text: transaction.balanceAfter != null
-          ? Formatter.currencyInputFormatter
-          .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: transaction.balanceAfter.toString()))
-          .text
-          : '',
+      text:
+          transaction.balanceAfter != null
+              ? Formatter.currencyInputFormatter
+                  .formatEditUpdate(
+                    const TextEditingValue(text: ''),
+                    TextEditingValue(
+                      text: transaction.balanceAfter!.toInt().toString(),
+                    ),
+                  )
+                  .text
+              : '',
     );
-    final lenderController = TextEditingController(text: transaction.lender ?? '');
-    final borrowerController = TextEditingController(text: transaction.borrower ?? '');
+    final lenderController = TextEditingController(
+      text: transaction.lender ?? '',
+    );
+    final borrowerController = TextEditingController(
+      text: transaction.borrower ?? '',
+    );
 
     DateTime selectedDate = transaction.date;
     DateTime? repaymentDate = transaction.repaymentDate;
     String selectedCategoryKey = transaction.categoryKey;
-    String selectedType = ListsCards.getLocalizedType(context, transaction.typeKey);
+    String selectedType = ListsCards.getLocalizedType(
+      context,
+      transaction.typeKey,
+    );
     String selectedWallet = transaction.wallet ?? '';
     String selectedFromWallet = transaction.fromWallet ?? '';
     String selectedToWallet = transaction.toWallet ?? '';
@@ -256,20 +464,28 @@ class _TransactionListScreenState extends State<TransactionListScreen>
 
     List<String> walletNames = [];
     final walletState = context.read<WalletBloc>().state;
-    final allWallets = [
-      ...walletState.wallets,
-      ...walletState.savingsWallets,
-      ...walletState.investmentWallets
-    ].where((w) => w.id.isNotEmpty).toList();
+    final allWallets =
+        [
+          ...walletState.wallets,
+          ...walletState.savingsWallets,
+          ...walletState.investmentWallets,
+        ].where((w) => w.id.isNotEmpty).toList();
     walletNames = allWallets.map((w) => w.name).toList();
-    final walletBalances =
-    Map.fromEntries(allWallets.map((w) => MapEntry(w.name, w.balance.toDouble())));
+    final walletBalances = Map.fromEntries(
+      allWallets.map((w) => MapEntry(w.name, w.balance.toDouble())),
+    );
 
     final transactionTypes = Constants.getTransactionTypes(l10n);
     _updateCategoryMap(l10n);
-    final categoryItems = _categoryMap.entries
-        .map((entry) => DropdownMenuItem<String>(value: entry.key, child: Text(entry.value)))
-        .toList();
+    final categoryItems =
+        _categoryMap.entries
+            .map(
+              (entry) => DropdownMenuItem<String>(
+                value: entry.key,
+                child: Text(entry.value),
+              ),
+            )
+            .toList();
 
     Dialogs.showFormDialog(
       context: context,
@@ -281,16 +497,26 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           controller: descriptionController,
           label: l10n.descriptionLabel,
           hint: l10n.descriptionHint,
-          validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.descriptionLabel),
+          validator:
+              (v) => Validators.validateNotEmpty(
+                v,
+                fieldName: l10n.descriptionLabel,
+              ),
           isRequired: true,
         ),
         const SizedBox(height: 16),
         InputFields.buildDropdownField<String>(
           label: l10n.transactionTypeLabel,
           value: selectedType,
-          items: transactionTypes
-              .map((type) => DropdownMenuItem<String>(value: type, child: Text(type)))
-              .toList(),
+          items:
+              transactionTypes
+                  .map(
+                    (type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    ),
+                  )
+                  .toList(),
           onChanged: (newValue) {
             if (newValue != null) {
               selectedType = newValue;
@@ -299,17 +525,24 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               borrowerController.clear();
               repaymentDate = null;
               repaymentDateError = null;
-              selectedCategoryKey = selectedType == l10n.transactionTypeExpense && _categoryMap.isNotEmpty
-                  ? _categoryMap.keys.first
-                  : '';
+              selectedCategoryKey =
+                  selectedType == l10n.transactionTypeExpense &&
+                          _categoryMap.isNotEmpty
+                      ? _categoryMap.keys.first
+                      : '';
               if (walletNames.isNotEmpty) {
                 selectedWallet = walletNames.first;
                 selectedFromWallet = walletNames.first;
-                selectedToWallet = walletNames.length > 1 ? walletNames[1] : walletNames.first;
+                selectedToWallet =
+                    walletNames.length > 1 ? walletNames[1] : walletNames.first;
               }
             }
           },
-          validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.transactionTypeLabel),
+          validator:
+              (v) => Validators.validateNotEmpty(
+                v,
+                fieldName: l10n.transactionTypeLabel,
+              ),
           isRequired: true,
         ),
         const SizedBox(height: 16),
@@ -330,18 +563,32 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             value: selectedCategoryKey,
             items: categoryItems,
             onChanged: (v) => selectedCategoryKey = v ?? selectedCategoryKey,
-            validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.expenseCategoryLabel),
+            validator:
+                (v) => Validators.validateNotEmpty(
+                  v,
+                  fieldName: l10n.expenseCategoryLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
           InputFields.buildDropdownField<String>(
             label: l10n.fromWalletLabel,
             value: selectedWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedWallet = v ?? selectedWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletLabel),
+            validator:
+                (v) => Validators.validateWallet(
+                  v,
+                  fieldName: l10n.fromWalletLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
@@ -350,11 +597,19 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           InputFields.buildDropdownField<String>(
             label: l10n.toWalletLabel,
             value: selectedWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedWallet = v ?? selectedWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
+            validator:
+                (v) =>
+                    Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
             isRequired: true,
           ),
           const SizedBox(height: 16),
@@ -363,31 +618,54 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           InputFields.buildDropdownField<String>(
             label: l10n.fromWalletSourceLabel,
             value: selectedFromWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (newValue) {
               if (newValue != null) {
                 selectedFromWallet = newValue;
                 if (walletNames.length > 1 && selectedToWallet == newValue) {
-                  final availableTo = walletNames.where((name) => name != newValue).toList();
-                  selectedToWallet = availableTo.isNotEmpty ? availableTo.first : '';
+                  final availableTo =
+                      walletNames.where((name) => name != newValue).toList();
+                  selectedToWallet =
+                      availableTo.isNotEmpty ? availableTo.first : '';
                 }
               }
             },
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletSourceLabel),
+            validator:
+                (v) => Validators.validateWallet(
+                  v,
+                  fieldName: l10n.fromWalletSourceLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
           InputFields.buildDropdownField<String>(
             label: l10n.toWalletDestinationLabel,
             value: selectedToWallet,
-            items: walletNames
-                .where((name) => name != selectedFromWallet)
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .where((name) => name != selectedFromWallet)
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedToWallet = v ?? selectedToWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.toWalletDestinationLabel, checkAgainst: selectedFromWallet),
+            validator:
+                (v) => Validators.validateWallet(
+                  v,
+                  fieldName: l10n.toWalletDestinationLabel,
+                  checkAgainst: selectedFromWallet,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
@@ -397,18 +675,28 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             controller: lenderController,
             label: l10n.lenderLabel,
             hint: l10n.lenderHint,
-            validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.lenderLabel),
+            validator:
+                (v) =>
+                    Validators.validateNotEmpty(v, fieldName: l10n.lenderLabel),
             isRequired: true,
           ),
           const SizedBox(height: 16),
           InputFields.buildDropdownField<String>(
             label: l10n.toWalletLabel,
             value: selectedWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedWallet = v ?? selectedWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
+            validator:
+                (v) =>
+                    Validators.validateWallet(v, fieldName: l10n.toWalletLabel),
             isRequired: true,
           ),
           const SizedBox(height: 16),
@@ -427,18 +715,32 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             controller: borrowerController,
             label: l10n.borrowerLabel,
             hint: l10n.borrowerHint,
-            validator: (v) => Validators.validateNotEmpty(v, fieldName: l10n.borrowerLabel),
+            validator:
+                (v) => Validators.validateNotEmpty(
+                  v,
+                  fieldName: l10n.borrowerLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
           InputFields.buildDropdownField<String>(
             label: l10n.fromWalletLabel,
             value: selectedWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedWallet = v ?? selectedWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.fromWalletLabel),
+            validator:
+                (v) => Validators.validateWallet(
+                  v,
+                  fieldName: l10n.fromWalletLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
@@ -456,15 +758,28 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           InputFields.buildDropdownField<String>(
             label: l10n.walletToAdjustLabel,
             value: selectedWallet,
-            items: walletNames
-                .map((name) => DropdownMenuItem<String>(value: name, child: Text(name)))
-                .toList(),
+            items:
+                walletNames
+                    .map(
+                      (name) => DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => selectedWallet = v ?? selectedWallet,
-            validator: (v) => Validators.validateWallet(v, fieldName: l10n.walletToAdjustLabel),
+            validator:
+                (v) => Validators.validateWallet(
+                  v,
+                  fieldName: l10n.walletToAdjustLabel,
+                ),
             isRequired: true,
           ),
           const SizedBox(height: 16),
-          UtilityWidgets.buildLabel(context: context, text: l10n.actualBalanceAfterAdjustmentLabel),
+          UtilityWidgets.buildLabel(
+            context: context,
+            text: l10n.actualBalanceAfterAdjustmentLabel,
+          ),
           const SizedBox(height: 8),
           InputFields.buildBalanceInputField(
             balanceAfterController,
@@ -476,9 +791,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           InputFields.buildBalanceInputField(
             amountController,
             validator: (value) {
-              final currentBalance = walletBalances[selectedType == l10n.transactionTypeTransfer
-                  ? selectedFromWallet
-                  : selectedWallet] ??
+              final currentBalance =
+                  walletBalances[selectedType == l10n.transactionTypeTransfer
+                      ? selectedFromWallet
+                      : selectedWallet] ??
                   0.0;
               return Validators.validateTransactionAmount(
                 value: value,
@@ -493,8 +809,12 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       ],
       onActionButtonPressed: () {
         dateError = Validators.validateDate(selectedDate);
-        if (selectedType == l10n.transactionTypeBorrow || selectedType == l10n.transactionTypeLend) {
-          repaymentDateError = Validators.validateRepaymentDate(repaymentDate, selectedDate);
+        if (selectedType == l10n.transactionTypeBorrow ||
+            selectedType == l10n.transactionTypeLend) {
+          repaymentDateError = Validators.validateRepaymentDate(
+            repaymentDate,
+            selectedDate,
+          );
         } else {
           repaymentDateError = null;
         }
@@ -522,10 +842,13 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               );
               return;
             }
-            if (walletNames.length > 1 && selectedFromWallet == selectedToWallet) {
+            if (walletNames.length > 1 &&
+                selectedFromWallet == selectedToWallet) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(l10n.sourceAndDestinationWalletCannotBeSameError),
+                  content: Text(
+                    l10n.sourceAndDestinationWalletCannotBeSameError,
+                  ),
                   behavior: SnackBarBehavior.floating,
                   margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 ),
@@ -536,7 +859,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             if (selectedWallet.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(l10n.selectWalletForTransactionError(selectedType)),
+                  content: Text(
+                    l10n.selectWalletForTransactionError(selectedType),
+                  ),
                   behavior: SnackBarBehavior.floating,
                   margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 ),
@@ -545,13 +870,18 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             }
           }
 
-          final amount = Formatter.getRawCurrencyValue(amountController.text).toDouble();
-          final balanceAfter = selectedType == l10n.transactionTypeAdjustment
-              ? Formatter.getRawCurrencyValue(balanceAfterController.text).toDouble()
-              : null;
+          final amount =
+              Formatter.getRawCurrencyValue(amountController.text).toDouble();
+          final balanceAfter =
+              selectedType == l10n.transactionTypeAdjustment
+                  ? Formatter.getRawCurrencyValue(
+                    balanceAfterController.text,
+                  ).toDouble()
+                  : null;
 
           String sourceWalletName = '';
-          if (selectedType == l10n.transactionTypeExpense || selectedType == l10n.transactionTypeLend) {
+          if (selectedType == l10n.transactionTypeExpense ||
+              selectedType == l10n.transactionTypeLend) {
             sourceWalletName = selectedWallet;
           } else if (selectedType == l10n.transactionTypeTransfer) {
             sourceWalletName = selectedFromWallet;
@@ -562,15 +892,24 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             if (amount > sourceBalance) {
               final locale = Intl.getCurrentLocale();
               final formattedSourceBalance = NumberFormat.currency(
-                  locale: locale, symbol: '', decimalDigits: 0)
-                  .format(sourceBalance);
+                locale: locale,
+                symbol: '',
+                decimalDigits: 0,
+              ).format(sourceBalance);
               final formattedAmount = NumberFormat.currency(
-                  locale: locale, symbol: '', decimalDigits: 0)
-                  .format(amount);
+                locale: locale,
+                symbol: '',
+                decimalDigits: 0,
+              ).format(amount);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(l10n.insufficientBalanceError(
-                      sourceWalletName, formattedSourceBalance, formattedAmount)),
+                  content: Text(
+                    l10n.insufficientBalanceError(
+                      sourceWalletName,
+                      formattedSourceBalance,
+                      formattedAmount,
+                    ),
+                  ),
                   behavior: SnackBarBehavior.floating,
                   margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 ),
@@ -579,13 +918,20 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             }
           }
 
-          String mapLocalizedTypeToKey(String localizedType, AppLocalizations l10n) {
+          String mapLocalizedTypeToKey(
+            String localizedType,
+            AppLocalizations l10n,
+          ) {
             if (localizedType == l10n.transactionTypeIncome) return "income";
             if (localizedType == l10n.transactionTypeExpense) return "expense";
-            if (localizedType == l10n.transactionTypeTransfer) return "transfer";
+            if (localizedType == l10n.transactionTypeTransfer) {
+              return "transfer";
+            }
             if (localizedType == l10n.transactionTypeBorrow) return "borrow";
             if (localizedType == l10n.transactionTypeLend) return "lend";
-            if (localizedType == l10n.transactionTypeAdjustment) return "adjustment";
+            if (localizedType == l10n.transactionTypeAdjustment) {
+              return "adjustment";
+            }
             return localizedType; // Fallback
           }
 
@@ -598,22 +944,42 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                 amount: amount,
                 date: selectedDate,
                 typeKey: mapLocalizedTypeToKey(selectedType, l10n),
-                categoryKey: selectedType == l10n.transactionTypeExpense ? selectedCategoryKey : '',
-                wallet: selectedType != l10n.transactionTypeTransfer ? selectedWallet : null,
-                fromWallet: selectedType == l10n.transactionTypeTransfer ? selectedFromWallet : null,
-                toWallet: selectedType == l10n.transactionTypeTransfer ? selectedToWallet : null,
-                lender: selectedType == l10n.transactionTypeBorrow ? lenderController.text.trim() : null,
-                borrower: selectedType == l10n.transactionTypeLend ? borrowerController.text.trim() : null,
-                repaymentDate: (selectedType == l10n.transactionTypeBorrow || selectedType == l10n.transactionTypeLend)
-                    ? repaymentDate
-                    : null,
+                categoryKey:
+                    selectedType == l10n.transactionTypeExpense
+                        ? selectedCategoryKey
+                        : '',
+                wallet:
+                    selectedType != l10n.transactionTypeTransfer
+                        ? selectedWallet
+                        : null,
+                fromWallet:
+                    selectedType == l10n.transactionTypeTransfer
+                        ? selectedFromWallet
+                        : null,
+                toWallet:
+                    selectedType == l10n.transactionTypeTransfer
+                        ? selectedToWallet
+                        : null,
+                lender:
+                    selectedType == l10n.transactionTypeBorrow
+                        ? lenderController.text.trim()
+                        : null,
+                borrower:
+                    selectedType == l10n.transactionTypeLend
+                        ? borrowerController.text.trim()
+                        : null,
+                repaymentDate:
+                    (selectedType == l10n.transactionTypeBorrow ||
+                            selectedType == l10n.transactionTypeLend)
+                        ? repaymentDate
+                        : null,
                 balanceAfter: balanceAfter,
               ),
             ),
           );
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              Navigator.of(context).pop(); // Quay lại TransactionListScreen
+              Navigator.pop(context);
             }
           });
         } else {
@@ -629,7 +995,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
     );
   }
 
-  void _confirmDeleteTransaction(BuildContext context, TransactionModel transaction) {
+  void _confirmDeleteTransaction(
+    BuildContext context,
+    TransactionModel transaction,
+  ) {
     context.read<TransactionBloc>().add(DeleteTransaction(transaction.id));
   }
 
@@ -656,7 +1025,8 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                 UtilityWidgets.showCustomSnackBar(
                   context: context,
                   message: state.message(context),
-                  backgroundColor: Theme.of(context).colorScheme.primary, // Đồng bộ theme
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary, // Đồng bộ theme
                 );
                 if (_isInitialized && _userId != null) {
                   context.read<WalletBloc>().add(LoadWallets());
@@ -685,17 +1055,37 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                                 _searchQuery = '';
                               });
                             } else {
-                              AppRoutes.navigateToDashboard(context);
+                              context.pop();
                             }
                           },
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
                           actions: [
+                            // Filter button using common widget
+                            BottomSheets.buildFilterButton(
+                              context: context,
+                              tooltip: l10n.filterTooltip,
+                              onPressed: _showFilterBottomSheet,
+                            ),
+                            // Sort button using common widget
+                            BottomSheets.buildSortButton(
+                              context: context,
+                              tooltip: l10n.sortTooltip,
+                              onPressed: _showSortBottomSheet,
+                            ),
+                            // Search button
                             IconButton(
                               icon: Icon(
                                 _isSearching ? Icons.close : Icons.search,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                               ),
-                              tooltip: _isSearching ? l10n.closeSearchTooltip : l10n.searchTooltip,
+                              tooltip:
+                                  _isSearching
+                                      ? l10n.closeSearchTooltip
+                                      : l10n.searchTooltip,
                               onPressed: () {
                                 setState(() {
                                   _isSearching = !_isSearching;
@@ -705,24 +1095,96 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                             ),
                           ],
                         ),
-                        if (state is TransactionLoading || state is TransactionInitial)
+                        if (state is TransactionLoading ||
+                            state is TransactionInitial)
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            child: UtilityWidgets.buildLoadingIndicator(context: context),
+                            child: UtilityWidgets.buildLoadingIndicator(
+                              context: context,
+                            ),
                           ),
+                        // Search field
                         if (_isSearching)
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: UtilityWidgets.buildSearchField(
                               context: context,
                               hintText: l10n.searchTransactionsHint,
-                              onChanged: (value) => setState(() => _searchQuery = value),
+                              onChanged:
+                                  (value) =>
+                                      setState(() => _searchQuery = value),
                             ),
                           ),
-                        if (!(state is TransactionLoading || state is TransactionInitial))
+                        // Show active filters indicators using common widget
+                        if (_selectedTypeFilters.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 16.0,
+                              right: 16.0,
+                              bottom: 8.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children:
+                                        _selectedTypeFilters.map((filter) {
+                                          return BottomSheets.buildFilterChip(
+                                            context: context,
+                                            label:
+                                                _transactionTypeMap[filter] ??
+                                                filter,
+                                            onDeleted: () {
+                                              setState(() {
+                                                _selectedTypeFilters.remove(
+                                                  filter,
+                                                );
+                                              });
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        // Show sorting indicator
+                        if (_sortOrder != 'newest')
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${l10n.sortLabel}: ',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  _sortOrder == 'oldest'
+                                      ? l10n.oldest
+                                      : _sortOrder == 'highest'
+                                      ? l10n.highestAmount
+                                      : l10n.lowestAmount,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (!(state is TransactionLoading ||
+                            state is TransactionInitial))
                           AppBarTabBar.buildTabBar(
                             context: context,
-                            tabTitles: [l10n.tabByDay, l10n.tabByMonth, l10n.tabByYear],
+                            tabTitles: [
+                              l10n.tabByDay,
+                              l10n.tabByMonth,
+                              l10n.tabByYear,
+                            ],
                             onTabChanged: (index) {
                               setState(() {
                                 _selectedTabIndex = index;
@@ -734,15 +1196,21 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                       ],
                     ),
                   ),
-                  if (!(state is TransactionLoading || state is TransactionInitial))
+                  if (!(state is TransactionLoading ||
+                      state is TransactionInitial))
                     SliverFillRemaining(
                       child: TabBarView(
                         controller: _tabController,
                         children: List.generate(
                           3,
-                              (index) => RefreshIndicator(
+                          (index) => RefreshIndicator(
                             onRefresh: _refreshTransactions,
-                            child: _buildTabViewContent(state, index, l10n, locale),
+                            child: _buildTabViewContent(
+                              state,
+                              index,
+                              l10n,
+                              locale,
+                            ),
                           ),
                         ),
                       ),
@@ -755,27 +1223,61 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             onPressed: () => AppRoutes.navigateToTransaction(context),
             tooltip: l10n.addTransactionTooltip,
             backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
+            child: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildTabViewContent(TransactionState state, int type, AppLocalizations l10n, Locale locale) {
+  Widget _buildTabViewContent(
+    TransactionState state,
+    int type,
+    AppLocalizations l10n,
+    Locale locale,
+  ) {
     if (state is TransactionLoaded) {
-      final transactions = _filterTransactions(_searchQuery, state.transactions)
-        ..sort((a, b) => b.date.compareTo(a.date));
+      // First filter by search query
+      var transactions = _filterTransactions(_searchQuery, state.transactions);
+
+      // Then filter by transaction type using the updated multi-selection method
+      transactions = _filterTransactionsByType(
+        transactions,
+        _selectedTypeFilters,
+      );
+
+      // Finally sort transactions
+      transactions = _sortTransactions(transactions, _sortOrder);
+
       if (transactions.isEmpty) {
         return UtilityWidgets.buildEmptyState(
           context: context,
-          message: _isSearching ? l10n.noMatchingTransactions : l10n.noTransactionsYet,
-          suggestion: _isSearching ? null : l10n.addFirstTransactionHint,
-          onActionPressed: _isSearching ? null : () => AppRoutes.navigateToTransaction(context),
-          actionText: _isSearching ? null : l10n.addTransactionButton,
+          message:
+              _isSearching || _selectedTypeFilters.isNotEmpty
+                  ? l10n.noMatchingTransactions
+                  : l10n.noTransactionsYet,
+          suggestion:
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
+                  ? null
+                  : l10n.addFirstTransactionHint,
+          onActionPressed:
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
+                  ? null
+                  : () => AppRoutes.navigateToTransaction(context),
+          actionText:
+              (_isSearching || _selectedTypeFilters.isNotEmpty)
+                  ? null
+                  : l10n.addTransactionButton,
         );
       }
-      return _buildGroupedListView(_groupTransactions(transactions, type, locale), l10n, locale);
+      return _buildGroupedListView(
+        _groupTransactions(transactions, type, locale),
+        l10n,
+        locale,
+      );
     } else if (state is TransactionError) {
       return UtilityWidgets.buildErrorState(
         context: context,

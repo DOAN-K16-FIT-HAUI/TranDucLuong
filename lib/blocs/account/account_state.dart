@@ -28,3 +28,5 @@ class AccountError extends AccountState {
 class AccountPasswordChanged extends AccountState {}
 
 class AccountLoggedOut extends AccountState {}
+
+class AccountDeleted extends AccountState {}

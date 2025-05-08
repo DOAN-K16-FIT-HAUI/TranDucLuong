@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "604592554761",
+    "project_id": "financial-management-b7043",
+    "storage_bucket": "financial-management-b7043.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604592554761:android:e1aa37ad84eed38a4349d8",
+        "android_client_info": {
+          "package_name": "com.io.ziblox.financial_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604592554761-g62kienaac9nvthj78vphedukcltmdeg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.io.ziblox.financial_app",
+            "certificate_hash": "340e3ef2f8af67b50824cefcf774c343ed9989c0"
+          }
+        },
+        {
+          "client_id": "604592554761-l0cfrccm3urapg7fccdnebvoh98b3ecs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC07XF3NY7uH5RpGTeSwI5wz_kKuQfidGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604592554761-l0cfrccm3urapg7fccdnebvoh98b3ecs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

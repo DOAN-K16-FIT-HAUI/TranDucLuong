@@ -22,6 +22,7 @@ import 'package:finance_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
@@ -142,17 +143,14 @@ class TransactionScreenState extends State<TransactionScreen> {
     try {
       PermissionStatus permissionStatus;
       String permissionDeniedMessage;
-      String openSettingsMessage;
       final l10n = AppLocalizations.of(context)!;
 
       if (source == 'camera') {
         permissionStatus = await Permission.camera.request();
         permissionDeniedMessage = l10n.cameraPermissionDenied;
-        openSettingsMessage = l10n.openSettingsToEnableCamera;
       } else if (source == 'gallery') {
         permissionStatus = await Permission.photos.request();
         permissionDeniedMessage = l10n.galleryPermissionDenied;
-        openSettingsMessage = l10n.openSettingsToEnableGallery;
       } else {
         return;
       }
@@ -177,9 +175,12 @@ class TransactionScreenState extends State<TransactionScreen> {
         }
 
         final inputImage = InputImage.fromFile(File(pickedFile.path));
-        final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
+        final RecognizedText recognizedText = await _textRecognizer
+            .processImage(inputImage);
 
-        Map<String, dynamic>? receiptData = _parseReceiptText(recognizedText.text);
+        Map<String, dynamic>? receiptData = _parseReceiptText(
+          recognizedText.text,
+        );
 
         if (receiptData == null && mounted) {
           UtilityWidgets.showCustomSnackBar(
@@ -193,7 +194,8 @@ class TransactionScreenState extends State<TransactionScreen> {
         if (receiptData != null && mounted) {
           final data = receiptData;
           setState(() {
-            if (data.containsKey('description') && data['description'] != null) {
+            if (data.containsKey('description') &&
+                data['description'] != null) {
               _descriptionController.text = data['description'].toString();
             }
             if (data.containsKey('amount') && data['amount'] != null) {
@@ -203,9 +205,11 @@ class TransactionScreenState extends State<TransactionScreen> {
               );
             }
             if (data.containsKey('date') && data['date'] != null) {
-              _selectedDate = data['date'] is DateTime
-                  ? data['date']
-                  : DateTime.tryParse(data['date'].toString()) ?? DateTime.now();
+              _selectedDate =
+                  data['date'] is DateTime
+                      ? data['date']
+                      : DateTime.tryParse(data['date'].toString()) ??
+                          DateTime.now();
               _dateError = null;
             }
             if (data.containsKey('categoryKey') &&
@@ -243,8 +247,8 @@ class TransactionScreenState extends State<TransactionScreen> {
         }
       }
     } catch (e) {
-      final l10n = AppLocalizations.of(context)!;
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         UtilityWidgets.showCustomSnackBar(
           context: context,
           message: '${l10n.receiptScanError}: $e',
@@ -311,6 +315,7 @@ class TransactionScreenState extends State<TransactionScreen> {
           result['date'] = parsedDate;
           break;
         } catch (e) {
+          debugPrint('Error parsing date: $e');
         }
       }
     }
@@ -822,7 +827,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                     ),
                     showBackButton: true,
                     backIcon: Icons.arrow_back,
-                    onBackPressed: () => AppRoutes.navigateToDashboard(context),
+                    onBackPressed: () => context.pop(),
                     actions: [
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
