@@ -8,9 +8,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final ReportRepository _reportRepository;
 
+  // Keep track of the last loaded report data
+  String? _lastUserId;
+  DateTime? _lastStartDate;
+  DateTime? _lastEndDate;
+  ReportLoaded? _lastLoadedState;
+
   ReportBloc(this._reportRepository) : super(ReportInitial()) {
     on<FetchReportData>(_onFetchReportData);
     on<ExportReportToCsv>(_onExportReportToCsv);
+    on<ImportTransactionsFromCsv>(_onImportTransactionsFromCsv);
   }
 
   Future<void> _onFetchReportData(
@@ -19,6 +26,11 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   ) async {
     emit(ReportLoading());
     try {
+      // Store the parameters for potential reload later
+      _lastUserId = event.userId;
+      _lastStartDate = event.startDate;
+      _lastEndDate = event.endDate;
+
       final result = await _reportRepository.getReportData(
         event.userId,
         event.startDate,
@@ -55,15 +67,16 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         (sum, item) => sum + item.amount,
       );
 
-      emit(
-        ReportLoaded(
-          categoryData: categoryData,
-          balanceData: balanceData,
-          typeData: typeData,
-          totalIncome: totalIncome,
-          totalExpenses: totalExpenses,
-        ),
+      // Create and store the loaded state
+      _lastLoadedState = ReportLoaded(
+        categoryData: categoryData,
+        balanceData: balanceData,
+        typeData: typeData,
+        totalIncome: totalIncome,
+        totalExpenses: totalExpenses,
       );
+
+      emit(_lastLoadedState!);
     } catch (e) {
       emit(
         ReportError(
@@ -77,6 +90,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     ExportReportToCsv event,
     Emitter<ReportState> emit,
   ) async {
+    // Store current state to restore it after export
+    final currentState = state;
+
     emit(ReportExportInProgress());
     try {
       final filePath = await _reportRepository.exportReportToCsv(
@@ -85,11 +101,67 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         event.endDate,
       );
 
+      // Emit success state with the file path
       emit(ReportExportSuccess(filePath));
+
+      // After showing export success, reload the report data to restore the chart
+      if (_lastUserId != null &&
+          _lastStartDate != null &&
+          _lastEndDate != null) {
+        // If we have last loaded parameters, restore report state
+        add(
+          FetchReportData(
+            userId: _lastUserId!,
+            startDate: _lastStartDate!,
+            endDate: _lastEndDate!,
+          ),
+        );
+      } else if (currentState is ReportLoaded) {
+        // If we can't reload, at least restore the previous state
+        emit(currentState);
+      }
     } catch (e) {
       emit(
         ReportExportFailure(
           (context) => AppLocalizations.of(context)!.exportFailure,
+        ),
+      );
+
+      // Restore previous state on failure
+      if (currentState is ReportLoaded) {
+        emit(currentState);
+      }
+    }
+  }
+
+  Future<void> _onImportTransactionsFromCsv(
+    ImportTransactionsFromCsv event,
+    Emitter<ReportState> emit,
+  ) async {
+    emit(ReportImportInProgress());
+    try {
+      final transactionCount = await _reportRepository
+          .importTransactionsFromCsv(event.userId, event.filePath);
+
+      emit(ReportImportSuccess(transactionCount));
+
+      // Reload report data after successful import if we have last parameters
+      if (_lastUserId != null &&
+          _lastStartDate != null &&
+          _lastEndDate != null) {
+        add(
+          FetchReportData(
+            userId: _lastUserId!,
+            startDate: _lastStartDate!,
+            endDate: _lastEndDate!,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(
+        ReportImportFailure(
+          (context) =>
+              AppLocalizations.of(context)!.importFailure(e.toString()),
         ),
       );
     }

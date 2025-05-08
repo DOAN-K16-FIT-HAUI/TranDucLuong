@@ -51,3 +51,16 @@ class ExportReportToCsv extends ReportEvent {
   @override
   List<Object?> get props => [userId, startDate, endDate];
 }
+
+class ImportTransactionsFromCsv extends ReportEvent {
+  final String userId;
+  final String filePath;
+
+  const ImportTransactionsFromCsv({
+    required this.userId,
+    required this.filePath,
+  });
+
+  @override
+  List<Object?> get props => [userId, filePath];
+}

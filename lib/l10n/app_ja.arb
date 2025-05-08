@@ -462,5 +462,52 @@
   "applySort": "並べ替えを適用",
   "@applySort": {
     "description": "選択した並べ替え順序を適用するボタンのテキスト"
-  }
+  },
+  "importFailure": "インポートに失敗しました: {error}",
+  "@importFailure": {
+    "description": "インポート操作が失敗した時に表示されるメッセージ",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "ネットワークタイムアウト"
+      }
+    }
+  },
+  "importSuccessMessage": "{count}件の取引をインポートしました",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "exportReportToCSV": "CSVにレポートをエクスポート",
+  "importTransactionsFromCSV": "CSVから取引をインポート",
+  "filePickerError": "ファイルの選択に失敗しました",
+  "exportSuccessTitle": "エクスポート成功",
+  "exportSuccessMessage": "レポートが正常にエクスポートされました。",
+  "okButton": "OK",
+  "exportShareMessage": "エクスポートされた取引レポートです。",
+  "shareButton": "共有",
+  "permissionRequired": "権限が必要です",
+  "storagePermissionExplanation": "ファイルのインポートおよびエクスポートのためにストレージアクセスが必要です。",
+  "fileLocationHelpText": "エクスポートされたファイルの保存場所です。",
+  "openLocation": "場所を開く",
+  "fileStorageLocation": "ファイル保存先: {location}",
+  "@fileStorageLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String",
+        "example": "/storage/emulated/0/Download"
+      }
+    }
+  },
+  "fileNotFoundError": "ファイルが見つかりませんでした",
+  "cannotOpenLocation": "ファイルの場所を開くことができません",
+  "fileLocationExplanation": "ファイルは保存されましたが、その場所を直接開くことはできませんでした。ファイルを共有するか、下のパスを使って手動で探してください。",
+  "manuallyFindAt": "ファイルの場所:",
+  "closeButton": "閉じる",
+  "cannotOpenDirectly": "このファイルは直接開くことができません",
+  "exportedReport": "エクスポートされた財務レポート",
+  "saveReportAs": "レポートを保存",
+  "chooseSaveLocation": "保存場所を選択",
+  "saveLocationCancelled": "保存場所の選択がキャンセルされました。デフォルトの場所を使用します"
 }

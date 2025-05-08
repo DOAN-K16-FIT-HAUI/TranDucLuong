@@ -66,3 +66,24 @@ class ReportExportFailure extends ReportState {
   @override
   List<Object?> get props => [message];
 }
+
+// New states for import functionality
+class ReportImportInProgress extends ReportState {}
+
+class ReportImportSuccess extends ReportState {
+  final int transactionCount;
+
+  const ReportImportSuccess(this.transactionCount);
+
+  @override
+  List<Object?> get props => [transactionCount];
+}
+
+class ReportImportFailure extends ReportState {
+  final String Function(BuildContext) message;
+
+  const ReportImportFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

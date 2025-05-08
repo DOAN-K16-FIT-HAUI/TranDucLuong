@@ -19,12 +19,8 @@ service cloud.firestore {
       }
 
       match /groupMemberships/{groupId} {
-        // Chỉ user đó mới được đọc/ghi vào danh sách group của mình
-        // Thử tách create ra xem có khác biệt không
         allow create: if isUserAuthenticated() && request.auth.uid == userId;
         allow read, update, delete: if isUserAuthenticated() && request.auth.uid == userId;
-        // Hoặc giữ allow read, write như cũ cũng được
-        // allow read, write: if isUserAuthenticated() && request.auth.uid == userId;
       }
     }
 
@@ -70,7 +66,6 @@ service cloud.firestore {
     }
 
     function isGroupAdmin(groupId) {
-      // Phải check group tồn tại VÀ adminIds là list TRƯỚC KHI dùng `in`
       let groupDocPath = /databases/$(database)/documents/groups/$(groupId);
       return isUserAuthenticated() &&
              exists(groupDocPath) &&
@@ -84,7 +79,6 @@ service cloud.firestore {
 
     function isGroupActiveMember(groupId) {
       let memberPath = /databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid);
-      // Phải check member doc tồn tại TRƯỚC KHI đọc status
       return isUserAuthenticated() &&
              exists(memberPath) &&
              get(memberPath).data.status == 'active';

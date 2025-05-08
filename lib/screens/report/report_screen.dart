@@ -9,11 +9,14 @@ import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/buttons.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
 import 'package:finance_app/utils/common_widget/utility_widgets.dart';
+import 'package:finance_app/utils/permissions_handler.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -86,6 +89,7 @@ class _ReportScreenState extends State<ReportScreen>
             title: l10n.reportsTitle,
             showBackButton: false,
             backgroundColor: theme.colorScheme.primaryContainer,
+            actions: [_buildExportImportMenu(context, authState)],
           ),
           body: Column(
             children: [
@@ -118,6 +122,249 @@ class _ReportScreenState extends State<ReportScreen>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildExportImportMenu(BuildContext context, AuthState authState) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return BlocListener<ReportBloc, ReportState>(
+      listenWhen:
+          (previous, current) =>
+              current is ReportExportSuccess ||
+              current is ReportExportFailure ||
+              current is ReportImportSuccess ||
+              current is ReportImportFailure,
+      listener: (context, state) {
+        if (state is ReportExportSuccess) {
+          _showExportSuccessDialog(context, state.filePath);
+        } else if (state is ReportExportFailure) {
+          // Show more detailed error and option to fix permission issues
+          _handleExportError(context, state.message(context));
+        } else if (state is ReportImportSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.importSuccessMessage(state.transactionCount)),
+              backgroundColor: theme.colorScheme.primary,
+            ),
+          );
+        } else if (state is ReportImportFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message(context)),
+              backgroundColor: theme.colorScheme.error,
+            ),
+          );
+        }
+      },
+      child: PopupMenuButton<String>(
+        icon: Icon(
+          Icons.more_vert,
+          color: theme.colorScheme.onPrimaryContainer,
+        ),
+        itemBuilder:
+            (context) => [
+              PopupMenuItem<String>(
+                value: 'export',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.file_download,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(l10n.exportReportToCSV),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'import',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.file_upload,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(l10n.importTransactionsFromCSV),
+                  ],
+                ),
+              ),
+            ],
+        onSelected: (value) {
+          if (value == 'export' &&
+              authState is AuthAuthenticated &&
+              _startDate != null &&
+              _endDate != null) {
+            context.read<ReportBloc>().add(
+              ExportReportToCsv(
+                userId: authState.user.id,
+                startDate: _startDate!,
+                endDate: _endDate!,
+              ),
+            );
+          } else if (value == 'import' && authState is AuthAuthenticated) {
+            _importCsvFile(context, authState.user.id);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleExportError(BuildContext context, String message) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    // Check if it's a permission error
+    if (message.contains('permission') || message.contains('denied')) {
+      final bool granted = await PermissionsHandler.requestStoragePermissions(
+        context,
+      );
+
+      if (granted && mounted) {
+        // If permission was granted, retry export
+        final authState = context.read<AuthBloc>().state;
+        if (authState is AuthAuthenticated &&
+            _startDate != null &&
+            _endDate != null) {
+          context.read<ReportBloc>().add(
+            ExportReportToCsv(
+              userId: authState.user.id,
+              startDate: _startDate!,
+              endDate: _endDate!,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // For other errors, show regular snackbar
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: theme.colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _importCsvFile(BuildContext context, String userId) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        if (file.path != null) {
+          context.read<ReportBloc>().add(
+            ImportTransactionsFromCsv(userId: userId, filePath: file.path!),
+          );
+        }
+      }
+    } catch (e) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.filePickerError),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  void _showExportSuccessDialog(BuildContext context, String filePath) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    // Get a more user-friendly file path representation
+    final pathInfo = await PermissionsHandler.getReadableFilePath(filePath);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing dialog by tapping outside
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.exportSuccessTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.exportSuccessMessage),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.fileStorageLocation(pathInfo['location']!),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: theme.colorScheme.surfaceVariant,
+                  ),
+                  child: SelectableText(
+                    pathInfo['displayPath']!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        l10n.fileLocationHelpText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Pass context to the openFileLocation method
+                  PermissionsHandler.openFileLocation(filePath, context);
+                },
+                child: Text(l10n.openLocation),
+              ),
+              TextButton(
+                onPressed: () {
+                  Share.shareXFiles([
+                    XFile(filePath),
+                  ], text: l10n.exportShareMessage);
+                },
+                child: Text(l10n.shareButton),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(l10n.okButton),
+              ),
+            ],
+          ),
     );
   }
 
@@ -178,7 +425,7 @@ class _ReportScreenState extends State<ReportScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
                   size: 16,
                 ),
               ),
@@ -278,6 +525,11 @@ class _ReportScreenState extends State<ReportScreen>
     final theme = Theme.of(context);
 
     return BlocBuilder<ReportBloc, ReportState>(
+      buildWhen:
+          (previous, current) =>
+              current is ReportLoading ||
+              current is ReportError ||
+              current is ReportLoaded,
       builder: (context, state) {
         if (state is ReportLoading) {
           return Center(
@@ -397,6 +649,11 @@ class _ReportScreenState extends State<ReportScreen>
     final theme = Theme.of(context);
 
     return BlocBuilder<ReportBloc, ReportState>(
+      buildWhen:
+          (previous, current) =>
+              current is ReportLoading ||
+              current is ReportError ||
+              current is ReportLoaded,
       builder: (context, state) {
         if (state is ReportLoading) {
           return Center(
@@ -470,6 +727,11 @@ class _ReportScreenState extends State<ReportScreen>
     final theme = Theme.of(context);
 
     return BlocBuilder<ReportBloc, ReportState>(
+      buildWhen:
+          (previous, current) =>
+              current is ReportLoading ||
+              current is ReportError ||
+              current is ReportLoaded,
       builder: (context, state) {
         if (state is ReportLoading) {
           return Center(
@@ -537,8 +799,7 @@ class _ReportScreenState extends State<ReportScreen>
                     margin: const EdgeInsets.only(top: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.3),
+                      color: theme.colorScheme.surface.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: theme.dividerColor),
                     ),
