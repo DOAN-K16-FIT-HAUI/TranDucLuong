@@ -23,7 +23,7 @@ class UtilityWidgets {
         focusNode: focusNode,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.poppins(
+          hintStyle: GoogleFonts.notoSans(
             fontSize: 15,
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sửa thành withOpacity
           ),
@@ -39,7 +39,7 @@ class UtilityWidgets {
             horizontal: 20,
           ),
         ),
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.notoSans(
           fontSize: 15,
           color: theme.colorScheme.onSurface,
         ),
@@ -69,7 +69,7 @@ class UtilityWidgets {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               title,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8), // Sửa thành withOpacity
@@ -85,7 +85,7 @@ class UtilityWidgets {
 
             return ChoiceChip(
               label: Text(label),
-              labelStyle: GoogleFonts.poppins(
+              labelStyle: GoogleFonts.notoSans(
                 fontSize: 13,
                 color: isSelected
                     ? theme.colorScheme.primary
@@ -128,7 +128,7 @@ class UtilityWidgets {
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Text(
         text,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: Theme.of(context).colorScheme.onSurface,
@@ -171,7 +171,7 @@ class UtilityWidgets {
             const SizedBox(height: 20),
             Text(
               message,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 17,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Sửa thành withOpacity
               ),
@@ -181,7 +181,7 @@ class UtilityWidgets {
               const SizedBox(height: 10),
               Text(
                 suggestion,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.notoSans(
                   fontSize: 14,
                   color: theme.hintColor,
                 ),
@@ -204,7 +204,7 @@ class UtilityWidgets {
                     horizontal: 20,
                     vertical: 12,
                   ),
-                  textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                  textStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -236,7 +236,7 @@ class UtilityWidgets {
             const SizedBox(height: 16),
             Text(
               effectiveTitle,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: iconColor,
@@ -247,7 +247,7 @@ class UtilityWidgets {
             Text(
               message(context),
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 14, color: theme.hintColor),
+              style: GoogleFonts.notoSans(fontSize: 14, color: theme.hintColor),
             ),
             const SizedBox(height: 30),
             ElevatedButton.icon(
@@ -261,7 +261,7 @@ class UtilityWidgets {
                   horizontal: 20,
                   vertical: 12,
                 ),
-                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                textStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w500),
               ),
             ),
           ],

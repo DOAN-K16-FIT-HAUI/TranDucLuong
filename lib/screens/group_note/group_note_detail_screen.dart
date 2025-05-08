@@ -44,7 +44,7 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBarTabBar.buildAppBar( // Use common AppBar
+      appBar: AppBarTabBar.buildAppBar(
         context: context,
         title: l10n.noteDetailTitle,
         showBackButton: true,
@@ -61,11 +61,11 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
                 style: theme.textTheme.displayMedium, // Use theme style
               ),
               const SizedBox(height: 8),
-              Text( // Keep Text, styled by theme
+              Text(
                 '${l10n.createdBy}: ${currentNote.createdBy}',
                 style: theme.textTheme.bodySmall,
               ),
-              Text( // Keep Text, styled by theme
+              Text(
                 Formatter.formatDateTime(
                   currentNote.createdAt,
                   locale: Localizations.localeOf(context),
@@ -80,9 +80,9 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
                   runSpacing: 4,
                   children: currentNote.tags
                       .map(
-                        (tag) => Chip( // Keep Chip, style based on theme
+                        (tag) => Chip(
                       label: Text(tag, style: theme.textTheme.labelSmall),
-                      backgroundColor: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5), // Use theme color
+                      backgroundColor: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     ),
@@ -93,14 +93,14 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
               const SizedBox(height: 16),
               Divider(color: theme.dividerColor.withValues(alpha: 0.5)), // Keep Divider
               const SizedBox(height: 16),
-              Text( // Keep Text, styled by theme
+              Text(
                 currentNote.content,
                 style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
               ),
               const SizedBox(height: 24),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.5)), // Keep Divider
+              Divider(color: theme.dividerColor.withValues(alpha: 0.5)),
               const SizedBox(height: 16),
-              UtilityWidgets.buildLabel( // Use common Label
+              UtilityWidgets.buildLabel(
                 context: context,
                 text: l10n.commentsLabel,
               ),
@@ -125,7 +125,7 @@ class _GroupNoteDetailScreenState extends State<GroupNoteDetailScreen> {
     if (comments.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: UtilityWidgets.buildEmptyState( // Use common EmptyState
+        child: UtilityWidgets.buildEmptyState(
           context: context,
           message: l10n.noComments,
           icon: Icons.comment_outlined,

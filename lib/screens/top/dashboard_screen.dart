@@ -83,7 +83,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               backgroundColor: theme.colorScheme.surface,
               appBar: AppBarTabBar.buildAppBar(
                 context: context,
-                title: l10n.welcomeUser(authState.user.displayName ?? 'User'),
+                title: l10n.welcomeUser(authState.user.displayName ?? ''),
                 showBackButton: false,
                 actions: [
                   BlocBuilder<NotificationBloc, NotificationState>(
@@ -132,6 +132,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(16.0),
+                              margin: const EdgeInsets.only(bottom: 100),
                               child: Column(
                                 children: [
                                   _buildMainBalanceAndWallets(context, wallets, locale),
@@ -196,7 +197,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               symbol: _getCurrencySymbol(locale),
               decimalDigits: 0,
             ).format(totalBalance),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.notoSans(
               fontSize: 30,
               fontWeight: FontWeight.bold,
               color: totalBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
@@ -213,7 +214,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                   },
                   child: Text(
                     l10n.viewAllAccounts,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.notoSans(
                       fontSize: 14,
                       color: theme.colorScheme.primary,
                     ),
@@ -284,7 +285,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           '${value.toInt()}M',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.notoSans(
                             fontSize: 12,
                             color: theme.colorScheme.onSurface.withValues(
                               alpha: 0.6,
@@ -300,7 +301,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           'G${value.toInt() + 1}',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.notoSans(
                             fontSize: 12,
                             color: theme.colorScheme.onSurface.withValues(
                               alpha: 0.6,
@@ -368,8 +369,6 @@ class DashboardScreenState extends State<DashboardScreen> {
             (tx) => ListsCards.buildTransactionListItem(
           context: context,
           transaction: tx,
-          menuItems: [],
-          onMenuSelected: (_) {},
         ),
       )
           .toList(),
@@ -406,8 +405,6 @@ class DashboardScreenState extends State<DashboardScreen> {
             (tx) => ListsCards.buildTransactionListItem(
           context: context,
           transaction: tx,
-          menuItems: [],
-          onMenuSelected: (_) {},
         ),
       )
           .toList(),
@@ -509,7 +506,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               onPressed: onTap,
               child: Text(
                 l10n.viewAll,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.notoSans(
                   fontSize: 14,
                   color: theme.colorScheme.primary,
                 ),

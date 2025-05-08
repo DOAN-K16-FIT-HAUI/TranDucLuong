@@ -5,6 +5,7 @@ import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
@@ -48,10 +49,16 @@ class TopScreenState extends State<TopScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ));
+
     int bottomNavIndex = _selectedIndex < 2 ? _selectedIndex : _selectedIndex + 1;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      extendBody: true,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
@@ -77,7 +84,7 @@ class TopScreenState extends State<TopScreen> {
     const double standardIconSize = 26.0;
     const double fabIconSize = 30.0;
     const double fabContainerHeight = 48.0;
-    const double fabContainerWidth = 56.0;
+    const double fabContainerWidth = 48.0;
 
     return [
       _buildBottomNavItem(theme, Icons.dashboard_outlined, Icons.dashboard, 0, currentBottomNavIndex, l10n.dashboardTitle, standardIconSize),

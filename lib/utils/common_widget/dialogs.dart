@@ -29,7 +29,7 @@ class Dialogs {
             actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             title: Text(
               title,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
@@ -49,7 +49,7 @@ class Dialogs {
                 onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
                   l10n.cancel,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
@@ -64,7 +64,7 @@ class Dialogs {
                 },
                 child: Text(
                   actionButtonText,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -96,7 +96,7 @@ class Dialogs {
             actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             title: Text(
               title,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
@@ -104,7 +104,7 @@ class Dialogs {
             ),
             content: Text(
               content,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 14,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
@@ -114,7 +114,7 @@ class Dialogs {
                 onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
                   l10n.cancel,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
@@ -127,8 +127,72 @@ class Dialogs {
                 },
                 child: Text(
                   l10n.confirm,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  static Future<void> showConfirmDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required String confirmText,
+    required VoidCallback onConfirm,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return showDialog(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            backgroundColor: theme.colorScheme.surface,
+            titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+            contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+            actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            title: Text(
+              title,
+              style: GoogleFonts.notoSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            content: Text(
+              content,
+              style: GoogleFonts.notoSans(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(
+                  l10n.cancel,
+                  style: GoogleFonts.notoSans(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  onConfirm();
+                },
+                child: Text(
+                  confirmText,
+                  style: GoogleFonts.notoSans(
+                    color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -168,7 +232,7 @@ class Dialogs {
             actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             title: Text(
               title.isEmpty ? l10n.selectIconTitle : title,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
@@ -227,7 +291,7 @@ class Dialogs {
                             const SizedBox(height: 4),
                             Text(
                               iconName,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.notoSans(
                                 fontSize: 9,
                                 color: theme.colorScheme.onSurface.withValues(
                                   alpha: 0.7,
@@ -254,7 +318,7 @@ class Dialogs {
                 onPressed: () => Navigator.pop(dialogContext, null),
                 child: Text(
                   l10n.cancel,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),

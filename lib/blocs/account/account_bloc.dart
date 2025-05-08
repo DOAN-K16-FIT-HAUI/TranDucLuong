@@ -20,7 +20,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         super(AccountLoading()) {
     on<LoadAccountDataEvent>(_onLoadAccountData);
     on<ToggleDarkModeEvent>(_onToggleDarkMode);
-    on<ToggleBiometricsEvent>(_onToggleBiometrics); // Thêm
     on<ChangePasswordEvent>(_onChangePassword);
     on<ChangeLanguageEvent>(_onChangeLanguage);
     on<UpdateUserInfoEvent>(_onUpdateUserInfo);
@@ -70,22 +69,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         await _accountRepository.saveDarkMode(event.isDarkMode);
         final updatedUser = currentState.user.copyWith(
           isDarkMode: event.isDarkMode,
-        );
-        emit(AccountLoaded(user: updatedUser));
-      } catch (e) {
-        emit(AccountError((context) => _mapExceptionToMessage(context, e)));
-      }
-    }
-  }
-
-  Future<void> _onToggleBiometrics(
-      ToggleBiometricsEvent event, Emitter<AccountState> emit) async {
-    if (state is AccountLoaded) {
-      final currentState = state as AccountLoaded;
-      try {
-        await _accountRepository.saveBiometricsEnabled(event.isBiometricsEnabled);
-        final updatedUser = currentState.user.copyWith(
-          isBiometricsEnabled: event.isBiometricsEnabled,
         );
         emit(AccountLoaded(user: updatedUser));
       } catch (e) {

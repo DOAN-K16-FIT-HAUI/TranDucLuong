@@ -1,20 +1,18 @@
 class AppPaths {
   static const String splashPath = '/splash';
-  static const String dashboardPath = '/';
-  static const String onBoardingPath = '/on-boarding';
-  static const String transactionsPath = '/transactions';
-  static const String addTransactionPath = '/transactions/add';
-  static const String editTransactionPath = '/transactions/:id';
-  static const String categoriesPath = '/categories';
-  static const String accountPath = '/account';
-  static const String reportsPath = '/reports';
+  static const String onBoardingPath = '/onboarding';
   static const String loginPath = '/login';
   static const String registerPath = '/register';
   static const String forgotPasswordPath = '/forgot-password';
-  static const String transactionListPath = '/transaction-list';
-  static const String walletListPath = '/wallet';
-  static const String appNotificationListPath = '/app-notification';
-  static const String groupNotePath = '/group-note';
-  static const String addEditGroupNotePath = '/group-note/add-edit';
-  static const String groupNoteDetailPath = '/group-note/detail';
+  static const String dashboardPath = '/top';
+  static const String walletListPath = '/top/wallets';
+  static const String appNotificationListPath = '/top/notifications';
+  static const String addTransactionPath = '/top/transactions/add';
+  static const String transactionListPath = '/top/transactions';
+  static const String accountPath = '/top/account';
+  static const String reportsPath = '/top/reports';
+  static const String groupNoteListPath = '/top/group-notes';
+  static const String addEditGroupNotePath = '/top/group-notes/edit';
+  static const String barcodeScannerPath = '/top/barcode-scanner'; // Thêm đường dẫn
+  static String groupNoteDetailPath(String noteId) => '/top/group-notes/detail/$noteId';
 }

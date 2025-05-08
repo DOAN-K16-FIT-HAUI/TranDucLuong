@@ -56,7 +56,7 @@ class NotificationScreen extends StatelessWidget {
               return Center(
                 child: Text(
                   'Chưa có thông báo nào',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.notoSans(
                     fontSize: 16,
                     color: AppTheme.lightTheme.colorScheme.onSurface.withAlpha(
                       153,
@@ -105,7 +105,7 @@ class NotificationScreen extends StatelessWidget {
         margin: const EdgeInsets.only(top: 8),
         subtitle: Text(
           notification.body,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.notoSans(
             fontSize: 14,
             color:
                 isRead
