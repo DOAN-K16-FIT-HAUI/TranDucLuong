@@ -1,7 +1,6 @@
+import 'package:finance_app/data/services/local_notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_app/data/models/app_notification.dart';
-import 'package:finance_app/data/services/local_notification_service.dart';
 
 class FirebaseMessagingService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;

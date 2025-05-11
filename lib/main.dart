@@ -5,7 +5,6 @@ import 'package:finance_app/blocs/account/account_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_event.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
-import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/blocs/localization/localization_bloc.dart';
 import 'package:finance_app/blocs/localization/localization_event.dart';
 import 'package:finance_app/blocs/localization/localization_state.dart';
@@ -17,7 +16,6 @@ import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/core/app_routes.dart';
-import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
 import 'package:finance_app/data/services/local_notification_service.dart';
 import 'package:finance_app/di/injection.dart';
@@ -125,13 +123,9 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<TransactionBloc>(),
         ),
         BlocProvider<AccountBloc>(create: (context) => sl<AccountBloc>()),
-        BlocProvider<GroupNoteBloc>(create: (context) => sl<GroupNoteBloc>()),
         BlocProvider<ReportBloc>(create: (context) => sl<ReportBloc>()),
         Provider<TransactionRepository>(
           create: (context) => sl<TransactionRepository>(),
-        ),
-        Provider<GroupNoteRepository>(
-          create: (context) => sl<GroupNoteRepository>(),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(

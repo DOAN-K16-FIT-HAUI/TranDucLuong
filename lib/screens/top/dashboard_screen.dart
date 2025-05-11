@@ -14,6 +14,7 @@ import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/core/app_theme.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
+import 'package:finance_app/screens/top/top_screen.dart';
 import 'package:finance_app/utils/common_widget/app_bar_tab_bar.dart';
 import 'package:finance_app/utils/common_widget/decorations.dart';
 import 'package:finance_app/utils/common_widget/lists_cards.dart';
@@ -463,7 +464,14 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                   )
                   .toList(),
-      onTap: () => AppRoutes.navigateToTransactionList(context),
+      onTap: () {
+        // Navigate to the parent TopScreen and select the transactions tab (index 1)
+        if (context.findAncestorStateOfType<TopScreenState>() != null) {
+          context.findAncestorStateOfType<TopScreenState>()!.setSelectedIndex(
+            1,
+          );
+        }
+      },
     );
   }
 
@@ -505,7 +513,14 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                   )
                   .toList(),
-      onTap: () => AppRoutes.navigateToTransactionList(context),
+      onTap: () {
+        // Navigate to the parent TopScreen and select the transactions tab (index 1)
+        if (context.findAncestorStateOfType<TopScreenState>() != null) {
+          context.findAncestorStateOfType<TopScreenState>()!.setSelectedIndex(
+            1,
+          );
+        }
+      },
     );
   }
 

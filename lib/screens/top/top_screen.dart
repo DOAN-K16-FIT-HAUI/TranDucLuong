@@ -1,14 +1,11 @@
-import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/core/app_routes.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
-import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/dashboard_screen.dart';
+import 'package:finance_app/screens/transaction/transaction_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:get_it/get_it.dart';
 
 class TopScreen extends StatefulWidget {
   const TopScreen({super.key});
@@ -21,11 +18,8 @@ class TopScreenState extends State<TopScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _screens = [
-    DashboardScreen(),
-    BlocProvider.value(
-      value: GetIt.instance<GroupNoteBloc>(),
-      child: const GroupNoteScreen(),
-    ),
+    const DashboardScreen(),
+    const TransactionListScreen(),
     const ReportScreen(),
     const AccountScreen(),
   ];
@@ -37,6 +31,13 @@ class TopScreenState extends State<TopScreen> {
     }
     setState(() {
       _selectedIndex = index > 2 ? index - 1 : index;
+    });
+  }
+
+  // Add this method to allow external widgets to change the selected tab
+  void setSelectedIndex(int index) {
+    setState(() {
+      _selectedIndex = index;
     });
   }
 
@@ -107,11 +108,11 @@ class TopScreenState extends State<TopScreen> {
       ),
       _buildBottomNavItem(
         theme,
-        Icons.group_outlined,
-        Icons.group,
+        Icons.list_alt_outlined,
+        Icons.list_alt,
         1,
         currentBottomNavIndex,
-        l10n.groupNotesTitle,
+        l10n.transactionHistoryTitle,
         standardIconSize,
       ),
       BottomNavigationBarItem(

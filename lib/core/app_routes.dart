@@ -1,25 +1,19 @@
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_state.dart';
-import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
-import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/app_notification/notification_screen.dart';
 import 'package:finance_app/screens/app_notification/savings_reminder_screen.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
-import 'package:finance_app/screens/group_note/add_edit_group_note_screen.dart';
-import 'package:finance_app/screens/group_note/group_note_detail_screen.dart';
-import 'package:finance_app/screens/group_note/group_note_screen.dart';
 import 'package:finance_app/screens/report/report_screen.dart';
 import 'package:finance_app/screens/top/top_screen.dart';
-import 'package:finance_app/screens/transaction/transaction_list.dart';
+import 'package:finance_app/screens/transaction/transaction_list_screen.dart';
 import 'package:finance_app/screens/transaction/transaction_screen.dart';
 import 'package:finance_app/screens/wallet/wallet_screen.dart';
 import 'package:finance_app/utils/common_widget/route_transitions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_paths.dart';
@@ -34,11 +28,7 @@ class AppRoutes {
   static const String transactionRoute = 'transaction';
   static const String transactionListRoute = 'transaction-list';
   static const String accountRoute = 'account';
-  static const String groupNoteRoute = 'group-note';
-  static const String addEditGroupNoteRoute = 'add-edit-group-note';
-  static const String groupNoteDetailRoute = 'group-note-detail';
   static const String reportRoute = 'report';
-  static const String barcodeScannerRoute = 'barcode-scanner';
   static const String savingsReminderRoute = 'savings-reminder';
 
   static final router = GoRouter(
@@ -86,83 +76,6 @@ class AppRoutes {
               state: state,
             ),
         routes: [
-          GoRoute(
-            name: groupNoteRoute,
-            path: 'group-notes',
-            pageBuilder:
-                (context, state) => RouteTransitions.buildPageWithTransition(
-                  child: BlocProvider.value(
-                    value: GetIt.instance<GroupNoteBloc>(),
-                    child: const GroupNoteScreen(),
-                  ),
-                  state: state,
-                ),
-          ),
-          GoRoute(
-            name: addEditGroupNoteRoute,
-            path: 'group-notes/edit',
-            pageBuilder: (context, state) {
-              final args = state.extra as Map<String, dynamic>?;
-              final note = args?['note'] as GroupNoteModel?;
-              final status =
-                  args?['status'] as String? ?? (note == null ? 'add' : 'edit');
-              final groupId = args?['groupId'] as String?;
-
-              if (groupId == null) {
-                return MaterialPage(
-                  child: Scaffold(
-                    body: Center(child: Text("Error: Group ID missing")),
-                  ),
-                );
-              }
-
-              return RouteTransitions.buildPageWithTransition(
-                child: BlocProvider.value(
-                  value: GetIt.instance<GroupNoteBloc>(),
-                  child: AddEditGroupNoteScreen(
-                    note: note,
-                    status: status,
-                    groupId: groupId,
-                    onSave: (savedNote) {
-                      if (status == 'add') {
-                        context.read<GroupNoteBloc>().add(AddNote(savedNote));
-                      } else {
-                        context.read<GroupNoteBloc>().add(EditNote(savedNote));
-                      }
-                    },
-                  ),
-                ),
-                state: state,
-                transitionType: RouteTransitionType.slide,
-              );
-            },
-          ),
-          GoRoute(
-            name: groupNoteDetailRoute,
-            path: 'group-notes/detail/:noteId',
-            pageBuilder: (context, state) {
-              final note = state.extra as GroupNoteModel?;
-              final noteId = state.pathParameters['noteId'];
-
-              if (note == null || note.id != noteId) {
-                return MaterialPage(
-                  child: Scaffold(
-                    body: Center(
-                      child: Text("Error: Note data missing or ID mismatch"),
-                    ),
-                  ),
-                );
-              }
-              return RouteTransitions.buildPageWithTransition(
-                child: BlocProvider.value(
-                  value: GetIt.instance<GroupNoteBloc>(),
-                  child: GroupNoteDetailScreen(note: note),
-                ),
-                state: state,
-                transitionType: RouteTransitionType.slide,
-              );
-            },
-          ),
           GoRoute(
             name: walletRoute,
             path: 'wallets',
@@ -280,50 +193,6 @@ class AppRoutes {
       context.push(AppPaths.accountPath);
   static void navigateToReport(BuildContext context) =>
       context.push(AppPaths.reportsPath);
-  static void navigateToGroupNoteList(BuildContext context) =>
-      context.push(AppPaths.groupNoteListPath);
-  static void navigateToBarcodeScanner(BuildContext context) =>
-      context.push(AppPaths.barcodeScannerPath);
   static void navigateToSavingsReminder(BuildContext context) =>
       context.go(AppPaths.savingsReminderPath);
-
-  static void navigateToAddEditGroupNote(
-    BuildContext context,
-    GroupNoteModel? note,
-    String status,
-    Function(GroupNoteModel) onSave, {
-    required String groupId,
-  }) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => BlocProvider.value(
-              value: GetIt.instance<GroupNoteBloc>(),
-              child: AddEditGroupNoteScreen(
-                note: note,
-                status: status,
-                groupId: groupId,
-                onSave: onSave,
-              ),
-            ),
-      ),
-    );
-  }
-
-  static void navigateToGroupNoteDetail(
-    BuildContext context,
-    GroupNoteModel note,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => BlocProvider.value(
-              value: GetIt.instance<GroupNoteBloc>(),
-              child: GroupNoteDetailScreen(note: note),
-            ),
-      ),
-    );
-  }
 }

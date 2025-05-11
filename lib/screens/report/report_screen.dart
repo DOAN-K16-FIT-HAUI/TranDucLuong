@@ -215,7 +215,6 @@ class _ReportScreenState extends State<ReportScreen>
   }
 
   Future<void> _handleExportError(BuildContext context, String message) async {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     // Check if it's a permission error
@@ -309,7 +308,7 @@ class _ReportScreenState extends State<ReportScreen>
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                   ),
                   child: SelectableText(
                     pathInfo['displayPath']!,
@@ -425,7 +424,7 @@ class _ReportScreenState extends State<ReportScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 16,
                 ),
               ),
@@ -799,7 +798,7 @@ class _ReportScreenState extends State<ReportScreen>
                     margin: const EdgeInsets.only(top: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.3),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: theme.dividerColor),
                     ),

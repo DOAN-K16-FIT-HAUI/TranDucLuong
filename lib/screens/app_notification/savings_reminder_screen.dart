@@ -140,7 +140,7 @@ class _SavingsReminderScreenState extends State<SavingsReminderScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppTheme.notificationSuccessColor.withOpacity(0.1),
+                      color: AppTheme.notificationSuccessColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: AppTheme.notificationSuccessColor,
@@ -170,7 +170,7 @@ class _SavingsReminderScreenState extends State<SavingsReminderScreen> {
                   // Thêm nút kiểm tra thông báo
                   TextButton.icon(
                     icon: const Icon(Icons.refresh),
-                    label: Text(l10n.updateReminderButton ?? "Check reminders"),
+                    label: Text(l10n.updateReminderButton),
                     onPressed: _checkScheduledNotifications,
                   ),
                   const SizedBox(height: 16),
