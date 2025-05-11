@@ -17,7 +17,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="finance_app"
+        android:label="Finance Manager"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true">
