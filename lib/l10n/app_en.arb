@@ -708,5 +708,21 @@
   "exportedReport": "Exported Finance Report",
   "saveReportAs": "Save report as",
   "chooseSaveLocation": "Choose save location",
-  "saveLocationCancelled": "Save location selection cancelled, using default location"
+  "saveLocationCancelled": "Save location selection cancelled, using default location",
+  "savingsReminderCardTitle": "Savings Reminder",
+  "savingsReminderTitle": "Savings Reminder",
+  "savingsReminderDescription": "Set up a daily reminder to help you save money regularly. A small saving each day adds up over time!",
+  "reminderTimeLabel": "Reminder Time",
+  "reminderMessageLabel": "Reminder Message",
+  "reminderMessageHint": "Enter a personalized message for your reminder",
+  "setReminderButton": "Set Reminder",
+  "updateReminderButton": "Update Reminder",
+  "cancelReminderButton": "Cancel Reminder",
+  "reminderSetConfirmation": "Savings reminder has been set",
+  "activeReminderMessage": "Active reminder at",
+  "activeReminderAt": "Active at",
+  "tapToSetupReminderText": "Tap to set up a daily savings reminder",
+  "recentNotificationsHeader": "Recent Notifications",
+  "notificationsCount": "notifications",
+  "savingsReminderTooltip": "Set a daily savings reminder"
 }

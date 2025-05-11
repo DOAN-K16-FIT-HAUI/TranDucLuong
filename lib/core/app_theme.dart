@@ -19,7 +19,7 @@ class AppTheme {
   static const Color _backgroundDark = Color(0xFF121212);
 
   // Surface colors
-  static const Color _surfaceLight = Colors.white;
+  static const Color _surfaceLight = Color(0xFFFFFFFF); // White
   static const Color _surfaceDark = Color(0xFF1E1E1E);
 
   // Text colors
@@ -32,25 +32,44 @@ class AppTheme {
   static const Color _errorLight = Color(0xFFD62828);
   static const Color _errorDark = Color(0xFFFF6B6B);
 
+  // Basic colors
+  static const Color _white = Color(0xFFFFFFFF);
+  static const Color _black = Color(0xFF000000);
+
   // Transaction type colors
   static const Color incomeColor = Color(0xFF198754); // Green for income
   static const Color expenseColor = Color(0xFFD62828); // Red for expense
-  static const Color transferColor = Color(0xFF1E4B94); // Deep blue for transfer
+  static const Color transferColor = Color(
+    0xFF1E4B94,
+  ); // Deep blue for transfer
   static const Color borrowColor = Color(0xFF7209B7); // Purple for borrow
   static const Color lendColor = Color(0xFFFF9F1C); // Orange for lend
   static const Color adjustmentColor = Color(0xFF2A9D8F); // Teal for adjustment
 
+  // Notification type colors
+  static const Color notificationInfoColor = Color(0xFF0D6EFD); // Blue for info
+  static const Color notificationSuccessColor = Color(
+    0xFF198754,
+  ); // Green for success
+  static const Color notificationWarningColor = Color(
+    0xFFFFC107,
+  ); // Yellow for warning
+  static const Color notificationErrorColor = Color(
+    0xFFD62828,
+  ); // Red for error
+
+  // Category colors for pie charts and listings
   static const List<Color> categoryColors = [
-    Colors.blue,
-    Colors.red,
-    Colors.green,
-    Colors.yellow,
-    Colors.purple,
-    Colors.orange,
-    Colors.teal,
-    Colors.pink,
-    Colors.cyan,
-    Colors.brown,
+    Color(0xFF0D6EFD), // Blue
+    Color(0xFFD62828), // Red
+    Color(0xFF198754), // Green
+    Color(0xFFFFC107), // Yellow
+    Color(0xFF7209B7), // Purple
+    Color(0xFFFF9F1C), // Orange
+    Color(0xFF2A9D8F), // Teal
+    Color(0xFFE83E8C), // Pink
+    Color(0xFF17A2B8), // Cyan
+    Color(0xFF795548), // Brown
   ];
 
   // Light theme
@@ -64,22 +83,22 @@ class AppTheme {
       tertiary: _successLight,
       error: _errorLight,
       surface: _surfaceLight,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onTertiary: Colors.white,
+      onPrimary: _white,
+      onSecondary: _white,
+      onTertiary: _white,
       onSurface: _textPrimaryLight,
-      onError: Colors.white,
+      onError: _white,
     ),
     scaffoldBackgroundColor: _backgroundLight,
     appBarTheme: AppBarTheme(
       backgroundColor: _primaryLight,
-      foregroundColor: Colors.white,
+      foregroundColor: _white,
       centerTitle: true,
       elevation: 0,
       titleTextStyle: GoogleFonts.notoSans(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: _white,
       ),
     ),
     textTheme: TextTheme(
@@ -103,34 +122,21 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         color: _textPrimaryLight,
       ),
-      bodyLarge: GoogleFonts.notoSans(
-        fontSize: 16,
-        color: _textPrimaryLight,
-      ),
-      bodyMedium: GoogleFonts.notoSans(
-        fontSize: 14,
-        color: _textPrimaryLight,
-      ),
-      bodySmall: GoogleFonts.notoSans(
-        fontSize: 12,
-        color: _textSecondaryLight,
-      ),
+      bodyLarge: GoogleFonts.notoSans(fontSize: 16, color: _textPrimaryLight),
+      bodyMedium: GoogleFonts.notoSans(fontSize: 14, color: _textPrimaryLight),
+      bodySmall: GoogleFonts.notoSans(fontSize: 12, color: _textSecondaryLight),
     ),
     cardTheme: CardTheme(
       color: _surfaceLight,
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: _primaryLight,
-        foregroundColor: Colors.white,
+        foregroundColor: _white,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -142,9 +148,7 @@ class AppTheme {
         foregroundColor: _primaryLight,
         side: BorderSide(color: _primaryLight),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -153,15 +157,19 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.white,
+      fillColor: _white,
       contentPadding: const EdgeInsets.all(16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryLight.withValues(alpha: 0.5)),
+        borderSide: BorderSide(
+          color: _textSecondaryLight.withValues(alpha: 0.5),
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryLight.withValues(alpha: 0.5)),
+        borderSide: BorderSide(
+          color: _textSecondaryLight.withValues(alpha: 0.5),
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -188,9 +196,7 @@ class AppTheme {
         fontSize: 12,
         fontWeight: FontWeight.w500,
       ),
-      unselectedLabelStyle: GoogleFonts.notoSans(
-        fontSize: 12,
-      ),
+      unselectedLabelStyle: GoogleFonts.notoSans(fontSize: 12),
       type: BottomNavigationBarType.fixed,
     ),
   );
@@ -203,14 +209,14 @@ class AppTheme {
     colorScheme: ColorScheme.dark(
       primary: _primaryDark,
       secondary: _secondaryDark,
-      tertiary: _successDark, // Use successDark for tertiary
+      tertiary: _successDark,
       error: _errorDark,
       surface: _surfaceDark,
-      onPrimary: Colors.black,
-      onSecondary: Colors.black,
-      onTertiary: Colors.black, // Text/icon color on success background
+      onPrimary: _black,
+      onSecondary: _black,
+      onTertiary: _black,
       onSurface: _textPrimaryDark,
-      onError: Colors.black,
+      onError: _black,
     ),
     scaffoldBackgroundColor: _backgroundDark,
     appBarTheme: AppBarTheme(
@@ -245,34 +251,21 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         color: _textPrimaryDark,
       ),
-      bodyLarge: GoogleFonts.notoSans(
-        fontSize: 16,
-        color: _textPrimaryDark,
-      ),
-      bodyMedium: GoogleFonts.notoSans(
-        fontSize: 14,
-        color: _textPrimaryDark,
-      ),
-      bodySmall: GoogleFonts.notoSans(
-        fontSize: 12,
-        color: _textSecondaryDark,
-      ),
+      bodyLarge: GoogleFonts.notoSans(fontSize: 16, color: _textPrimaryDark),
+      bodyMedium: GoogleFonts.notoSans(fontSize: 14, color: _textPrimaryDark),
+      bodySmall: GoogleFonts.notoSans(fontSize: 12, color: _textSecondaryDark),
     ),
     cardTheme: CardTheme(
       color: _surfaceDark,
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: _primaryDark,
-        foregroundColor: Colors.black,
+        foregroundColor: _black,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -284,9 +277,7 @@ class AppTheme {
         foregroundColor: _primaryDark,
         side: BorderSide(color: _primaryDark),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: GoogleFonts.notoSans(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -299,11 +290,15 @@ class AppTheme {
       contentPadding: const EdgeInsets.all(16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryDark.withValues(alpha: 0.5)),
+        borderSide: BorderSide(
+          color: _textSecondaryDark.withValues(alpha: 0.5),
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: _textSecondaryDark.withValues(alpha: 0.5)),
+        borderSide: BorderSide(
+          color: _textSecondaryDark.withValues(alpha: 0.5),
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -313,10 +308,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: _errorDark, width: 2),
       ),
-      labelStyle: GoogleFonts.notoSans(
-        color: _textSecondaryDark,
-        fontSize: 14,
-      ),
+      labelStyle: GoogleFonts.notoSans(color: _textSecondaryDark, fontSize: 14),
       hintStyle: GoogleFonts.notoSans(
         color: _textSecondaryDark.withValues(alpha: 0.7),
         fontSize: 14,
@@ -330,10 +322,19 @@ class AppTheme {
         fontSize: 12,
         fontWeight: FontWeight.w500,
       ),
-      unselectedLabelStyle: GoogleFonts.notoSans(
-        fontSize: 12,
-      ),
+      unselectedLabelStyle: GoogleFonts.notoSans(fontSize: 12),
       type: BottomNavigationBarType.fixed,
     ),
   );
+}
+
+extension ColorExtension on Color {
+  Color withValues({int? red, int? green, int? blue, double? alpha}) {
+    return Color.fromRGBO(
+      red ?? this.red,
+      green ?? this.green,
+      blue ?? this.blue,
+      alpha ?? this.opacity,
+    );
+  }
 }

@@ -781,5 +781,21 @@
   "exportedReport": "Báo cáo tài chính đã xuất",
   "saveReportAs": "Lưu báo cáo thành",
   "chooseSaveLocation": "Chọn vị trí lưu file",
-  "saveLocationCancelled": "Đã hủy chọn vị trí lưu, sử dụng vị trí mặc định"
+  "saveLocationCancelled": "Đã hủy chọn vị trí lưu, sử dụng vị trí mặc định",
+  "savingsReminderCardTitle": "Nhắc nhở tiết kiệm",
+  "savingsReminderTitle": "Nhắc nhở tiết kiệm",
+  "savingsReminderDescription": "Thiết lập nhắc nhở hàng ngày để giúp bạn tiết kiệm tiền đều đặn. Một khoản tiết kiệm nhỏ mỗi ngày sẽ tích lũy theo thời gian!",
+  "reminderTimeLabel": "Thời gian nhắc nhở",
+  "reminderMessageLabel": "Tin nhắn nhắc nhở",
+  "reminderMessageHint": "Nhập tin nhắn cá nhân cho lời nhắc của bạn",
+  "setReminderButton": "Đặt lịch nhắc",
+  "updateReminderButton": "Cập nhật nhắc nhở",
+  "cancelReminderButton": "Hủy nhắc nhở",
+  "reminderSetConfirmation": "Đã thiết lập nhắc nhở tiết kiệm",
+  "activeReminderMessage": "Đang nhắc nhở lúc",
+  "activeReminderAt": "Hoạt động lúc",
+  "tapToSetupReminderText": "Nhấn để thiết lập nhắc nhở tiết kiệm hàng ngày",
+  "recentNotificationsHeader": "Thông báo gần đây",
+  "notificationsCount": "thông báo",
+  "savingsReminderTooltip": "Đặt lịch nhắc nhở tiết kiệm hàng ngày"
 }

@@ -4,6 +4,7 @@ import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/screens/account/account_screen.dart';
 import 'package:finance_app/screens/app_notification/notification_screen.dart';
+import 'package:finance_app/screens/app_notification/savings_reminder_screen.dart';
 import 'package:finance_app/screens/auth/forgot_password_screen.dart';
 import 'package:finance_app/screens/auth/login_screen.dart';
 import 'package:finance_app/screens/auth/register_screen.dart';
@@ -38,57 +39,64 @@ class AppRoutes {
   static const String groupNoteDetailRoute = 'group-note-detail';
   static const String reportRoute = 'report';
   static const String barcodeScannerRoute = 'barcode-scanner';
+  static const String savingsReminderRoute = 'savings-reminder';
 
   static final router = GoRouter(
     initialLocation: AppPaths.loginPath,
     debugLogDiagnostics: true,
-    errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('Error')),
-      body: Center(child: Text('Page not found: ${state.error}')),
-    ),
+    errorBuilder:
+        (context, state) => Scaffold(
+          appBar: AppBar(title: const Text('Error')),
+          body: Center(child: Text('Page not found: ${state.error}')),
+        ),
     routes: [
       GoRoute(
         name: loginRoute,
         path: AppPaths.loginPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const LoginScreen(),
-          state: state,
-        ),
+        pageBuilder:
+            (context, state) => RouteTransitions.buildPageWithTransition(
+              child: const LoginScreen(),
+              state: state,
+            ),
       ),
       GoRoute(
         name: registerRoute,
         path: AppPaths.registerPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const RegisterScreen(),
-          state: state,
-        ),
+        pageBuilder:
+            (context, state) => RouteTransitions.buildPageWithTransition(
+              child: const RegisterScreen(),
+              state: state,
+            ),
       ),
       GoRoute(
         name: forgotPasswordRoute,
         path: AppPaths.forgotPasswordPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const ForgotPasswordScreen(),
-          state: state,
-        ),
+        pageBuilder:
+            (context, state) => RouteTransitions.buildPageWithTransition(
+              child: const ForgotPasswordScreen(),
+              state: state,
+            ),
       ),
       GoRoute(
         name: dashboardRoute,
         path: AppPaths.dashboardPath,
-        pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-          child: const TopScreen(),
-          state: state,
-        ),
+        pageBuilder:
+            (context, state) => RouteTransitions.buildPageWithTransition(
+              child: const TopScreen(),
+              state: state,
+            ),
         routes: [
           GoRoute(
             name: groupNoteRoute,
             path: 'group-notes',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: BlocProvider.value(
-                value: GetIt.instance<GroupNoteBloc>(),
-                child: const GroupNoteScreen(),
-              ),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: BlocProvider.value(
+                    value: GetIt.instance<GroupNoteBloc>(),
+                    child: const GroupNoteScreen(),
+                  ),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: addEditGroupNoteRoute,
@@ -96,11 +104,16 @@ class AppRoutes {
             pageBuilder: (context, state) {
               final args = state.extra as Map<String, dynamic>?;
               final note = args?['note'] as GroupNoteModel?;
-              final status = args?['status'] as String? ?? (note == null ? 'add' : 'edit');
+              final status =
+                  args?['status'] as String? ?? (note == null ? 'add' : 'edit');
               final groupId = args?['groupId'] as String?;
 
               if (groupId == null) {
-                return MaterialPage(child: Scaffold(body: Center(child: Text("Error: Group ID missing"))));
+                return MaterialPage(
+                  child: Scaffold(
+                    body: Center(child: Text("Error: Group ID missing")),
+                  ),
+                );
               }
 
               return RouteTransitions.buildPageWithTransition(
@@ -132,7 +145,13 @@ class AppRoutes {
               final noteId = state.pathParameters['noteId'];
 
               if (note == null || note.id != noteId) {
-                return MaterialPage(child: Scaffold(body: Center(child: Text("Error: Note data missing or ID mismatch"))));
+                return MaterialPage(
+                  child: Scaffold(
+                    body: Center(
+                      child: Text("Error: Note data missing or ID mismatch"),
+                    ),
+                  ),
+                );
               }
               return RouteTransitions.buildPageWithTransition(
                 child: BlocProvider.value(
@@ -147,50 +166,65 @@ class AppRoutes {
           GoRoute(
             name: walletRoute,
             path: 'wallets',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const WalletScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const WalletScreen(),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: appNotificationRoute,
             path: 'notifications',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const NotificationScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const NotificationScreen(),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: transactionRoute,
             path: 'transactions/add',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const TransactionScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const TransactionScreen(),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: transactionListRoute,
             path: 'transactions',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const TransactionListScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const TransactionListScreen(),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: accountRoute,
             path: 'account',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const AccountScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const AccountScreen(),
+                  state: state,
+                ),
           ),
           GoRoute(
             name: reportRoute,
             path: 'reports',
-            pageBuilder: (context, state) => RouteTransitions.buildPageWithTransition(
-              child: const ReportScreen(),
-              state: state,
-            ),
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const ReportScreen(),
+                  state: state,
+                ),
+          ),
+          GoRoute(
+            name: savingsReminderRoute,
+            path: 'savings-reminder',
+            pageBuilder:
+                (context, state) => RouteTransitions.buildPageWithTransition(
+                  child: const SavingsReminderScreen(),
+                  state: state,
+                ),
           ),
         ],
       ),
@@ -206,13 +240,18 @@ class AppRoutes {
       final isAuthenticated = authState is AuthAuthenticated;
       final isOnLogin = state.matchedLocation == AppPaths.loginPath;
       final isOnRegister = state.matchedLocation == AppPaths.registerPath;
-      final isOnForgotPassword = state.matchedLocation == AppPaths.forgotPasswordPath;
+      final isOnForgotPassword =
+          state.matchedLocation == AppPaths.forgotPasswordPath;
 
-      if (!isAuthenticated && !isOnLogin && !isOnRegister && !isOnForgotPassword) {
+      if (!isAuthenticated &&
+          !isOnLogin &&
+          !isOnRegister &&
+          !isOnForgotPassword) {
         return AppPaths.loginPath;
       }
 
-      if (isAuthenticated && (isOnLogin || isOnRegister || isOnForgotPassword)) {
+      if (isAuthenticated &&
+          (isOnLogin || isOnRegister || isOnForgotPassword)) {
         return AppPaths.dashboardPath;
       }
 
@@ -221,50 +260,69 @@ class AppRoutes {
   );
 
   // Navigation Helpers
-  static void navigateToLogin(BuildContext context) => context.go(AppPaths.loginPath);
-  static void navigateToRegister(BuildContext context) => context.go(AppPaths.registerPath);
-  static void navigateToForgotPassword(BuildContext context) => context.push(AppPaths.forgotPasswordPath);
-  static void navigateToDashboard(BuildContext context) => context.go(AppPaths.dashboardPath);
-  static void navigateToWallet(BuildContext context) => context.push(AppPaths.walletListPath);
-  static void navigateToAppNotification(BuildContext context) => context.push(AppPaths.appNotificationListPath);
-  static void navigateToTransaction(BuildContext context) => context.push(AppPaths.addTransactionPath);
-  static void navigateToTransactionList(BuildContext context) => context.push(AppPaths.transactionListPath);
-  static void navigateToAccount(BuildContext context) => context.push(AppPaths.accountPath);
-  static void navigateToReport(BuildContext context) => context.push(AppPaths.reportsPath);
-  static void navigateToGroupNoteList(BuildContext context) => context.push(AppPaths.groupNoteListPath);
-  static void navigateToBarcodeScanner(BuildContext context) => context.push(AppPaths.barcodeScannerPath);
+  static void navigateToLogin(BuildContext context) =>
+      context.go(AppPaths.loginPath);
+  static void navigateToRegister(BuildContext context) =>
+      context.go(AppPaths.registerPath);
+  static void navigateToForgotPassword(BuildContext context) =>
+      context.push(AppPaths.forgotPasswordPath);
+  static void navigateToDashboard(BuildContext context) =>
+      context.go(AppPaths.dashboardPath);
+  static void navigateToWallet(BuildContext context) =>
+      context.push(AppPaths.walletListPath);
+  static void navigateToAppNotification(BuildContext context) =>
+      context.push(AppPaths.appNotificationListPath);
+  static void navigateToTransaction(BuildContext context) =>
+      context.push(AppPaths.addTransactionPath);
+  static void navigateToTransactionList(BuildContext context) =>
+      context.push(AppPaths.transactionListPath);
+  static void navigateToAccount(BuildContext context) =>
+      context.push(AppPaths.accountPath);
+  static void navigateToReport(BuildContext context) =>
+      context.push(AppPaths.reportsPath);
+  static void navigateToGroupNoteList(BuildContext context) =>
+      context.push(AppPaths.groupNoteListPath);
+  static void navigateToBarcodeScanner(BuildContext context) =>
+      context.push(AppPaths.barcodeScannerPath);
+  static void navigateToSavingsReminder(BuildContext context) =>
+      context.go(AppPaths.savingsReminderPath);
 
   static void navigateToAddEditGroupNote(
-      BuildContext context,
-      GroupNoteModel? note,
-      String status,
-      Function(GroupNoteModel) onSave, {
-        required String groupId,
-      }) {
+    BuildContext context,
+    GroupNoteModel? note,
+    String status,
+    Function(GroupNoteModel) onSave, {
+    required String groupId,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: GetIt.instance<GroupNoteBloc>(),
-          child: AddEditGroupNoteScreen(
-            note: note,
-            status: status,
-            groupId: groupId,
-            onSave: onSave,
-          ),
-        ),
+        builder:
+            (_) => BlocProvider.value(
+              value: GetIt.instance<GroupNoteBloc>(),
+              child: AddEditGroupNoteScreen(
+                note: note,
+                status: status,
+                groupId: groupId,
+                onSave: onSave,
+              ),
+            ),
       ),
     );
   }
 
-  static void navigateToGroupNoteDetail(BuildContext context, GroupNoteModel note) {
+  static void navigateToGroupNoteDetail(
+    BuildContext context,
+    GroupNoteModel note,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: GetIt.instance<GroupNoteBloc>(),
-          child: GroupNoteDetailScreen(note: note),
-        ),
+        builder:
+            (_) => BlocProvider.value(
+              value: GetIt.instance<GroupNoteBloc>(),
+              child: GroupNoteDetailScreen(note: note),
+            ),
       ),
     );
   }

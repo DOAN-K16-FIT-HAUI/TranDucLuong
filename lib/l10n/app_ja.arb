@@ -509,5 +509,21 @@
   "exportedReport": "エクスポートされた財務レポート",
   "saveReportAs": "レポートを保存",
   "chooseSaveLocation": "保存場所を選択",
-  "saveLocationCancelled": "保存場所の選択がキャンセルされました。デフォルトの場所を使用します"
+  "saveLocationCancelled": "保存場所の選択がキャンセルされました。デフォルトの場所を使用します",
+  "savingsReminderCardTitle": "貯金リマインダー",
+  "savingsReminderTitle": "貯金リマインダー",
+  "savingsReminderDescription": "毎日の貯金を定期的に行うためにリマインダーを設定しましょう。日々の小さな貯金が積み重なります！",
+  "reminderTimeLabel": "リマインダー時刻",
+  "reminderMessageLabel": "リマインダーメッセージ",
+  "reminderMessageHint": "リマインダー用のカスタムメッセージを入力",
+  "setReminderButton": "リマインダーを設定",
+  "updateReminderButton": "リマインダーを更新",
+  "cancelReminderButton": "リマインダーをキャンセル",
+  "reminderSetConfirmation": "貯金リマインダーが設定されました",
+  "activeReminderMessage": "アクティブなリマインダー：",
+  "activeReminderAt": "設定時刻：",
+  "tapToSetupReminderText": "タップして毎日の貯金リマインダーを設定",
+  "recentNotificationsHeader": "最近の通知",
+  "notificationsCount": "件の通知",
+  "savingsReminderTooltip": "毎日の貯金リマインダーを設定"
 }

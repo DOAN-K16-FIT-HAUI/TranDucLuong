@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -41,6 +42,11 @@ void setupDependencies() {
     () => FirebaseMessagingService(),
   );
   sl.registerLazySingleton<FirestoreService>(() => FirestoreService());
+
+  // Register Shared Preferences for future use
+  sl.registerSingletonAsync<SharedPreferences>(
+    () async => await SharedPreferences.getInstance(),
+  );
 
   // Register Repositories
   sl.registerLazySingleton<AuthRepository>(
