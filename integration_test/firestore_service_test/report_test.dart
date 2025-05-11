@@ -316,12 +316,12 @@ void main() {
           predicate<ReportState>((state) {
             if (state is ReportLoaded) {
               debugPrint(
-                'Report state emitted: ${state.runtimeType} - ' +
-                    'categoryData=${state.categoryData.length}, ' +
-                    'balanceData=${state.balanceData.length}, ' +
-                    'typeData=${state.typeData.length}, ' +
-                    'income=${state.totalIncome}, ' +
-                    'expenses=${state.totalExpenses}',
+                'Report state emitted: ${state.runtimeType} - '
+                'categoryData=${state.categoryData.length}, '
+                'balanceData=${state.balanceData.length}, '
+                'typeData=${state.typeData.length}, '
+                'income=${state.totalIncome}, '
+                'expenses=${state.totalExpenses}',
               );
 
               // The test is failing because balanceData is not empty as expected
