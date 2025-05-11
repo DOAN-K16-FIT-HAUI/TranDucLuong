@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 class PermissionsHandler {
   /// Request storage permissions with better user feedback
   static Future<bool> requestStoragePermissions(BuildContext context) async {
+    // Cache the l10n before any async operations
     final l10n = AppLocalizations.of(context)!;
 
     // Request permissions
@@ -24,6 +25,9 @@ class PermissionsHandler {
     // If denied, show explanation dialog
     if (!granted) {
       // Using a separate method to avoid context issues
+      // Capture context.mounted to check after the async gap
+      if (!context.mounted) return false;
+
       bool shouldOpenSettings = await _showPermissionDialog(context, l10n);
 
       if (shouldOpenSettings) {
@@ -105,11 +109,14 @@ class PermissionsHandler {
     String filePath,
     BuildContext context,
   ) async {
+    // Cache the l10n before any async operations
     final l10n = AppLocalizations.of(context)!;
 
     try {
       final file = File(filePath);
       if (!await file.exists()) {
+        // Check if context is still valid after async operation
+        if (!context.mounted) return;
         _showErrorDialog(context, l10n.error);
         return;
       }
@@ -124,6 +131,9 @@ class PermissionsHandler {
         return;
       }
 
+      // Check if context is still valid after async operations
+      if (!context.mounted) return;
+
       // If direct opening fails, use the share functionality
       await Share.shareXFiles(
         [XFile(filePath)],
@@ -132,6 +142,8 @@ class PermissionsHandler {
       );
     } catch (e) {
       debugPrint('Error opening file: $e');
+      // Check if context is still valid after async operations
+      if (!context.mounted) return;
       // Show a dialog explaining the issue
       _showLocationDialog(context, l10n, filePath);
     }
@@ -185,7 +197,7 @@ class PermissionsHandler {
                   padding: const EdgeInsets.all(8),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: SelectableText(

@@ -215,7 +215,6 @@ class _ReportScreenState extends State<ReportScreen>
   }
 
   Future<void> _handleExportError(BuildContext context, String message) async {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     // Check if it's a permission error
@@ -224,7 +223,10 @@ class _ReportScreenState extends State<ReportScreen>
         context,
       );
 
-      if (granted && mounted) {
+      // Check if context is still mounted after the async operation
+      if (!context.mounted) return;
+
+      if (granted) {
         // If permission was granted, retry export
         final authState = context.read<AuthBloc>().state;
         if (authState is AuthAuthenticated &&
@@ -243,7 +245,7 @@ class _ReportScreenState extends State<ReportScreen>
     }
 
     // For other errors, show regular snackbar
-    if (mounted) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -260,6 +262,9 @@ class _ReportScreenState extends State<ReportScreen>
         allowedExtensions: ['csv'],
       );
 
+      // Check if context is still mounted after async operation
+      if (!context.mounted) return;
+
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
         if (file.path != null) {
@@ -269,6 +274,9 @@ class _ReportScreenState extends State<ReportScreen>
         }
       }
     } catch (e) {
+      // Check if context is still mounted after catching exception
+      if (!context.mounted) return;
+
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -285,6 +293,9 @@ class _ReportScreenState extends State<ReportScreen>
 
     // Get a more user-friendly file path representation
     final pathInfo = await PermissionsHandler.getReadableFilePath(filePath);
+
+    // Check if context is still mounted after async operation
+    if (!context.mounted) return;
 
     showDialog(
       context: context,
@@ -309,7 +320,7 @@ class _ReportScreenState extends State<ReportScreen>
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                   ),
                   child: SelectableText(
                     pathInfo['displayPath']!,
@@ -425,7 +436,7 @@ class _ReportScreenState extends State<ReportScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 16,
                 ),
               ),
@@ -508,6 +519,9 @@ class _ReportScreenState extends State<ReportScreen>
       firstDate: firstDate,
       lastDate: lastDate,
     );
+
+    // Check if context is still mounted after async operation
+    if (!context.mounted) return;
 
     if (selectedDate != null) {
       setState(() {
@@ -799,7 +813,7 @@ class _ReportScreenState extends State<ReportScreen>
                     margin: const EdgeInsets.only(top: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.3),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: theme.dividerColor),
                     ),

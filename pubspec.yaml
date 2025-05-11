@@ -57,6 +57,10 @@ dependencies:
   # Dependency Injection
   get_it: ^8.0.3 # For dependency injection and service locator pattern
 
+  # Notifications
+  flutter_local_notifications: ^18.0.1 # For local notifications
+  timezone: ^0.9.1 # For timezone support in scheduled notifications
+
   # Flutter_localizations
   flutter_localizations:
     sdk: flutter # For enabling localization support in Flutter

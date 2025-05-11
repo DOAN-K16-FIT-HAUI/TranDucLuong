@@ -1,6 +1,5 @@
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
-import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/blocs/localization/localization_bloc.dart';
 import 'package:finance_app/blocs/report/report_bloc.dart';
 import 'package:finance_app/blocs/theme/theme_bloc.dart';
@@ -8,7 +7,6 @@ import 'package:finance_app/blocs/transaction/transaction_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/data/repositories/account_repository.dart';
 import 'package:finance_app/data/repositories/auth_repository.dart';
-import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
 import 'package:finance_app/data/repositories/report_repository.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
@@ -20,6 +18,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -42,6 +41,11 @@ void setupDependencies() {
   );
   sl.registerLazySingleton<FirestoreService>(() => FirestoreService());
 
+  // Register Shared Preferences for future use
+  sl.registerSingletonAsync<SharedPreferences>(
+    () async => await SharedPreferences.getInstance(),
+  );
+
   // Register Repositories
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepository(firebaseAuthService: sl<FirebaseAuthService>()),
@@ -55,9 +59,6 @@ void setupDependencies() {
   );
   sl.registerLazySingleton<WalletRepository>(
     () => WalletRepository(sl<FirestoreService>()),
-  );
-  sl.registerLazySingleton<GroupNoteRepository>(
-    () => GroupNoteRepository(sl<FirestoreService>()),
   );
   sl.registerLazySingleton<ReportRepository>(
     () => ReportRepository(sl<FirestoreService>()),
@@ -75,9 +76,6 @@ void setupDependencies() {
   );
   sl.registerFactory<WalletBloc>(
     () => WalletBloc(walletRepository: sl<WalletRepository>()),
-  );
-  sl.registerFactory<GroupNoteBloc>(
-    () => GroupNoteBloc(groupNoteRepository: sl<GroupNoteRepository>()),
   );
   sl.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
   sl.registerLazySingleton<LocalizationBloc>(() => LocalizationBloc());

@@ -422,151 +422,6 @@
     }
   },
   "viewAll": "View All",
-  "onboardingTitle1": "Track Your Budget Easily",
-  "onboardingDescription1": "Manage daily expenses, save effectively, and achieve your financial goals.",
-  "onboardingTitle2": "Smart Spending Control",
-  "onboardingDescription2": "Monitor daily spending, categorize expenses, and save smarter.",
-  "onboardingTitle3": "Plan for Long-Term Wealth",
-  "onboardingDescription3": "Build financial plans, save, and invest to reach your goals.",
-  "onboardingTitle4": "Secure Financial Management",
-  "onboardingDescription4": "Protect your financial data and manage accounts with ease and security.",
-  "onboardingContinue": "Continue",
-  "onboardingStart": "Get Started",
-  "onboardingSkip": "Skip",
-  "noEndedNotes": "No ended notes",
-  "noOngoingNotes": "No ongoing notes",
-  "noUpcomingNotes": "No upcoming notes",
-  "groupNotesTitle": "Group Notes",
-  "@groupNotesTitle": {
-    "description": "Title for the group notes screen."
-  },
-  "searchTooltip": "Search notes",
-  "@searchTooltip": {
-    "description": "Tooltip for the search icon in the group notes screen."
-  },
-  "filterTooltip": "Filter notes",
-  "@filterTooltip": {
-    "description": "Tooltip for the filter icon in the group notes screen."
-  },
-  "noNotesInGroup": "No notes in this group yet.",
-  "@noNotesInGroup": {
-    "description": "Message shown when there are no notes in the group."
-  },
-  "noNotesFoundSearch": "No notes found for your search.",
-  "@noNotesFoundSearch": {
-    "description": "Message shown when no notes match the search query."
-  },
-  "addNoteTooltip": "Add a new note",
-  "@addNoteTooltip": {
-    "description": "Tooltip for the floating action button to add a new note."
-  },
-  "filterNotesTitle": "Filter Notes",
-  "@filterNotesTitle": {
-    "description": "Title for the filter dialog in the group notes screen."
-  },
-  "errorAddingNote": "Failed to add note. Please try again.",
-  "@errorAddingNote": {
-    "description": "Error message when adding a note fails."
-  },
-  "errorUpdatingNote": "Failed to update note. Please try again.",
-  "@errorUpdatingNote": {
-    "description": "Error message when updating a note fails."
-  },
-  "errorDeletingNote": "Failed to delete note. Please try again.",
-  "@errorDeletingNote": {
-    "description": "Error message when deleting a note fails."
-  },
-  "errorAddingComment": "Failed to add comment. Please try again.",
-  "@errorAddingComment": {
-    "description": "Error message when adding a comment fails."
-  },
-  "addNoteDialogTitle": "Add Note",
-  "@addNoteDialogTitle": {
-    "description": "Title for the dialog/screen to add a new note."
-  },
-  "editNoteDialogTitle": "Edit Note",
-  "@editNoteDialogTitle": {
-    "description": "Title for the dialog/screen to edit an existing note."
-  },
-  "noteTitleLabel": "Title",
-  "@noteTitleLabel": {
-    "description": "Label for the note title input field."
-  },
-  "noteTitleHint": "Enter note title",
-  "@noteTitleHint": {
-    "description": "Hint text for the note title input field."
-  },
-  "noteContentLabel": "Content",
-  "@noteContentLabel": {
-    "description": "Label for the note content input field."
-  },
-  "noteContentHint": "Enter note content",
-  "@noteContentHint": {
-    "description": "Hint text for the note content input field."
-  },
-  "noteTagLabel": "Tag",
-  "@noteTagLabel": {
-    "description": "Label for the note tag dropdown field."
-  },
-  "selectTagHint": "Select a tag",
-  "@selectTagHint": {
-    "description": "Hint text for the note tag dropdown field."
-  },
-  "noteDetailTitle": "Note Details",
-  "@noteDetailTitle": {
-    "description": "Title for the note details screen."
-  },
-  "createdBy": "Created by",
-  "@createdBy": {
-    "description": "Label for the creator of the note."
-  },
-  "commentsLabel": "Comments",
-  "@commentsLabel": {
-    "description": "Label for the comments section in the note details screen."
-  },
-  "noComments": "No comments yet.",
-  "@noComments": {
-    "description": "Message shown when there are no comments on a note."
-  },
-  "addCommentLabel": "Add Comment",
-  "@addCommentLabel": {
-    "description": "Label for the comment input field."
-  },
-  "addCommentHint": "Enter your comment",
-  "@addCommentHint": {
-    "description": "Hint text for the comment input field."
-  },
-  "sendButton": "Send",
-  "@sendButton": {
-    "description": "Text for the button to send a comment."
-  },
-  "noGroupsFound": "No groups found",
-  "joinGroupSuggestion": "Join or create a group to start adding notes",
-  "createGroup": "Create Group",
-  "pleaseLogin": "Please log in to continue",
-  "failedToCreateGroup": "Failed to create group",
-  "groupNameLabel": "Group Name",
-  "groupNameHint": "Enter group name",
-  "addMemberEmailLabel": "Add Member by Email",
-  "addMemberEmailHint": "Enter member email",
-  "groupNameRequired": "Group name is required",
-  "selectGroup": "Select a group",
-  "create": "Create",
-  "all": "All",
-  "tagExpense": "Expense",
-  "tagNote": "Reminder",
-  "tagGoal": "Goal",
-  "tagOther": "Other",
-  "addEmailTooltip": "Add email",
-  "addMembersInstruction": "Add members by entering their email.",
-  "emailAlreadyAdded": "Email already added.",
-  "creatingGroup": "Creating group...",
-  "groupCreatedSuccess": "Group created successfully!",
-  "errorCreatingGroup": "Error creating group",
-  "errorLoadingGroups": "Error loading groups",
-  "pleaseSelectGroup": "Please select a group to view notes.",
-  "noNotesFoundSearchFilter": "No notes found matching your search/filter.",
-  "tryDifferentSearchFilter": "Try adjusting your search or filter.",
   "loading": "Loading...",
   "scanBarcodeCamera": "Scan from Camera",
   "scanBarcodeGallery": "Scan from Gallery",
@@ -708,5 +563,24 @@
   "exportedReport": "Exported Finance Report",
   "saveReportAs": "Save report as",
   "chooseSaveLocation": "Choose save location",
-  "saveLocationCancelled": "Save location selection cancelled, using default location"
+  "saveLocationCancelled": "Save location selection cancelled, using default location",
+  "savingsReminderCardTitle": "Savings Reminder",
+  "savingsReminderTitle": "Savings Reminder",
+  "savingsReminderDescription": "Set up a daily reminder to help you save money regularly. A small saving each day adds up over time!",
+  "reminderTimeLabel": "Reminder Time",
+  "reminderMessageLabel": "Reminder Message",
+  "reminderMessageHint": "Enter a personalized message for your reminder",
+  "setReminderButton": "Set Reminder",
+  "updateReminderButton": "Update Reminder",
+  "cancelReminderButton": "Cancel Reminder",
+  "reminderSetConfirmation": "Savings reminder has been set",
+  "activeReminderMessage": "Active reminder at",
+  "activeReminderAt": "Active at",
+  "tapToSetupReminderText": "Tap to set up a daily savings reminder",
+  "recentNotificationsHeader": "Recent Notifications",
+  "notificationsCount": "notifications",
+  "savingsReminderTooltip": "Set a daily savings reminder",
+  "searchTooltip": "Search transactions",
+  "all": "All",
+  "filterTooltip": "Filter transactions"
 }

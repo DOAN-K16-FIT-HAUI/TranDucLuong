@@ -6,7 +6,6 @@ import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/blocs/wallet/wallet_state.dart';
 import 'package:finance_app/data/repositories/report_repository.dart';
 import 'package:finance_app/data/repositories/wallet_repository.dart';
-import 'package:finance_app/data/services/firebase_auth_service.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +14,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../test_helpers.dart';
 
 void main() {
-  late FirebaseAuthService authService;
   late ReportBloc reportBloc;
   late ReportRepository reportRepository;
   late WalletBloc walletBloc;
   late WalletRepository walletRepository;
   late FirestoreService firestoreService;
   late String testEmail;
-  const testPassword = 'testpassword';
 
   setUpAll(() async {
     debugPrint('Setting up Firebase emulators...');
@@ -31,7 +28,6 @@ void main() {
     debugPrint('Firebase emulators initialized.');
 
     // Initialize services
-    authService = FirebaseAuthService();
     firestoreService = FirestoreService();
     reportRepository = ReportRepository(firestoreService);
     walletRepository = WalletRepository(firestoreService);
@@ -65,11 +61,6 @@ void main() {
     test('Load report data after sign in with various transactions', () async {
       // Sign up and sign in
       debugPrint('Starting sign up and sign in process...');
-      final user = await signUpAndSignIn(
-        authService: authService,
-        email: testEmail,
-        password: testPassword,
-      );
 
       // Ensure user is properly authenticated
       expect(FirebaseAuth.instance.currentUser, isNotNull);
@@ -284,11 +275,6 @@ void main() {
     test('Load report data with no transactions', () async {
       // Sign up and sign in
       debugPrint('Starting sign up and sign in process...');
-      final user = await signUpAndSignIn(
-        authService: authService,
-        email: testEmail,
-        password: testPassword,
-      );
 
       final userId = FirebaseAuth.instance.currentUser!.uid;
       debugPrint('Successfully authenticated with user ID: $userId');

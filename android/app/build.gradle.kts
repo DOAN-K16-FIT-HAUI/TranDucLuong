@@ -13,6 +13,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        // Enable core library desugaring
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -25,6 +27,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true // Enable multidex support
     }
 
     signingConfigs {
@@ -57,4 +60,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.mlkit:text-recognition:16.0.0")
+    
+    // Add the core library desugaring dependency
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
+    
+    // Add multidex support
+    implementation("androidx.multidex:multidex:2.0.1")
 }

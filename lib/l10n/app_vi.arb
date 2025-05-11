@@ -491,151 +491,6 @@
     }
   },
   "viewAll": "Xem tất cả",
-  "onboardingTitle1": "Theo dõi ngân sách dễ dàng",
-  "onboardingDescription1": "Quản lý chi tiêu hàng ngày, tiết kiệm hiệu quả và đạt mục tiêu tài chính.",
-  "onboardingTitle2": "Kiểm soát chi tiêu thông minh",
-  "onboardingDescription2": "Theo dõi chi tiêu hàng ngày, phân loại chi phí và tiết kiệm thông minh hơn.",
-  "onboardingTitle3": "Lập kế hoạch tài chính dài hạn",
-  "onboardingDescription3": "Xây dựng kế hoạch tài chính, tiết kiệm và đầu tư để đạt mục tiêu.",
-  "onboardingTitle4": "Quản lý tài chính an toàn",
-  "onboardingDescription4": "Bảo vệ dữ liệu tài chính và quản lý tài khoản dễ dàng, an toàn.",
-  "onboardingContinue": "Tiếp tục",
-  "onboardingStart": "Bắt đầu",
-  "onboardingSkip": "Bỏ qua",
-  "noEndedNotes": "Không có ghi chú đã kết thúc",
-  "noOngoingNotes": "Không có ghi chú đang diễn ra",
-  "noUpcomingNotes": "Không có ghi chú sắp tới",
-  "groupNotesTitle": "Ghi chú nhóm",
-  "@groupNotesTitle": {
-    "description": "Tiêu đề cho màn hình ghi chú nhóm."
-  },
-  "searchTooltip": "Tìm kiếm ghi chú",
-  "@searchTooltip": {
-    "description": "Chú giải cho biểu tượng tìm kiếm trong màn hình ghi chú nhóm."
-  },
-  "filterTooltip": "Lọc ghi chú",
-  "@filterTooltip": {
-    "description": "Chú giải cho biểu tượng lọc trong màn hình ghi chú nhóm."
-  },
-  "noNotesInGroup": "Chưa có ghi chú nào trong nhóm này.",
-  "@noNotesInGroup": {
-    "description": "Thông báo hiển thị khi không có ghi chú nào trong nhóm."
-  },
-  "noNotesFoundSearch": "Không tìm thấy ghi chú nào cho tìm kiếm của bạn.",
-  "@noNotesFoundSearch": {
-    "description": "Thông báo hiển thị khi không có ghi chú nào khớp với truy vấn tìm kiếm."
-  },
-  "addNoteTooltip": "Thêm ghi chú mới",
-  "@addNoteTooltip": {
-    "description": "Chú giải cho nút hành động nổi để thêm ghi chú mới."
-  },
-  "filterNotesTitle": "Lọc ghi chú",
-  "@filterNotesTitle": {
-    "description": "Tiêu đề cho hộp thoại lọc trong màn hình ghi chú nhóm."
-  },
-  "errorAddingNote": "Không thể thêm ghi chú. Vui lòng thử lại.",
-  "@errorAddingNote": {
-    "description": "Thông báo lỗi khi thêm ghi chú thất bại."
-  },
-  "errorUpdatingNote": "Không thể cập nhật ghi chú. Vui lòng thử lại.",
-  "@errorUpdatingNote": {
-    "description": "Thông báo lỗi khi cập nhật ghi chú thất bại."
-  },
-  "errorDeletingNote": "Không thể xóa ghi chú. Vui lòng thử lại.",
-  "@errorDeletingNote": {
-    "description": "Thông báo lỗi khi xóa ghi chú thất bại."
-  },
-  "errorAddingComment": "Không thể thêm bình luận. Vui lòng thử lại.",
-  "@errorAddingComment": {
-    "description": "Thông báo lỗi khi thêm bình luận thất bại."
-  },
-  "addNoteDialogTitle": "Thêm ghi chú",
-  "@addNoteDialogTitle": {
-    "description": "Tiêu đề cho hộp thoại/màn hình thêm ghi chú mới."
-  },
-  "editNoteDialogTitle": "Sửa ghi chú",
-  "@editNoteDialogTitle": {
-    "description": "Tiêu đề cho hộp thoại/màn hình sửa ghi chú hiện có."
-  },
-  "noteTitleLabel": "Tiêu đề",
-  "@noteTitleLabel": {
-    "description": "Nhãn cho trường nhập tiêu đề ghi chú."
-  },
-  "noteTitleHint": "Nhập tiêu đề ghi chú",
-  "@noteTitleHint": {
-    "description": "Văn bản gợi ý cho trường nhập tiêu đề ghi chú."
-  },
-  "noteContentLabel": "Nội dung",
-  "@noteContentLabel": {
-    "description": "Nhãn cho trường nhập nội dung ghi chú."
-  },
-  "noteContentHint": "Nhập nội dung ghi chú",
-  "@noteContentHint": {
-    "description": "Văn bản gợi ý cho trường nhập nội dung ghi chú."
-  },
-  "noteTagLabel": "Thẻ",
-  "@noteTagLabel": {
-    "description": "Nhãn cho trường thả xuống chọn thẻ ghi chú."
-  },
-  "selectTagHint": "Chọn một thẻ",
-  "@selectTagHint": {
-    "description": "Văn bản gợi ý cho trường thả xuống chọn thẻ ghi chú."
-  },
-  "noteDetailTitle": "Chi tiết ghi chú",
-  "@noteDetailTitle": {
-    "description": "Tiêu đề cho màn hình chi tiết ghi chú."
-  },
-  "createdBy": "Được tạo bởi",
-  "@createdBy": {
-    "description": "Nhãn cho người tạo ghi chú."
-  },
-  "commentsLabel": "Bình luận",
-  "@commentsLabel": {
-    "description": "Nhãn cho phần bình luận trong màn hình chi tiết ghi chú."
-  },
-  "noComments": "Chưa có bình luận nào.",
-  "@noComments": {
-    "description": "Thông báo hiển thị khi không có bình luận nào về ghi chú."
-  },
-  "addCommentLabel": "Thêm bình luận",
-  "@addCommentLabel": {
-    "description": "Nhãn cho trường nhập bình luận."
-  },
-  "addCommentHint": "Nhập bình luận của bạn",
-  "@addCommentHint": {
-    "description": "Văn bản gợi ý cho trường nhập bình luận."
-  },
-  "sendButton": "Gửi",
-  "@sendButton": {
-    "description": "Văn bản cho nút gửi bình luận."
-  },
-  "noGroupsFound": "Không tìm thấy nhóm nào",
-  "joinGroupSuggestion": "Tham gia hoặc tạo nhóm để bắt đầu thêm ghi chú",
-  "createGroup": "Tạo nhóm",
-  "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
-  "failedToCreateGroup": "Tạo nhóm thất bại",
-  "groupNameLabel": "Tên nhóm",
-  "groupNameHint": "Nhập tên nhóm",
-  "addMemberEmailLabel": "Thêm thành viên bằng Email",
-  "addMemberEmailHint": "Nhập email thành viên",
-  "groupNameRequired": "Tên nhóm là bắt buộc",
-  "selectGroup": "Chọn một nhóm",
-  "create": "Tạo",
-  "all": "Tất cả",
-  "tagExpense": "Chi phí",
-  "tagNote": "Nhắc nhở",
-  "tagGoal": "Mục tiêu",
-  "tagOther": "Khác",
-  "addEmailTooltip": "Thêm email",
-  "addMembersInstruction": "Thêm thành viên bằng cách nhập email của họ.",
-  "emailAlreadyAdded": "Email đã được thêm.",
-  "creatingGroup": "Đang tạo nhóm...",
-  "groupCreatedSuccess": "Tạo nhóm thành công!",
-  "errorCreatingGroup": "Lỗi khi tạo nhóm",
-  "errorLoadingGroups": "Lỗi khi tải danh sách nhóm",
-  "pleaseSelectGroup": "Vui lòng chọn một nhóm để xem ghi chú.",
-  "noNotesFoundSearchFilter": "Không tìm thấy ghi chú nào phù hợp với tìm kiếm/bộ lọc.",
-  "tryDifferentSearchFilter": "Thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn.",
   "loading": "Đang tải...",
   "scanBarcodeCamera": "Quét từ Camera",
   "scanBarcodeGallery": "Quét từ Thư viện",
@@ -781,5 +636,24 @@
   "exportedReport": "Báo cáo tài chính đã xuất",
   "saveReportAs": "Lưu báo cáo thành",
   "chooseSaveLocation": "Chọn vị trí lưu file",
-  "saveLocationCancelled": "Đã hủy chọn vị trí lưu, sử dụng vị trí mặc định"
+  "saveLocationCancelled": "Đã hủy chọn vị trí lưu, sử dụng vị trí mặc định",
+  "savingsReminderCardTitle": "Nhắc nhở tiết kiệm",
+  "savingsReminderTitle": "Nhắc nhở tiết kiệm",
+  "savingsReminderDescription": "Thiết lập nhắc nhở hàng ngày để giúp bạn tiết kiệm tiền đều đặn. Một khoản tiết kiệm nhỏ mỗi ngày sẽ tích lũy theo thời gian!",
+  "reminderTimeLabel": "Thời gian nhắc nhở",
+  "reminderMessageLabel": "Tin nhắn nhắc nhở",
+  "reminderMessageHint": "Nhập tin nhắn cá nhân cho lời nhắc của bạn",
+  "setReminderButton": "Đặt lịch nhắc",
+  "updateReminderButton": "Cập nhật nhắc nhở",
+  "cancelReminderButton": "Hủy nhắc nhở",
+  "reminderSetConfirmation": "Đã thiết lập nhắc nhở tiết kiệm",
+  "activeReminderMessage": "Đang nhắc nhở lúc",
+  "activeReminderAt": "Hoạt động lúc",
+  "tapToSetupReminderText": "Nhấn để thiết lập nhắc nhở tiết kiệm hàng ngày",
+  "recentNotificationsHeader": "Thông báo gần đây",
+  "notificationsCount": "thông báo",
+  "savingsReminderTooltip": "Đặt lịch nhắc nhở tiết kiệm hàng ngày",
+  "searchTooltip": "Tìm kiếm giao dịch",
+  "all": "Tất cả",
+  "filterTooltip": "Lọc giao dịch"
 }

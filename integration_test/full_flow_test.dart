@@ -3,7 +3,6 @@ import 'package:finance_app/blocs/account/account_event.dart';
 import 'package:finance_app/blocs/account/account_state.dart';
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/auth/auth_bloc.dart';
-import 'package:finance_app/blocs/group_note/group_note_bloc.dart';
 import 'package:finance_app/blocs/report/report_bloc.dart';
 import 'package:finance_app/blocs/report/report_event.dart';
 import 'package:finance_app/blocs/report/report_state.dart';
@@ -13,11 +12,9 @@ import 'package:finance_app/blocs/transaction/transaction_state.dart';
 import 'package:finance_app/blocs/wallet/wallet_bloc.dart';
 import 'package:finance_app/blocs/wallet/wallet_event.dart';
 import 'package:finance_app/blocs/wallet/wallet_state.dart';
-import 'package:finance_app/data/models/group_note.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/models/wallet.dart';
 import 'package:finance_app/data/repositories/account_repository.dart';
-import 'package:finance_app/data/repositories/group_note_repository.dart';
 import 'package:finance_app/data/repositories/notification_repository.dart';
 import 'package:finance_app/data/repositories/report_repository.dart';
 import 'package:finance_app/data/repositories/transaction_repository.dart';
@@ -47,7 +44,6 @@ void main() {
   late TransactionRepository transactionRepository;
   late ReportRepository reportRepository;
   late NotificationRepository notificationRepository;
-  late GroupNoteRepository groupNoteRepository;
   late AccountRepository accountRepository;
 
   // Blocs
@@ -55,13 +51,11 @@ void main() {
   late TransactionBloc transactionBloc;
   late ReportBloc reportBloc;
   late NotificationBloc notificationBloc;
-  late GroupNoteBloc groupNoteBloc;
   late AccountBloc accountBloc;
 
   // Test variables
   late String testEmail;
   late String testUserId;
-  late String testGroupId;
   const testPassword = 'testpassword';
   const testNewPassword = 'newpassword123';
   const testDisplayName = 'Test User';
@@ -83,7 +77,6 @@ void main() {
     transactionRepository = TransactionRepository(firestoreService);
     reportRepository = ReportRepository(firestoreService);
     notificationRepository = NotificationRepository(FirebaseMessagingService());
-    groupNoteRepository = GroupNoteRepository(firestoreService);
     accountRepository = AccountRepository();
 
     // Setup shared preferences for tests
@@ -110,7 +103,6 @@ void main() {
     );
     reportBloc = ReportBloc(reportRepository);
     notificationBloc = NotificationBloc(notificationRepository);
-    groupNoteBloc = GroupNoteBloc(groupNoteRepository: groupNoteRepository);
     accountBloc = AccountBloc(
       accountRepository: accountRepository,
       authBloc: mockAuthBloc,
@@ -123,7 +115,6 @@ void main() {
     transactionBloc.close();
     reportBloc.close();
     notificationBloc.close();
-    groupNoteBloc.close();
     accountBloc.close();
   });
 
@@ -494,153 +485,6 @@ void main() {
         ),
       );
       debugPrint('✓ Report generated successfully');
-
-      // SECTION 6: GROUP NOTE MANAGEMENT
-      debugPrint('\n==== STARTING GROUP NOTE FLOW ====');
-
-      // Step 16: Create a group
-      testGroupId = await groupNoteRepository.createGroup(
-        'Family Finance Group',
-        [], // Empty member list for test purposes
-      );
-      expect(testGroupId.isNotEmpty, true);
-      debugPrint('✓ Group created successfully');
-
-      // Step 17: Add notes to group
-      final expenseNote = GroupNoteModel(
-        id: '',
-        groupId: testGroupId,
-        title: 'Monthly Expenses',
-        content: 'Let\'s track our monthly expenses here',
-        createdBy: testUserId,
-        createdAt: DateTime.now(),
-        tags: ['Expense', 'Budget'],
-        comments: [],
-      );
-
-      groupNoteBloc.add(AddNote(expenseNote));
-      await Future.delayed(const Duration(seconds: 1));
-
-      final goalNote = GroupNoteModel(
-        id: '',
-        groupId: testGroupId,
-        title: 'Saving Goals',
-        content: 'Our family saving goals for the year',
-        createdBy: testUserId,
-        createdAt: DateTime.now(),
-        tags: ['Goal', 'Savings'],
-        comments: [],
-      );
-
-      groupNoteBloc.add(AddNote(goalNote));
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Load notes to verify they were added
-      groupNoteBloc.add(LoadNotes(testGroupId));
-      await expectLater(
-        groupNoteBloc.stream,
-        emitsThrough(
-          predicate<GroupNoteState>(
-            (state) =>
-                state.notes.length == 2 &&
-                state.notes.any((note) => note.title == 'Monthly Expenses') &&
-                state.notes.any((note) => note.title == 'Saving Goals'),
-          ),
-        ),
-      );
-      debugPrint('✓ Multiple notes created successfully');
-
-      // Step 18: Filter notes by tag
-      groupNoteBloc.add(const FilterNotes('Goal'));
-      await expectLater(
-        groupNoteBloc.stream,
-        emitsThrough(
-          predicate<GroupNoteState>(
-            (state) =>
-                state.filteredNotes.length == 1 &&
-                state.filteredNotes.first.title == 'Saving Goals',
-          ),
-        ),
-      );
-      debugPrint('✓ Notes filtered by tag successfully');
-
-      // Clear filter
-      groupNoteBloc.add(const FilterNotes(null));
-      await expectLater(
-        groupNoteBloc.stream,
-        emitsThrough(
-          predicate<GroupNoteState>((state) => state.filteredNotes.length == 2),
-        ),
-      );
-
-      // Step 19: Add a comment to a note
-      final noteId = groupNoteBloc.state.notes.first.id;
-      final comment = CommentModel(
-        userId: testUserId,
-        content: 'We should reduce our food expenses',
-        createdAt: DateTime.now(),
-      );
-
-      groupNoteBloc.add(AddComment(noteId, comment, groupId: testGroupId));
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Reload notes to see the comment
-      groupNoteBloc.add(LoadNotes(testGroupId));
-      await expectLater(
-        groupNoteBloc.stream,
-        emitsThrough(
-          predicate<GroupNoteState>((state) {
-            final noteWithComment = state.notes.firstWhere(
-              (note) => note.id == noteId,
-              orElse:
-                  () => GroupNoteModel(
-                    id: '',
-                    groupId: '',
-                    title: '',
-                    content: '',
-                    createdBy: '',
-                    createdAt: DateTime.now(),
-                    tags: [],
-                    comments: [],
-                  ),
-            );
-            return noteWithComment.comments.isNotEmpty &&
-                noteWithComment.comments.first.content ==
-                    'We should reduce our food expenses';
-          }),
-        ),
-      );
-      debugPrint('✓ Comment added to note successfully');
-
-      // Step 20: Edit a note
-      final noteToEdit = groupNoteBloc.state.notes.firstWhere(
-        (note) => note.title == 'Saving Goals',
-      );
-
-      final editedNote = noteToEdit.copyWith(
-        title: 'Updated Saving Goals',
-        content: 'Our updated family saving goals for the year',
-        tags: ['Goal', 'Savings', 'Priority'],
-      );
-
-      groupNoteBloc.add(EditNote(editedNote));
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Reload notes to verify edit
-      groupNoteBloc.add(LoadNotes(testGroupId));
-      await expectLater(
-        groupNoteBloc.stream,
-        emitsThrough(
-          predicate<GroupNoteState>(
-            (state) => state.notes.any(
-              (note) =>
-                  note.title == 'Updated Saving Goals' &&
-                  note.tags.contains('Priority'),
-            ),
-          ),
-        ),
-      );
-      debugPrint('✓ Note edited successfully');
 
       // SECTION 7: ACCOUNT MANAGEMENT
       debugPrint('\n==== STARTING ACCOUNT MANAGEMENT FLOW ====');

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:flutter/foundation.dart';
@@ -188,14 +187,10 @@ class ReportRepository {
         }
 
         // If that fails, use external storage directory
-        if (directory == null) {
-          directory = await getExternalStorageDirectory();
-        }
+        directory ??= await getExternalStorageDirectory();
 
         // If external storage isn't available, fall back to app documents directory
-        if (directory == null) {
-          directory = await getApplicationDocumentsDirectory();
-        }
+        directory ??= await getApplicationDocumentsDirectory();
 
         final filePath = '${directory.path}/$fileName';
 
@@ -220,31 +215,6 @@ class ReportRepository {
     } catch (e) {
       debugPrint('Failed to export report: $e');
       throw Exception('Failed to export report: $e');
-    }
-  }
-
-  /// Save to default app location when user cancels picker or on error
-  Future<String> _saveToDefaultLocation(String csvData, String fileName) async {
-    Directory? directory;
-
-    try {
-      // Try app documents directory
-      directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/$fileName';
-
-      final file = File(filePath);
-      await file.writeAsString(csvData);
-
-      return filePath;
-    } catch (e) {
-      // Try temporary directory as last resort
-      directory = await getTemporaryDirectory();
-      final filePath = '${directory.path}/$fileName';
-
-      final file = File(filePath);
-      await file.writeAsString(csvData);
-
-      return filePath;
     }
   }
 

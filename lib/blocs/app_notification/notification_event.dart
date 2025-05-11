@@ -16,3 +16,19 @@ class MarkNotificationAsRead extends NotificationEvent {
 }
 
 class MarkAllNotificationsAsRead extends NotificationEvent {}
+
+class ScheduleSavingsReminder extends NotificationEvent {
+  final int hour;
+  final int minute;
+  final String message;
+
+  ScheduleSavingsReminder({
+    required this.hour,
+    required this.minute,
+    required this.message,
+  });
+}
+
+class CancelSavingsReminder extends NotificationEvent {}
+
+class LoadSavedReminderSettings extends NotificationEvent {}
