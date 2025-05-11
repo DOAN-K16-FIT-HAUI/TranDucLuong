@@ -163,11 +163,6 @@ class _TransactionListScreenState extends State<TransactionListScreen>
         context.read<TransactionBloc>().add(
           UpdateTransaction(updatedTransaction),
         );
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.pop(context);
-          }
-        });
       },
     );
   }

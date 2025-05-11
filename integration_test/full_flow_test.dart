@@ -56,7 +56,6 @@ void main() {
   // Test variables
   late String testEmail;
   late String testUserId;
-  late String testGroupId;
   const testPassword = 'testpassword';
   const testNewPassword = 'newpassword123';
   const testDisplayName = 'Test User';

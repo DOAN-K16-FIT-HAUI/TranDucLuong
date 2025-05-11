@@ -223,7 +223,10 @@ class _ReportScreenState extends State<ReportScreen>
         context,
       );
 
-      if (granted && mounted) {
+      // Check if context is still mounted after the async operation
+      if (!context.mounted) return;
+
+      if (granted) {
         // If permission was granted, retry export
         final authState = context.read<AuthBloc>().state;
         if (authState is AuthAuthenticated &&
@@ -242,7 +245,7 @@ class _ReportScreenState extends State<ReportScreen>
     }
 
     // For other errors, show regular snackbar
-    if (mounted) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -259,6 +262,9 @@ class _ReportScreenState extends State<ReportScreen>
         allowedExtensions: ['csv'],
       );
 
+      // Check if context is still mounted after async operation
+      if (!context.mounted) return;
+
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
         if (file.path != null) {
@@ -268,6 +274,9 @@ class _ReportScreenState extends State<ReportScreen>
         }
       }
     } catch (e) {
+      // Check if context is still mounted after catching exception
+      if (!context.mounted) return;
+
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -284,6 +293,9 @@ class _ReportScreenState extends State<ReportScreen>
 
     // Get a more user-friendly file path representation
     final pathInfo = await PermissionsHandler.getReadableFilePath(filePath);
+
+    // Check if context is still mounted after async operation
+    if (!context.mounted) return;
 
     showDialog(
       context: context,
@@ -507,6 +519,9 @@ class _ReportScreenState extends State<ReportScreen>
       firstDate: firstDate,
       lastDate: lastDate,
     );
+
+    // Check if context is still mounted after async operation
+    if (!context.mounted) return;
 
     if (selectedDate != null) {
       setState(() {
