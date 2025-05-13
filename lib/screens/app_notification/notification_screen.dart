@@ -15,8 +15,26 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
+
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  // Key for the refresh indicator to programmatically trigger refresh
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  // Refresh function that will be used by RefreshIndicator
+  Future<void> _refreshNotifications(BuildContext context) async {
+    // Reset notifications by re-initializing
+    context.read<NotificationBloc>().add(InitializeNotifications());
+
+    // Add a small delay to make the refresh experience smoother
+    return Future.delayed(const Duration(milliseconds: 500));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +53,32 @@ class NotificationScreen extends StatelessWidget {
           actions: [
             BlocBuilder<NotificationBloc, NotificationState>(
               builder: (context, state) {
-                return IconButton(
-                  icon: Icon(
-                    Icons.done_all,
-                    color: AppTheme.lightTheme.colorScheme.surface,
-                  ),
-                  tooltip: l10n.notificationsTooltipMarkAllRead,
-                  onPressed:
-                      () => context.read<NotificationBloc>().add(
-                        MarkAllNotificationsAsRead(),
+                return Row(
+                  children: [
+                    // Add refresh button
+                    IconButton(
+                      icon: Icon(
+                        Icons.refresh,
+                        color: AppTheme.lightTheme.colorScheme.surface,
                       ),
+                      tooltip: 'Refresh notifications',
+                      onPressed: () {
+                        _refreshIndicatorKey.currentState?.show();
+                      },
+                    ),
+                    // Mark all as read button
+                    IconButton(
+                      icon: Icon(
+                        Icons.done_all,
+                        color: AppTheme.lightTheme.colorScheme.surface,
+                      ),
+                      tooltip: l10n.notificationsTooltipMarkAllRead,
+                      onPressed:
+                          () => context.read<NotificationBloc>().add(
+                            MarkAllNotificationsAsRead(),
+                          ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -58,94 +92,123 @@ class NotificationScreen extends StatelessWidget {
               );
             }
 
-            return Column(
-              children: [
-                // Savings Reminder Card
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    color: Colors.blue.shade50,
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.savings, color: Colors.white),
-                      ),
-                      title: Text(
-                        l10n.savingsReminderCardTitle,
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
+            return RefreshIndicator(
+              key: _refreshIndicatorKey,
+              onRefresh: () => _refreshNotifications(context),
+              child: CustomScrollView(
+                slivers: [
+                  // Savings Reminder Card
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        color: Colors.blue.shade50,
+                        child: ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.blue,
+                            child: Icon(Icons.savings, color: Colors.white),
+                          ),
+                          title: Text(
+                            l10n.savingsReminderCardTitle,
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            state.hasActiveReminder
+                                ? '${l10n.activeReminderAt} ${_formatTime(state.reminderHour!, state.reminderMinute!)}'
+                                : l10n.tapToSetupReminderText,
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            AppRoutes.navigateToSavingsReminder(context);
+                          },
                         ),
                       ),
-                      subtitle: Text(
-                        state.hasActiveReminder
-                            ? '${l10n.activeReminderAt} ${_formatTime(state.reminderHour!, state.reminderMinute!)}'
-                            : l10n.tapToSetupReminderText,
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        AppRoutes.navigateToSavingsReminder(context);
-                      },
                     ),
                   ),
-                ),
 
-                // Notifications List Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        l10n.recentNotificationsHeader,
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  // Notifications List Header
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
                       ),
-                      const Spacer(),
-                      if (state.notifications.isNotEmpty)
-                        Text(
-                          '${state.notifications.length} ${l10n.notificationsCount}',
-                          style: GoogleFonts.notoSans(
-                            fontSize: 14,
-                            color: Colors.grey,
+                      child: Row(
+                        children: [
+                          Text(
+                            l10n.recentNotificationsHeader,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-
-                // Notification List
-                Expanded(
-                  child:
-                      state.notifications.isEmpty
-                          ? Center(
-                            child: Text(
-                              l10n.notificationsEmptyMessage,
+                          const Spacer(),
+                          if (state.notifications.isNotEmpty)
+                            Text(
+                              '${state.notifications.length} ${l10n.notificationsCount}',
                               style: GoogleFonts.notoSans(
-                                fontSize: 16,
-                                color: AppTheme.lightTheme.colorScheme.onSurface
-                                    .withAlpha(153),
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
                             ),
-                          )
-                          : ListView.builder(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
-                            itemCount: state.notifications.length,
-                            itemBuilder: (context, index) {
-                              final notification = state.notifications[index];
-                              return _buildNotificationCard(
-                                context,
-                                notification,
-                              );
-                            },
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Notification List or Empty State
+                  state.notifications.isEmpty
+                      ? SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.notifications_off_outlined,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.notificationsEmptyMessage,
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 16,
+                                  color: AppTheme
+                                      .lightTheme
+                                      .colorScheme
+                                      .onSurface
+                                      .withAlpha(153),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Pull down to refresh',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 14,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
                           ),
-                ),
-              ],
+                        ),
+                      )
+                      : SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        sliver: SliverList.builder(
+                          itemCount: state.notifications.length,
+                          itemBuilder: (context, index) {
+                            final notification = state.notifications[index];
+                            return _buildNotificationCard(
+                              context,
+                              notification,
+                            );
+                          },
+                        ),
+                      ),
+                ],
+              ),
             );
           },
         ),

@@ -23,9 +23,31 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     InitializeNotifications event,
     Emitter<NotificationState> emit,
   ) async {
+    // If we're reinitializing (already initialized), emit loading state
+    if (state.isInitialized) {
+      emit(state.copyWith(isInitialized: false));
+    }
+
     await _repository.initialize();
-    final token = await _repository.getToken();
-    debugPrint('FCM Token: $token');
+
+    // Load saved notifications first
+    final savedNotifications = await _repository.getSavedNotifications();
+
+    // Check FCM token but don't block on failure
+    try {
+      final token = await _repository.getToken();
+      debugPrint('FCM Token: ${token ?? "null - will retry later"}');
+
+      if (token == null) {
+        // Schedule a token retry for later
+        Future.delayed(const Duration(seconds: 30), () async {
+          final retryToken = await _repository.getToken();
+          debugPrint('Retry FCM Token: ${retryToken ?? "still null"}');
+        });
+      }
+    } catch (e) {
+      debugPrint('Error getting FCM token: $e');
+    }
 
     // Xử lý thông báo foreground
     _repository.getForegroundNotifications().listen((notification) {
@@ -43,6 +65,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     // Xử lý thông báo local
     _repository.getLocalNotifications().listen((notification) {
       add(NotificationReceived(notification));
+      _repository.saveNotification(notification);
     });
 
     // Xử lý thông báo khi mở từ terminated
@@ -54,7 +77,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     // Load saved reminder settings
     add(LoadSavedReminderSettings());
 
-    emit(state.copyWith(isInitialized: true));
+    // Emit the new state with loaded notifications
+    emit(
+      state.copyWith(isInitialized: true, notifications: savedNotifications),
+    );
   }
 
   void _onNotificationReceived(
@@ -67,13 +93,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     // Sort by timestamp (newest first)
     updatedNotifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
+    // Save the notification to persistent storage
+    _repository.saveNotification(event.notification);
+
     emit(state.copyWith(notifications: updatedNotifications));
   }
 
-  void _onMarkNotificationAsRead(
+  Future<void> _onMarkNotificationAsRead(
     MarkNotificationAsRead event,
     Emitter<NotificationState> emit,
-  ) {
+  ) async {
     final updated =
         state.notifications.map((n) {
           if (n.id == event.notificationId) {
@@ -82,15 +111,21 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           return n;
         }).toList();
 
+    // Update in persistent storage
+    await _repository.markNotificationAsRead(event.notificationId);
+
     emit(state.copyWith(notifications: updated));
   }
 
-  void _onMarkAllNotificationsAsRead(
+  Future<void> _onMarkAllNotificationsAsRead(
     MarkAllNotificationsAsRead event,
     Emitter<NotificationState> emit,
-  ) {
+  ) async {
     final updated =
         state.notifications.map((n) => n.copyWith(isRead: true)).toList();
+
+    // Update in persistent storage
+    await _repository.markAllNotificationsAsRead();
 
     emit(state.copyWith(notifications: updated));
   }
@@ -100,6 +135,23 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
+      // Check permissions first
+      final hasPermission =
+          await LocalNotificationService.checkPermissionStatus();
+      if (!hasPermission) {
+        add(
+          NotificationReceived(
+            AppNotification.local(
+              title: 'Permission Required',
+              body:
+                  'Please enable notifications in your device settings to receive reminders.',
+              payload: 'permission_alert',
+            ),
+          ),
+        );
+        return;
+      }
+
       await _repository.scheduleDailySavingsReminder(
         hour: event.hour,
         minute: event.minute,
@@ -112,6 +164,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
       if (!hasScheduled) {
         debugPrint('WARNING: No pending notifications after scheduling!');
+        add(
+          NotificationReceived(
+            AppNotification.local(
+              title: 'Reminder Setup Issue',
+              body:
+                  'The reminder may not work correctly. Please check your device settings.',
+              payload: 'setup_alert',
+            ),
+          ),
+        );
       }
 
       emit(
@@ -130,6 +192,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             title: 'Savings Reminder Set',
             body:
                 'Daily reminder set for ${_formatTime(event.hour, event.minute)}',
+            payload: 'reminder_confirmation',
           ),
         ),
       );
@@ -141,7 +204,9 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         NotificationReceived(
           AppNotification.local(
             title: 'Error Setting Reminder',
-            body: 'Could not set reminder: ${e.toString()}',
+            body:
+                'Could not set reminder. Please check notification permissions.',
+            payload: 'error_alert',
           ),
         ),
       );
@@ -152,7 +217,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     CancelSavingsReminder event,
     Emitter<NotificationState> emit,
   ) async {
-    await _repository.cancelAllNotifications();
+    await _repository.cancelSavingsReminder();
     emit(state.copyWith(hasActiveReminder: false));
 
     // Add a notification to show in the list
@@ -160,7 +225,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       NotificationReceived(
         AppNotification.local(
           title: 'Reminders Cancelled',
-          body: 'All scheduled reminders have been cancelled',
+          body: 'Savings reminder has been cancelled',
+          payload: 'cancel_confirmation',
         ),
       ),
     );

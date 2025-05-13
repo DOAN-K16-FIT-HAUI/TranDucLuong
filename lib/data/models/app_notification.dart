@@ -36,9 +36,13 @@ class AppNotification {
   factory AppNotification.fromRemoteMessage(Map<String, dynamic> message) {
     final notification = message['notification'] as Map<String, dynamic>?;
     final data = message['data'] as Map<String, dynamic>? ?? message;
-    debugPrint('Message received: $message'); // In dữ liệu để kiểm tra
+    
+    // Ensure we have a unique and consistent ID for the notification
+    final String id = message['messageId'] ?? 
+        (data['id'] != null ? data['id'].toString() : DateTime.now().microsecondsSinceEpoch.toString());
+    
     return AppNotification(
-      id: message['messageId'] ?? DateTime.now().toIso8601String(),
+      id: id,
       title: notification?['title'] ?? data['title'] ?? 'No Title',
       body: notification?['body'] ?? data['body'] ?? 'No Body',
       timestamp: DateTime.now(),
@@ -52,8 +56,11 @@ class AppNotification {
     required String body,
     String? payload,
   }) {
+    // Create a more unique ID using microseconds (more granular than milliseconds)
+    final String id = '${DateTime.now().microsecondsSinceEpoch}_${title.hashCode}';
+    
     return AppNotification(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: id,
       title: title,
       body: body,
       timestamp: DateTime.now(),
