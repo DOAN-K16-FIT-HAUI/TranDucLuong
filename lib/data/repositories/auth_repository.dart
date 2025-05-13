@@ -7,27 +7,68 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthRepository {
   final FirebaseAuthService _firebaseAuthService;
 
-  AuthRepository({
-    FirebaseAuthService? firebaseAuthService,
-  }) : _firebaseAuthService = firebaseAuthService ??
-      FirebaseAuthService(
-        firebaseAuth: FirebaseAuth.instance,
-        googleSignIn: GoogleSignIn(),
-        facebookAuth: FacebookAuth.instance,
-      );
+  AuthRepository({FirebaseAuthService? firebaseAuthService})
+    : _firebaseAuthService =
+          firebaseAuthService ??
+          FirebaseAuthService(
+            firebaseAuth: FirebaseAuth.instance,
+            googleSignIn: GoogleSignIn(),
+            facebookAuth: FacebookAuth.instance,
+          );
 
   // Get current user
   User? get currentUser => _firebaseAuthService.currentUser;
+
+  // Verify if user account is active (not disabled)
+  Future<bool> isAccountActive() async {
+    try {
+      final user = _firebaseAuthService.currentUser;
+      if (user == null) return false;
+
+      // Force reload user metadata to get latest account status
+      await user.reload();
+
+      // Get fresh user object after reload
+      final freshUser = _firebaseAuthService.currentUser;
+      if (freshUser == null) return false;
+
+      // Check disabled status via metadata
+      // Note: Firebase doesn't directly expose isDisabled, but a disabled account
+      // will throw an error when trying to get ID token
+      try {
+        await freshUser.getIdToken(true);
+        return true; // Account is active
+      } catch (e) {
+        if (e is FirebaseAuthException && e.code == 'user-disabled') {
+          return false; // Account is disabled
+        }
+        rethrow; // Some other error occurred
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<UserModel> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     try {
-      return await _firebaseAuthService.signInWithEmailAndPassword(
+      final user = await _firebaseAuthService.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Check if account is active after sign in
+      if (!await isAccountActive()) {
+        await signOut(); // Sign out if account is disabled
+        throw FirebaseAuthException(
+          code: 'user-disabled',
+          message: 'This account has been disabled.',
+        );
+      }
+
+      return user;
     } catch (e) {
       rethrow; // Propagate the error to AuthBloc
     }
@@ -79,11 +120,22 @@ class AuthRepository {
     }
   }
 
+  // Enhanced version that checks disabled status
   Future<UserModel> getCurrentUser() async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
       throw Exception('No authenticated user');
     }
+
+    // Check if account is disabled
+    if (!await isAccountActive()) {
+      await signOut(); // Sign out the disabled user
+      throw FirebaseAuthException(
+        code: 'user-disabled',
+        message: 'This account has been disabled.',
+      );
+    }
+
     // Chuyển đổi Firebase User thành UserModel của ứng dụng
     return UserModel(
       id: firebaseUser.uid,

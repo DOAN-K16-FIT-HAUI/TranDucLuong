@@ -2,19 +2,65 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart'; // For debugPrint
+import 'package:flutter/foundation.dart';
 
 class TransactionRepository {
   final FirestoreService firestoreService;
-  final FirebaseAuth _auth; // Inject FirebaseAuth
-  static const String transactionCollectionPath =
-      'transactions'; // Collection gốc
+  final FirebaseAuth _auth;
+
+  // Default pagination size
+  static const int defaultPageSize = 20;
+  static const String transactionCollectionName = 'transactions';
 
   // Sửa constructor để nhận FirebaseAuth
   TransactionRepository(this.firestoreService, {FirebaseAuth? auth})
     : _auth = auth ?? FirebaseAuth.instance;
 
-  // Lấy userId hiện tại
+  // Verify if the user account is active
+  Future<bool> _verifyAccountActive() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+
+      // Force reload user to get latest account status
+      await user.reload();
+
+      // Get fresh user object after reload
+      final freshUser = _auth.currentUser;
+      if (freshUser == null) return false;
+
+      try {
+        // This will throw an error if account is disabled
+        await freshUser.getIdToken(true);
+        return true;
+      } catch (e) {
+        if (e is FirebaseAuthException && e.code == 'user-disabled') {
+          return false;
+        }
+        rethrow;
+      }
+    } catch (e) {
+      debugPrint("Error verifying account status: $e");
+      return false;
+    }
+  }
+
+  // Enhanced getUserId with account status check
+  Future<String> _getVerifiedUserId() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw SecurityException("User not logged in");
+    }
+
+    // Check if account is disabled
+    if (!await _verifyAccountActive()) {
+      throw SecurityException("Account is disabled");
+    }
+
+    return user.uid;
+  }
+
+  // Lấy userId hiện tại (without verification - for read operations)
   String? _getUserId() {
     final user = _auth.currentUser;
     if (user == null) {
@@ -23,18 +69,40 @@ class TransactionRepository {
     return user?.uid;
   }
 
+  // Lấy đường dẫn collection transactions của người dùng
+  String _userTransactionsPath(String userId) {
+    return 'users/$userId/$transactionCollectionName';
+  }
+
   // Lấy đường dẫn collection ví của người dùng
   String _userWalletCollectionPath(String userId) {
     // Quan trọng: Đảm bảo đường dẫn này khớp với WalletRepository
     return 'users/$userId/wallets';
   }
 
+  // Lấy document Reference của ví từ tên ví
+  Future<DocumentReference?> _getWalletRefByName({
+    required FirebaseFirestore firestore,
+    required String userId,
+    required String walletName,
+  }) async {
+    final querySnapshot =
+        await firestore
+            .collection(_userWalletCollectionPath(userId))
+            .where('name', isEqualTo: walletName)
+            .limit(1)
+            .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.reference;
+    }
+    return null;
+  }
+
   // --- Hàm trợ giúp cập nhật số dư ví (sử dụng trong Batch hoặc Transaction) ---
   Future<void> _updateWalletBalance({
     required FirebaseFirestore firestore, // Instance Firestore
     required WriteBatch batch, // Batch đang thực thi
-    // Hoặc Transaction transaction object nếu dùng Firestore Transaction
-    // required dynamic transactionOrBatch, // Có thể truyền Transaction hoặc WriteBatch
     required String userId,
     required String walletName, // Tìm ví theo tên
     required double amountChange, // Số tiền thay đổi (+ hoặc -)
@@ -54,29 +122,14 @@ class TransactionRepository {
       if (isAdjustment && newBalance != null) {
         // Điều chỉnh số dư: Đặt giá trị mới
         batch.update(walletDocRef, {'balance': newBalance});
-        // if (transactionOrBatch is WriteBatch) {
-        //   transactionOrBatch.update(walletDocRef, {'balance': newBalance});
-        // } else if (transactionOrBatch is Transaction) {
-        //   transactionOrBatch.update(walletDocRef, {'balance': newBalance});
-        // }
       } else {
         // Các loại khác: Tăng/giảm bằng FieldValue.increment
         batch.update(walletDocRef, {
           'balance': FieldValue.increment(amountChange),
         });
-        // if (transactionOrBatch is WriteBatch) {
-        //   transactionOrBatch.update(walletDocRef, {'balance': FieldValue.increment(amountChange)});
-        // } else if (transactionOrBatch is Transaction) {
-        //    // Đọc số dư hiện tại trong transaction để đảm bảo tính đúng đắn nếu cần kiểm tra logic phức tạp
-        // final walletSnapshot = await transactionOrBatch.get(walletDocRef);
-        // final currentBalance = (walletSnapshot.data() as Map<String, dynamic>?)?['balance'] ?? 0.0;
-        // transactionOrBatch.update(walletDocRef, {'balance': currentBalance + amountChange});
-        //    // Hoặc đơn giản nếu chỉ cần tăng/giảm:
-        //    transactionOrBatch.update(walletDocRef, {'balance': FieldValue.increment(amountChange)});
-        // }
       }
       debugPrint(
-        "Scheduled update for wallet '$walletName': change=$amountChange, adjustment=$isAdjustment, newBalance=$newBalance",
+        "Scheduled update for wallet '$walletName' (${walletDocRef.path}): change=$amountChange, adjustment=$isAdjustment, newBalance=$newBalance",
       );
     } else {
       // Ví không tìm thấy! Đây là lỗi nghiêm trọng.
@@ -93,20 +146,14 @@ class TransactionRepository {
     required FirebaseFirestore firestore,
     required Transaction transaction, // Đối tượng Transaction
     required String userId,
-    required String walletName,
+    required String walletPath, // Đường dẫn đến document ví, không còn là tên
     required double amountChange,
     bool isAdjustment = false,
     double? newBalance,
   }) async {
-    final querySnapshot =
-        await firestore // Query bên ngoài transaction không được khuyến nghị, nhưng get thì được
-            .collection(_userWalletCollectionPath(userId))
-            .where('name', isEqualTo: walletName)
-            .limit(1)
-            .get(); // Get có thể chạy bên ngoài transaction
+    final walletDocRef = firestore.doc(walletPath);
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final walletDocRef = querySnapshot.docs.first.reference;
+    try {
       if (isAdjustment && newBalance != null) {
         transaction.update(walletDocRef, {'balance': newBalance});
       } else {
@@ -116,26 +163,23 @@ class TransactionRepository {
         });
       }
       debugPrint(
-        "Scheduled update via Transaction for wallet '$walletName': change=$amountChange, adjustment=$isAdjustment, newBalance=$newBalance",
+        "Scheduled update via Transaction for wallet '${walletDocRef.path}': change=$amountChange, adjustment=$isAdjustment, newBalance=$newBalance",
       );
-    } else {
+    } catch (e) {
       debugPrint(
-        "Error: Wallet with name '$walletName' not found during transaction for user '$userId'. Transaction will fail.",
+        "Error: Failed to update wallet ${walletDocRef.path} in transaction: $e",
       );
       throw Exception(
-        "Wallet '$walletName' not found.",
+        "Failed to update wallet balance. Transaction will fail: $e",
       ); // Throw để hủy transaction
     }
   }
 
   // --- Add a new transaction AND update wallet balance ---
   Future<void> addTransaction(TransactionModel transaction) async {
-    final userId = _getUserId();
-    if (userId == null) {
-      throw Exception('User not logged in. Cannot add transaction.');
-    }
+    final userId = await _getVerifiedUserId();
 
-    // Gán userId cho giao dịch nếu chưa có (đảm bảo)
+    // Gán userId cho giao dịch nếu chưa có
     final transactionWithUser =
         transaction.userId.isEmpty
             ? _copyWithUserId(transaction, userId)
@@ -145,65 +189,151 @@ class TransactionRepository {
     final batch = firestore.batch();
 
     try {
-      // 1. Thêm document giao dịch mới vào batch
-      // Collection gốc 'transactions'
+      // Chuyển đổi wallet name thành wallet path (document reference) nếu cần
+      TransactionModel transactionToSave = transactionWithUser;
+
+      if (transactionWithUser.wallet != null &&
+          !transactionWithUser.wallet!.contains('/')) {
+        final walletRef = await _getWalletRefByName(
+          firestore: firestore,
+          userId: userId,
+          walletName: transactionWithUser.wallet!,
+        );
+        if (walletRef != null) {
+          transactionToSave = transactionToSave.copyWith(
+            wallet: walletRef.path,
+          );
+        }
+      }
+
+      if (transactionWithUser.fromWallet != null &&
+          !transactionWithUser.fromWallet!.contains('/')) {
+        final fromWalletRef = await _getWalletRefByName(
+          firestore: firestore,
+          userId: userId,
+          walletName: transactionWithUser.fromWallet!,
+        );
+        if (fromWalletRef != null) {
+          transactionToSave = transactionToSave.copyWith(
+            fromWallet: fromWalletRef.path,
+          );
+        }
+      }
+
+      if (transactionWithUser.toWallet != null &&
+          !transactionWithUser.toWallet!.contains('/')) {
+        final toWalletRef = await _getWalletRefByName(
+          firestore: firestore,
+          userId: userId,
+          walletName: transactionWithUser.toWallet!,
+        );
+        if (toWalletRef != null) {
+          transactionToSave = transactionToSave.copyWith(
+            toWallet: toWalletRef.path,
+          );
+        }
+      }
+
+      // Đặc biệt xử lý cho adjustment transaction để lưu balanceBefore
+      if (transactionToSave.typeKey == 'adjustment' &&
+          transactionToSave.wallet != null &&
+          transactionToSave.balanceAfter != null) {
+        // Đọc số dư hiện tại để lưu vào balanceBefore
+        final walletRef = firestore.doc(transactionToSave.wallet!);
+        final walletDoc = await walletRef.get();
+
+        if (walletDoc.exists) {
+          final currentBalance =
+              (walletDoc.data() as Map<String, dynamic>)['balance'] ?? 0.0;
+          transactionToSave = transactionToSave.copyWith(
+            balanceBefore:
+                currentBalance is int
+                    ? currentBalance.toDouble()
+                    : (currentBalance as num).toDouble(),
+          );
+        }
+      }
+
+      // 1. Thêm document giao dịch mới vào batch - sử dụng subcollection
       final newTransactionRef =
-          firestore
-              .collection(transactionCollectionPath)
-              .doc(); // Để Firestore tạo ID
-      // Tạo transaction với ID mới trước khi lưu để có thể tham chiếu nếu cần
-      final transactionToSave = _copyWithId(
-        transactionWithUser,
+          firestore.collection(_userTransactionsPath(userId)).doc();
+
+      // Tạo transaction với ID mới trước khi lưu
+      final finalTransaction = _copyWithId(
+        transactionToSave,
         newTransactionRef.id,
       );
-      batch.set(newTransactionRef, transactionToSave.toJson());
+      batch.set(newTransactionRef, finalTransaction.toJson());
 
       // 2. Cập nhật số dư ví dựa trên loại giao dịch
-      switch (transactionToSave.typeKey) {
+      // Functionality is the same but needs to update paths instead of names
+      switch (finalTransaction.typeKey) {
         case 'income':
-          if (transactionToSave.wallet != null) {
-            await _updateWalletBalance(
+          if (finalTransaction.wallet != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.wallet!), {
+                  'balance': FieldValue.increment(finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.wallet!,
-              amountChange: transactionToSave.amount,
+              walletPath: finalTransaction.wallet!,
+              amountChange: finalTransaction.amount,
             );
           } else {
             throw Exception("Wallet is required for Income transaction.");
           }
           break;
         case 'expense':
-          if (transactionToSave.wallet != null) {
-            await _updateWalletBalance(
+          if (finalTransaction.wallet != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.wallet!), {
+                  'balance': FieldValue.increment(-finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.wallet!,
-              amountChange: -transactionToSave.amount, // Trừ đi
+              walletPath: finalTransaction.wallet!,
+              amountChange: -finalTransaction.amount,
             );
           } else {
             throw Exception("Wallet is required for Expense transaction.");
           }
           break;
         case 'transfer':
-          if (transactionToSave.fromWallet != null &&
-              transactionToSave.toWallet != null) {
-            // Giảm số dư ví nguồn
-            await _updateWalletBalance(
+          if (finalTransaction.fromWallet != null &&
+              finalTransaction.toWallet != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(
+                  firestore.doc(finalTransaction.fromWallet!),
+                  {'balance': FieldValue.increment(-finalTransaction.amount)},
+                );
+                transaction.update(firestore.doc(finalTransaction.toWallet!), {
+                  'balance': FieldValue.increment(finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.fromWallet!,
-              amountChange: -transactionToSave.amount,
+              walletPath: finalTransaction.fromWallet!,
+              amountChange: -finalTransaction.amount,
             );
-            // Tăng số dư ví đích
-            await _updateWalletBalance(
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.toWallet!), {
+                  'balance': FieldValue.increment(finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.toWallet!,
-              amountChange: transactionToSave.amount,
+              walletPath: finalTransaction.toWallet!,
+              amountChange: finalTransaction.amount,
             );
           } else {
             throw Exception(
@@ -212,13 +342,18 @@ class TransactionRepository {
           }
           break;
         case 'borrow':
-          if (transactionToSave.wallet != null) {
-            await _updateWalletBalance(
+          if (finalTransaction.wallet != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.wallet!), {
+                  'balance': FieldValue.increment(finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.wallet!,
-              amountChange: transactionToSave.amount, // Tăng số dư
+              walletPath: finalTransaction.wallet!,
+              amountChange: finalTransaction.amount,
             );
           } else {
             throw Exception(
@@ -227,29 +362,39 @@ class TransactionRepository {
           }
           break;
         case 'lend':
-          if (transactionToSave.wallet != null) {
-            await _updateWalletBalance(
+          if (finalTransaction.wallet != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.wallet!), {
+                  'balance': FieldValue.increment(-finalTransaction.amount),
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.wallet!,
-              amountChange: -transactionToSave.amount, // Giảm số dư
+              walletPath: finalTransaction.wallet!,
+              amountChange: -finalTransaction.amount,
             );
           } else {
             throw Exception("Wallet is required for Loan (Lend) transaction.");
           }
           break;
         case 'adjustment':
-          if (transactionToSave.wallet != null &&
-              transactionToSave.balanceAfter != null) {
-            await _updateWalletBalance(
+          if (finalTransaction.wallet != null &&
+              finalTransaction.balanceAfter != null) {
+            await _updateWalletBalanceInTransaction(
               firestore: firestore,
-              batch: batch,
+              transaction: await firestore.runTransaction((transaction) async {
+                transaction.update(firestore.doc(finalTransaction.wallet!), {
+                  'balance': finalTransaction.balanceAfter,
+                });
+                return transaction;
+              }),
               userId: userId,
-              walletName: transactionToSave.wallet!,
+              walletPath: finalTransaction.wallet!,
               amountChange: 0,
               isAdjustment: true,
-              newBalance: transactionToSave.balanceAfter!,
+              newBalance: finalTransaction.balanceAfter!,
             );
           } else {
             throw Exception(
@@ -259,20 +404,21 @@ class TransactionRepository {
           break;
         default:
           debugPrint(
-            "Warning: Unknown transaction type '${transactionToSave.typeKey}'. Wallet balance not updated.",
+            "Warning: Unknown transaction type '${finalTransaction.typeKey}'. Wallet balance not updated.",
           );
-        // Hoặc throw lỗi nếu type không hợp lệ là nghiêm trọng
-        // throw Exception("Invalid transaction typeKey: ${transactionToSave.typeKey}");
       }
 
       // 3. Commit batch
       await batch.commit();
+
+      // 4. Cập nhật dữ liệu tổng hợp nếu cần
+      await _updateTransactionSummary(finalTransaction);
+
       debugPrint(
         "Transaction added and wallet balance(s) updated successfully (ID: ${newTransactionRef.id}).",
       );
     } catch (e) {
       debugPrint("Error during addTransaction batch: $e");
-      // Ném lại lỗi để Bloc có thể bắt và hiển thị cho người dùng
       throw Exception('Failed to add transaction and update balance: $e');
     }
   }
@@ -293,7 +439,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.wallet!,
+            walletPath: oldTransaction.wallet!,
             amountChange: amountChange,
           );
         }
@@ -305,7 +451,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.wallet!,
+            walletPath: oldTransaction.wallet!,
             amountChange: amountChange,
           );
         }
@@ -318,7 +464,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.fromWallet!,
+            walletPath: oldTransaction.fromWallet!,
             amountChange: oldTransaction.amount,
           );
           // Hoàn tác ví đích (trừ đi)
@@ -326,7 +472,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.toWallet!,
+            walletPath: oldTransaction.toWallet!,
             amountChange: -oldTransaction.amount,
           );
         }
@@ -338,7 +484,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.wallet!,
+            walletPath: oldTransaction.wallet!,
             amountChange: amountChange,
           );
         }
@@ -350,19 +496,37 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: oldTransaction.wallet!,
+            walletPath: oldTransaction.wallet!,
             amountChange: amountChange,
           );
         }
         break;
       case 'adjustment':
-        // Hoàn tác điều chỉnh rất phức tạp vì không biết số dư *trước* đó.
-        // Cách an toàn nhất là không cho phép sửa/xóa giao dịch này hoặc yêu cầu tạo giao dịch điều chỉnh mới để sửa.
-        // Tạm thời không làm gì hoặc throw lỗi nếu cố gắng sửa/xóa loại này.
-        debugPrint(
-          "Warning: Reversing 'Balance Adjustment' is complex and not fully implemented. Balance may become incorrect if this transaction is updated or deleted.",
-        );
-        // throw UnsupportedError("Updating or deleting 'Balance Adjustment' transactions is not recommended.");
+        // Cải thiện hỗ trợ cho hoàn tác điều chỉnh số dư
+        if (oldTransaction.wallet != null) {
+          if (oldTransaction.balanceBefore != null) {
+            // Nếu có balanceBefore, khôi phục về giá trị đó
+            await _updateWalletBalanceInTransaction(
+              firestore: firestore,
+              transaction: transaction,
+              userId: userId,
+              walletPath: oldTransaction.wallet!,
+              isAdjustment: true,
+              newBalance: oldTransaction.balanceBefore!,
+              amountChange: amountChange,
+            );
+            debugPrint(
+              "Reversed adjustment by restoring previous balance: ${oldTransaction.balanceBefore}",
+            );
+          } else {
+            // Nếu không có balanceBefore, hiển thị cảnh báo rõ ràng hơn
+            debugPrint(
+              "Warning: Cannot properly reverse 'Balance Adjustment' transaction because 'balanceBefore' is not available. "
+              "This was likely created before this feature was implemented. Balance might be incorrect.",
+            );
+            // Không throw lỗi, nhưng developer cần biết về vấn đề này
+          }
+        }
         break;
       default:
         debugPrint(
@@ -386,7 +550,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.wallet!,
+            walletPath: newTransaction.wallet!,
             amountChange: amountChange,
           );
         } else {
@@ -400,7 +564,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.wallet!,
+            walletPath: newTransaction.wallet!,
             amountChange: amountChange,
           );
         } else {
@@ -414,14 +578,14 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.fromWallet!,
+            walletPath: newTransaction.fromWallet!,
             amountChange: -newTransaction.amount,
           );
           await _updateWalletBalanceInTransaction(
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.toWallet!,
+            walletPath: newTransaction.toWallet!,
             amountChange: newTransaction.amount,
           );
         } else {
@@ -437,7 +601,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.wallet!,
+            walletPath: newTransaction.wallet!,
             amountChange: amountChange,
           );
         } else {
@@ -451,7 +615,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.wallet!,
+            walletPath: newTransaction.wallet!,
             amountChange: amountChange,
           );
         } else {
@@ -465,7 +629,7 @@ class TransactionRepository {
             firestore: firestore,
             transaction: transaction,
             userId: userId,
-            walletName: newTransaction.wallet!,
+            walletPath: newTransaction.wallet!,
             amountChange: 0, // Không dùng
             isAdjustment: true,
             newBalance: newTransaction.balanceAfter!,
@@ -485,13 +649,20 @@ class TransactionRepository {
 
   // --- Update an existing transaction AND adjust wallet balances ---
   Future<void> updateTransaction(TransactionModel newTransaction) async {
-    final userId = _getUserId();
-    if (userId == null) {
-      throw Exception('User not logged in. Cannot update transaction.');
-    }
+    final userId = await _getVerifiedUserId();
+
     if (newTransaction.id.isEmpty) {
       throw ArgumentError("Transaction ID is required for update.");
     }
+
+    // Đặc biệt xử lý cho loại giao dịch adjustment
+    if (newTransaction.typeKey == 'adjustment') {
+      throw UnsupportedError(
+        "Updating 'Balance Adjustment' transactions is not supported. "
+        "Please create a new adjustment transaction instead.",
+      );
+    }
+
     // Gán userId cho giao dịch nếu chưa có (đảm bảo)
     final transactionWithUser =
         newTransaction.userId.isEmpty
@@ -500,7 +671,7 @@ class TransactionRepository {
 
     final firestore = firestoreService.firestore;
     final transactionRef = firestore
-        .collection(transactionCollectionPath)
+        .collection(_userTransactionsPath(userId))
         .doc(transactionWithUser.id);
 
     try {
@@ -557,17 +728,15 @@ class TransactionRepository {
 
   // --- Delete a transaction AND reverse its effect on wallet balance ---
   Future<void> deleteTransaction(String transactionId) async {
-    final userId = _getUserId();
-    if (userId == null) {
-      throw Exception('User not logged in. Cannot delete transaction.');
-    }
+    final userId = await _getVerifiedUserId();
+
     if (transactionId.isEmpty) {
       throw ArgumentError("Transaction ID is required for delete.");
     }
 
     final firestore = firestoreService.firestore;
     final transactionRef = firestore
-        .collection(transactionCollectionPath)
+        .collection(_userTransactionsPath(userId))
         .doc(transactionId);
 
     try {
@@ -588,13 +757,12 @@ class TransactionRepository {
           transactionSnapshot.id,
         );
 
-        // --- Cảnh báo về sửa/xóa Điều chỉnh số dư ---
-        if (transactionToDelete.typeKey == 'Điều chỉnh số dư') {
-          debugPrint(
-            "Warning: Deleting a 'Balance Adjustment' transaction can lead to incorrect balances due to the complexity of reversal.",
+        // Không cho phép xóa giao dịch điều chỉnh số dư
+        if (transactionToDelete.typeKey == 'adjustment') {
+          throw UnsupportedError(
+            "Deleting 'Balance Adjustment' transactions is not supported. "
+            "Please create a new adjustment transaction to correct the balance if needed.",
           );
-          // Cân nhắc throw lỗi ở đây để ngăn chặn:
-          // throw UnsupportedError("Deleting 'Balance Adjustment' transactions is not recommended. Create a new adjustment instead.");
         }
 
         // 2. Hoàn tác ảnh hưởng của giao dịch lên số dư ví
@@ -607,7 +775,11 @@ class TransactionRepository {
 
         // 3. Xóa document giao dịch
         transaction.delete(transactionRef);
+
+        // 4. Cập nhật dữ liệu tổng hợp
+        await _updateTransactionSummary(transactionToDelete, isDelete: true);
       });
+
       debugPrint(
         "Transaction deleted and wallet balance(s) reversed successfully (ID: $transactionId).",
       );
@@ -617,19 +789,28 @@ class TransactionRepository {
     }
   }
 
-  // --- Get a transaction by ID (Không thay đổi nhiều) ---
+  // --- Get a transaction by ID ---
   Future<TransactionModel> getTransaction(String transactionId) async {
+    final userId = _getUserId();
+    if (userId == null) {
+      throw Exception('User not logged in. Cannot get transaction.');
+    }
+
     if (transactionId.isEmpty) {
       throw ArgumentError("Transaction ID cannot be empty.");
     }
+
     try {
-      final doc = await firestoreService.getDocument(
-        transactionCollectionPath,
-        transactionId,
-      );
+      final doc =
+          await firestoreService.firestore
+              .collection(_userTransactionsPath(userId))
+              .doc(transactionId)
+              .get();
+
       if (!doc.exists || doc.data() == null) {
-        throw Exception('TransactionModel not found with ID: $transactionId');
+        throw Exception('Transaction not found with ID: $transactionId');
       }
+
       return TransactionModel.fromJson(
         doc.data() as Map<String, dynamic>,
         doc.id,
@@ -640,46 +821,160 @@ class TransactionRepository {
     }
   }
 
-  // --- Get a stream of transactions for a user ---
-  Stream<List<TransactionModel>> getUserTransactions(String userId) {
+  // --- Get transactions with pagination ---
+  Future<List<TransactionModel>> getTransactions({
+    int limit = defaultPageSize,
+    DocumentSnapshot? startAfter,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? type,
+    String? categoryKey,
+    String? walletId,
+  }) async {
+    final userId = _getUserId();
+    if (userId == null) {
+      throw Exception('User not logged in. Cannot get transactions.');
+    }
+
+    try {
+      // Start with base query on user's transactions collection
+      Query query = firestoreService.firestore.collection(
+        _userTransactionsPath(userId),
+      );
+
+      // Add date range filter if provided
+      if (startDate != null) {
+        query = query.where(
+          'date',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        );
+      }
+      if (endDate != null) {
+        query = query.where(
+          'date',
+          isLessThanOrEqualTo: Timestamp.fromDate(endDate),
+        );
+      }
+
+      // Add type filter if provided
+      if (type != null) {
+        query = query.where('typeKey', isEqualTo: type);
+      }
+
+      // Add category filter if provided
+      if (categoryKey != null) {
+        query = query.where('categoryKey', isEqualTo: categoryKey);
+      }
+
+      // Add wallet filter if provided
+      if (walletId != null) {
+        final walletPath = 'users/$userId/wallets/$walletId';
+        // Need to check in all wallet fields
+        query = query.where(
+          Filter.or(
+            Filter('wallet', isEqualTo: walletPath),
+            Filter.or(
+              Filter('fromWallet', isEqualTo: walletPath),
+              Filter('toWallet', isEqualTo: walletPath),
+            ),
+          ),
+        );
+      }
+
+      // Order by date, newest first
+      query = query.orderBy('date', descending: true);
+
+      // Add pagination
+      if (startAfter != null) {
+        query = query.startAfterDocument(startAfter);
+      }
+      query = query.limit(limit);
+
+      // Hint about index requirements in debug print
+      debugPrint(
+        "Note: This query might require a composite index. If you see a Firestore error,"
+        "check the Firebase console for index creation link.",
+      );
+
+      // Execute query
+      final querySnapshot = await query.get();
+
+      return querySnapshot.docs
+          .map(
+            (doc) => TransactionModel.fromJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
+          .toList();
+    } catch (e) {
+      debugPrint("Error getting transactions: $e");
+      throw Exception('Failed to get transactions: $e');
+    }
+  }
+
+  // --- Get a stream of transactions for a user with pagination ---
+  Stream<List<TransactionModel>> getUserTransactions(
+    String userId, {
+    int limit = defaultPageSize,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
     if (userId.isEmpty) {
       debugPrint("Cannot get transactions for empty userId.");
-      return Stream.value([]); // Trả về stream rỗng
+      return Stream.value([]);
     }
+
     try {
-      // Query collection gốc 'transactions' và lọc theo 'userId'
-      return firestoreService.firestore
-          .collection(transactionCollectionPath)
-          .where('userId', isEqualTo: userId)
-          // .orderBy('date', descending: true) // Sắp xếp theo ngày giảm dần (mới nhất trước) - tùy chọn
+      // Start with base query on user's transactions collection
+      Query query = firestoreService.firestore.collection(
+        _userTransactionsPath(userId),
+      );
+
+      // Add date filters if provided
+      if (startDate != null) {
+        query = query.where(
+          'date',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        );
+      }
+      if (endDate != null) {
+        query = query.where(
+          'date',
+          isLessThanOrEqualTo: Timestamp.fromDate(endDate),
+        );
+      }
+
+      // Order by date, newest first
+      query = query.orderBy('date', descending: true);
+
+      // Apply limit for pagination
+      query = query.limit(limit);
+
+      return query
           .snapshots()
           .map((snapshot) {
-            // Log số lượng documents tìm thấy
-            // debugPrint("getUserTransactions stream received ${snapshot.docs.length} docs for user $userId");
             return snapshot.docs
                 .map((doc) {
                   try {
-                    return TransactionModel.fromJson(doc.data(), doc.id);
+                    return TransactionModel.fromJson(
+                      doc.data() as Map<String, dynamic>,
+                      doc.id,
+                    );
                   } catch (e) {
                     debugPrint(
                       "Error parsing transaction ${doc.id}: $e. Data: ${doc.data()}",
                     );
-                    // Trả về một giá trị mặc định hoặc bỏ qua document lỗi
-                    // Hoặc return null và lọc ra sau: .where((item) => item != null).toList();
-                    // Để đơn giản, tạm thời bỏ qua:
                     return null;
                   }
                 })
                 .whereType<TransactionModel>()
-                .toList(); // Lọc bỏ các giá trị null nếu có lỗi parsing
+                .toList();
           })
           .handleError((error) {
-            // Bắt lỗi từ stream
             debugPrint(
               "Error in getUserTransactions stream for user $userId: $error",
             );
-            // Có thể emit một trạng thái lỗi ở đây nếu Bloc lắng nghe trực tiếp stream này
-            // Hoặc chỉ log lỗi và trả về danh sách rỗng
             return <TransactionModel>[];
           });
     } catch (e) {
@@ -690,7 +985,26 @@ class TransactionRepository {
     }
   }
 
-  // --- Hàm helper để tạo bản sao TransactionModel với ID ---
+  // Helper method to update transaction summaries
+  Future<void> _updateTransactionSummary(
+    TransactionModel transaction, {
+    bool isDelete = false,
+  }) async {
+    try {
+      // This would be implemented in TransactionSummaryRepository
+      // We're just making a stub call here
+      debugPrint(
+        "Updating transaction summary for ${transaction.date.year}-${transaction.date.month}",
+      );
+      // In a real implementation, you would get an instance of TransactionSummaryRepository
+      // and call its updateSummaryForTransaction method
+    } catch (e) {
+      // Non-critical error, just log it
+      debugPrint("Error updating transaction summary: $e");
+    }
+  }
+
+  // --- Helper functions to copy TransactionModel instances ---
   TransactionModel _copyWithId(TransactionModel transaction, String id) {
     // Không thể dùng copyWith vì model chưa có, phải tạo instance mới
     return TransactionModel(
@@ -733,4 +1047,13 @@ class TransactionRepository {
       balanceAfter: transaction.balanceAfter,
     );
   }
+}
+
+// Add custom exceptions for better error handling
+class SecurityException implements Exception {
+  final String message;
+  SecurityException(this.message);
+
+  @override
+  String toString() => 'SecurityException: $message';
 }

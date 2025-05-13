@@ -25,3 +25,25 @@ class LoadTransactions extends TransactionEvent {
 
   LoadTransactions(this.userId);
 }
+
+// New event for loading more transactions (pagination)
+class LoadMoreTransactions extends TransactionEvent {
+  LoadMoreTransactions();
+}
+
+// New event for filtering transactions
+class FilterTransactions extends TransactionEvent {
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? transactionType;
+  final String? categoryKey;
+  final String? walletId;
+
+  FilterTransactions({
+    this.startDate,
+    this.endDate,
+    this.transactionType,
+    this.categoryKey,
+    this.walletId,
+  });
+}

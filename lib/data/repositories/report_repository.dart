@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:finance_app/data/models/transaction.dart';
 import 'package:finance_app/data/services/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,8 +12,64 @@ import 'package:uuid/uuid.dart';
 
 class ReportRepository {
   final FirestoreService _firestoreService;
+  final FirebaseAuth _auth;
 
-  ReportRepository(this._firestoreService);
+  ReportRepository(this._firestoreService, {FirebaseAuth? auth})
+    : _auth = auth ?? FirebaseAuth.instance;
+
+  // Verify if the user account is active
+  Future<bool> _verifyAccountActive() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+
+      // Force reload user to get latest account status
+      await user.reload();
+
+      // Get fresh user object after reload
+      final freshUser = _auth.currentUser;
+      if (freshUser == null) return false;
+
+      try {
+        // This will throw an error if account is disabled
+        await freshUser.getIdToken(true);
+        return true;
+      } catch (e) {
+        if (e is FirebaseAuthException && e.code == 'user-disabled') {
+          return false;
+        }
+        rethrow;
+      }
+    } catch (e) {
+      debugPrint("Error verifying account status: $e");
+      return false;
+    }
+  }
+
+  // Enhanced getUserId with account status check
+  Future<String> _getVerifiedUserId() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw SecurityException("User not logged in");
+    }
+
+    // Check if account is disabled
+    if (!await _verifyAccountActive()) {
+      throw SecurityException("Account is disabled");
+    }
+
+    return user.uid;
+  }
+
+  // Get cached userId for non-critical operations
+  String? _getUserId() {
+    return _auth.currentUser?.uid;
+  }
+
+  // Get transactions collection path for a user
+  String _userTransactionsPath(String userId) {
+    return 'users/$userId/transactions';
+  }
 
   Future<List<TransactionModel>> getTransactions(
     String userId,
@@ -20,10 +77,12 @@ class ReportRepository {
     DateTime endDate,
   ) async {
     try {
+      // Verify account is active for this sensitive operation
+      await _getVerifiedUserId();
+
       final querySnapshot =
           await _firestoreService.firestore
-              .collection('transactions')
-              .where('userId', isEqualTo: userId)
+              .collection(_userTransactionsPath(userId))
               .where('date', isGreaterThanOrEqualTo: startDate)
               .where(
                 'date',
@@ -104,10 +163,23 @@ class ReportRepository {
         }
       }
 
+      // Add wallet breakdown - expense by wallet
+      final walletExpenses = <String, double>{};
+      for (var t in transactions.where(
+        (t) => t.typeKey == 'expense' && t.wallet != null,
+      )) {
+        // Extract wallet name from path or use path as key
+        final walletKey = t.wallet!;
+        final walletName = t.walletDisplayName ?? walletKey.split('/').last;
+        walletExpenses[walletName] =
+            (walletExpenses[walletName] ?? 0) + t.amount;
+      }
+
       return ReportData(
         categoryExpenses: categoryExpenses,
         dailyBalances: dailyBalances,
         transactionTypeTotals: transactionTypeTotals,
+        walletExpenses: walletExpenses,
       );
     } catch (e) {
       debugPrint('Failed to get report data: $e');
@@ -121,6 +193,9 @@ class ReportRepository {
     DateTime endDate,
   ) async {
     try {
+      // Verify account is active for this operation
+      await _getVerifiedUserId();
+
       // Request storage permission with improved handling
       if (!kIsWeb) {
         Map<Permission, PermissionStatus> statuses =
@@ -143,8 +218,20 @@ class ReportRepository {
 
       // Create CSV data
       List<List<dynamic>> csvData = [
-        // Header row
-        ['Date', 'Time', 'Type', 'Category', 'Description', 'Amount', 'Wallet'],
+        // Header row with more detailed information
+        [
+          'Date',
+          'Time',
+          'Type',
+          'Category',
+          'Description',
+          'Amount',
+          'Wallet',
+          'From Wallet',
+          'To Wallet',
+          'Balance Before',
+          'Balance After',
+        ],
       ];
 
       // Add transaction rows
@@ -159,8 +246,11 @@ class ReportRepository {
           t.categoryKey,
           t.description,
           t.amount,
-          t.wallet ??
-              (t.fromWallet != null ? '${t.fromWallet} -> ${t.toWallet}' : ''),
+          t.wallet != null ? t.walletDisplayName : '',
+          t.fromWallet != null ? t.fromWalletDisplayName : '',
+          t.toWallet != null ? t.toWalletDisplayName : '',
+          t.balanceBefore,
+          t.balanceAfter,
         ]);
       }
 
@@ -220,6 +310,9 @@ class ReportRepository {
 
   Future<int> importTransactionsFromCsv(String userId, String filePath) async {
     try {
+      // Verify account is active for this sensitive operation
+      final verifiedUserId = await _getVerifiedUserId();
+
       final file = File(filePath);
       if (!await file.exists()) {
         throw Exception('File not found: $filePath');
@@ -280,23 +373,56 @@ class ReportRepository {
           String? fromWallet;
           String? toWallet;
 
-          // Handle wallet field
+          // Extract wallet information and convert to proper paths
           if (row.length > 6) {
             final walletInfo = row[6].toString();
-            if (walletInfo.contains('->')) {
-              // This is a transfer
-              final parts = walletInfo.split('->');
-              fromWallet = parts[0].trim();
-              toWallet = parts[1].trim();
-            } else {
-              wallet = walletInfo;
+            if (walletInfo.isNotEmpty) {
+              // Check if this is a wallet path already
+              if (walletInfo.contains('/')) {
+                wallet = walletInfo;
+              } else {
+                // Try to find wallet by name and get its path
+                wallet =
+                    'users/$verifiedUserId/wallets/${walletInfo}'; // Simplified path construction
+              }
             }
+          }
+
+          // Handle from/to wallets for transfers
+          if (row.length > 7 && row[7].toString().isNotEmpty) {
+            final fromWalletInfo = row[7].toString();
+            if (fromWalletInfo.contains('/')) {
+              fromWallet = fromWalletInfo;
+            } else {
+              fromWallet = 'users/$verifiedUserId/wallets/${fromWalletInfo}';
+            }
+          }
+
+          if (row.length > 8 && row[8].toString().isNotEmpty) {
+            final toWalletInfo = row[8].toString();
+            if (toWalletInfo.contains('/')) {
+              toWallet = toWalletInfo;
+            } else {
+              toWallet = 'users/$verifiedUserId/wallets/${toWalletInfo}';
+            }
+          }
+
+          // Parse balance information (if available)
+          double? balanceBefore;
+          double? balanceAfter;
+
+          if (row.length > 9 && row[9].toString().isNotEmpty) {
+            balanceBefore = double.tryParse(row[9].toString());
+          }
+
+          if (row.length > 10 && row[10].toString().isNotEmpty) {
+            balanceAfter = double.tryParse(row[10].toString());
           }
 
           // Create transaction object
           final transaction = TransactionModel(
             id: const Uuid().v4(),
-            userId: userId,
+            userId: verifiedUserId,
             date: date,
             amount: amount,
             description: description,
@@ -305,11 +431,13 @@ class ReportRepository {
             wallet: wallet,
             fromWallet: fromWallet,
             toWallet: toWallet,
+            balanceBefore: balanceBefore,
+            balanceAfter: balanceAfter,
           );
 
-          // Save to Firestore
+          // Save to Firestore in user's transactions subcollection
           await _firestoreService.firestore
-              .collection('transactions')
+              .collection(_userTransactionsPath(verifiedUserId))
               .doc(transaction.id)
               .set(transaction.toJson());
 
@@ -332,10 +460,21 @@ class ReportData {
   final Map<String, double> categoryExpenses;
   final Map<DateTime, double> dailyBalances;
   final Map<String, double> transactionTypeTotals;
+  final Map<String, double> walletExpenses; // Added wallet breakdown
 
   ReportData({
     required this.categoryExpenses,
     required this.dailyBalances,
     required this.transactionTypeTotals,
+    required this.walletExpenses,
   });
+}
+
+// Add custom exceptions for better error handling
+class SecurityException implements Exception {
+  final String message;
+  SecurityException(this.message);
+
+  @override
+  String toString() => 'SecurityException: $message';
 }

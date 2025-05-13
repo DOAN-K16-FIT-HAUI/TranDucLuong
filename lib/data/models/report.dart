@@ -1,5 +1,3 @@
-
-
 /// Data point for category expenses chart
 class CategoryDataPoint {
   final String category;
@@ -32,4 +30,15 @@ class TypeDataPoint {
 
   @override
   String toString() => 'TypeDataPoint{type: $type, amount: $amount}';
+}
+
+/// Data point for wallet expense breakdown
+class WalletDataPoint {
+  final String wallet;
+  final double amount;
+
+  WalletDataPoint(this.wallet, this.amount);
+
+  @override
+  String toString() => 'WalletDataPoint{wallet: $wallet, amount: $amount}';
 }

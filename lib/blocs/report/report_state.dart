@@ -17,6 +17,7 @@ class ReportLoaded extends ReportState {
   final List<CategoryDataPoint> categoryData;
   final List<BalanceDataPoint> balanceData;
   final List<TypeDataPoint> typeData;
+  final List<WalletDataPoint> walletData; // Added wallet breakdown data
   final double totalIncome;
   final double totalExpenses;
 
@@ -24,6 +25,7 @@ class ReportLoaded extends ReportState {
     required this.categoryData,
     required this.balanceData,
     required this.typeData,
+    required this.walletData, // Added this parameter
     required this.totalIncome,
     required this.totalExpenses,
   });
@@ -33,6 +35,7 @@ class ReportLoaded extends ReportState {
     categoryData,
     balanceData,
     typeData,
+    walletData, // Added to props
     totalIncome,
     totalExpenses,
   ];

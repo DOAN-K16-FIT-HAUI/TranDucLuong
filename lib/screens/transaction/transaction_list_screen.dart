@@ -391,16 +391,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                 ],
               );
             },
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => AppRoutes.navigateToTransaction(context),
-            tooltip: l10n.addTransactionTooltip,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Icon(
-              Icons.add,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-          ),
+          )
         );
       },
     );
