@@ -10,8 +10,36 @@ class AccountRepository {
   AccountRepository({
     FirebaseAuthService? authService,
     FirebaseAuth? firebaseAuth,
-  })  : _authService = authService ?? FirebaseAuthService(),
-        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  }) : _authService = authService ?? FirebaseAuthService(),
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+
+  // Check if the user account is active (not disabled)
+  Future<bool> isAccountActive() async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) return false;
+
+      // Force reload user metadata to get latest account status
+      await user.reload();
+
+      // Get fresh user object after reload
+      final freshUser = _firebaseAuth.currentUser;
+      if (freshUser == null) return false;
+
+      // Try to get token - this will fail if account is disabled
+      try {
+        await freshUser.getIdToken(true);
+        return true; // Account is active
+      } catch (e) {
+        if (e is FirebaseAuthException && e.code == 'user-disabled') {
+          return false; // Account is disabled
+        }
+        rethrow; // Some other error occurred
+      }
+    } catch (e) {
+      return false; // Default to inactive on error
+    }
+  }
 
   Future<UserModel> getAccountData() async {
     try {
@@ -20,10 +48,24 @@ class AccountRepository {
         throw Exception('No user is currently signed in');
       }
 
+      // Check if account is disabled
+      if (!await isAccountActive()) {
+        // Sign out if account is disabled
+        await _authService.signOut();
+        throw FirebaseAuthException(
+          code: 'user-disabled',
+          message: 'This account has been disabled.',
+        );
+      }
+
       String loginMethod = 'email';
-      if (firebaseUser.providerData.any((provider) => provider.providerId == 'google.com')) {
+      if (firebaseUser.providerData.any(
+        (provider) => provider.providerId == 'google.com',
+      )) {
         loginMethod = 'google';
-      } else if (firebaseUser.providerData.any((provider) => provider.providerId == 'facebook.com')) {
+      } else if (firebaseUser.providerData.any(
+        (provider) => provider.providerId == 'facebook.com',
+      )) {
         loginMethod = 'facebook';
       }
 

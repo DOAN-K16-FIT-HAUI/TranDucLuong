@@ -14,7 +14,17 @@ class Wallet {
     required this.balance,
     required this.icon,
     required this.type,
-  });
+  }) {
+    // Validate wallet data on instantiation
+    if (name.trim().isEmpty) {
+      throw ArgumentError('Wallet name cannot be empty');
+    }
+
+    if (type < 0 || type > 5) {
+      // Assuming valid type values are 0-5
+      throw ArgumentError('Invalid wallet type: $type');
+    }
+  }
 
   Wallet copyWith({
     String? id,
@@ -62,6 +72,18 @@ class Wallet {
       ),
       type: (data['type'] ?? 0).toInt(),
     );
+  }
+
+  // Validator function that can be used before committing changes
+  static void validateWallet(Wallet wallet) {
+    if (wallet.name.trim().isEmpty) {
+      throw ArgumentError('Wallet name cannot be empty');
+    }
+
+    if (wallet.type < 0 || wallet.type > 5) {
+      // Adjust range as needed
+      throw ArgumentError('Invalid wallet type: ${wallet.type}');
+    }
   }
 
   static IconData findIconByName(String name) {

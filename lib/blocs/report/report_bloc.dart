@@ -54,6 +54,12 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
               .map((entry) => TypeDataPoint(entry.key, entry.value))
               .toList();
 
+      // Add wallet data
+      final walletData =
+          result.walletExpenses.entries
+              .map((entry) => WalletDataPoint(entry.key, entry.value))
+              .toList();
+
       // Calculate income and expense totals
       final incomeEntry = result.transactionTypeTotals.entries.firstWhere(
         (entry) => entry.key == 'income',
@@ -72,6 +78,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         categoryData: categoryData,
         balanceData: balanceData,
         typeData: typeData,
+        walletData: walletData,
         totalIncome: totalIncome,
         totalExpenses: totalExpenses,
       );

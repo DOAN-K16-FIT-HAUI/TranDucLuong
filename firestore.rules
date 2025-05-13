@@ -3,9 +3,17 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // TRANSACTIONS
-    match /transactions/{transactionId} {
-      allow read, write: if isUserAuthenticated() && request.auth.uid == resource.data.userId;
-      allow create: if isUserAuthenticated() && request.auth.uid == request.resource.data.userId;
+    match /users/{userId}/transactions/{transactionId} {
+      allow read: if isUserAuthenticated() && request.auth.uid == userId;
+      allow create: if isUserAuthenticated() && 
+                      request.auth.uid == userId &&
+                      request.resource.data.userId == userId &&
+                      validateTransactionData(request.resource.data);
+      allow update: if isUserAuthenticated() && 
+                      request.auth.uid == userId && 
+                      request.resource.data.userId == userId &&
+                      validateTransactionData(request.resource.data);
+      allow delete: if isUserAuthenticated() && request.auth.uid == userId;
     }
 
     // USERS + subcollections
@@ -15,13 +23,35 @@ service cloud.firestore {
       allow delete: if false;
 
       match /wallets/{walletId} {
-        allow read, write: if isUserAuthenticated() && request.auth.uid == userId;
+        allow read: if isUserAuthenticated() && request.auth.uid == userId;
+        allow create: if isUserAuthenticated() && 
+                        request.auth.uid == userId &&
+                        validateWalletData(request.resource.data);
+        allow update: if isUserAuthenticated() && 
+                        request.auth.uid == userId &&
+                        validateWalletData(request.resource.data);
+        allow delete: if isUserAuthenticated() && request.auth.uid == userId;
+      }
+
+      match /summaries/{summaryId} {
+        allow read: if isUserAuthenticated() && request.auth.uid == userId;
+        allow create, update: if isUserAuthenticated() && 
+                                request.auth.uid == userId &&
+                                validateSummaryData(request.resource.data);
+        allow delete: if false; // Summaries should not be deleted
       }
 
       match /groupMemberships/{groupId} {
         allow create: if isUserAuthenticated() && request.auth.uid == userId;
         allow read, update, delete: if isUserAuthenticated() && request.auth.uid == userId;
       }
+    }
+
+    // Legacy transaction path (for backward compatibility)
+    match /transactions/{transactionId} {
+      allow read: if isUserAuthenticated() && request.auth.uid == resource.data.userId;
+      // Migration should happen through admin or server functions
+      allow write: if false;
     }
 
     // GROUP NOTES
@@ -98,6 +128,53 @@ service cloud.firestore {
      }
 
     // ==== HELPER FUNCTIONS ====
+    
+    // Validate transaction data
+    function validateTransactionData(data) {
+      let validTransactionTypes = ['income', 'expense', 'transfer', 'borrow', 'lend', 'adjustment'];
+      
+      // Basic required fields validation
+      let hasRequiredFields = data.keys().hasAll(['description', 'amount', 'date', 'typeKey', 'userId']) &&
+                              data.description is string && 
+                              data.amount is number &&
+                              data.typeKey is string;
+                              
+      // Type-specific validations
+      let isValidTransaction = 
+        // All non-transfer transactions require a wallet
+        ((data.typeKey != 'transfer' && data.wallet is string && data.wallet.size() > 0) ||
+        // Transfer requires fromWallet and toWallet
+        (data.typeKey == 'transfer' && data.fromWallet is string && data.fromWallet.size() > 0 &&
+                                      data.toWallet is string && data.toWallet.size() > 0)) &&
+        // Amount must be positive
+        data.amount > 0 &&
+        // Type must be valid
+        validTransactionTypes.hasAny([data.typeKey]);
+      
+      // Additional validations for special types
+      let isValidAdjustment = data.typeKey != 'adjustment' || 
+                            (data.typeKey == 'adjustment' && 
+                             data.balanceAfter is number);
+      
+      return hasRequiredFields && isValidTransaction && isValidAdjustment;
+    }
+    
+    // Validate wallet data
+    function validateWalletData(data) {
+      return data.keys().hasAll(['name', 'balance']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.balance is number;
+    }
+    
+    // Validate summary data 
+    function validateSummaryData(data) {
+      return data.keys().hasAll(['userId', 'year', 'month']) &&
+             data.userId is string &&
+             data.year is string &&
+             data.month is string;
+    }
+    
     function isUserAuthenticated() {
       return request.auth != null && request.auth.uid != null;
     }
