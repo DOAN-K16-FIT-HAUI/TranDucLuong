@@ -521,6 +521,8 @@ class TransactionScreenState extends State<TransactionScreen> {
         }
       }
 
+      // No need to find wallet objects - just use wallet names directly
+      // The repository will convert these to paths when needed
       final transaction = TransactionModel(
         id: '',
         userId: userId,
@@ -533,15 +535,15 @@ class TransactionScreenState extends State<TransactionScreen> {
                 ? _selectedCategoryKey
                 : '',
         wallet:
-            (_selectedType != l10n.transactionTypeTransfer)
+            _selectedType != l10n.transactionTypeTransfer
                 ? _selectedWallet
                 : null,
         fromWallet:
-            (_selectedType == l10n.transactionTypeTransfer)
+            _selectedType == l10n.transactionTypeTransfer
                 ? _selectedFromWallet
                 : null,
         toWallet:
-            (_selectedType == l10n.transactionTypeTransfer)
+            _selectedType == l10n.transactionTypeTransfer
                 ? _selectedToWallet
                 : null,
         lender:

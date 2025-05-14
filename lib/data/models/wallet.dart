@@ -115,4 +115,15 @@ class Wallet {
     }
     return 'help_outline';
   }
+
+  /// Creates an empty Wallet instance
+  factory Wallet.empty() {
+    return Wallet(
+      id: '',
+      name: '',
+      balance: 0,
+      icon: Icons.help_outline,
+      type: 0,
+    );
+  }
 }
