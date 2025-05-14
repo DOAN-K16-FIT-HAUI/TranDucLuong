@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:finance_app/blocs/account/account_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_bloc.dart';
 import 'package:finance_app/blocs/app_notification/notification_event.dart';
@@ -37,15 +38,41 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
   debugPrint('Background message: ${message.messageId}');
 
-  // Show local notification for important alerts from backend
-  if (message.data.containsKey('type') &&
-      message.data['type'] == 'spending_alert') {
+  // Enhanced background notification handling for different message types
+  final data = message.data;
+  final notification = message.notification;
+
+  if (notification != null) {
+    int notificationId;
+    String payload;
+
+    // Process different notification types
+    if (data.containsKey('type')) {
+      switch (data['type']) {
+        case 'spending_alert':
+          notificationId = LocalNotificationService.spendingAlertNotificationId;
+          payload = 'spending_alert';
+          break;
+        case 'savings_reminder':
+          notificationId =
+              LocalNotificationService.savingsReminderNotificationId;
+          payload = 'savings_reminder';
+          break;
+        default:
+          notificationId = message.hashCode;
+          payload = data['type'] ?? 'notification';
+      }
+    } else {
+      notificationId = message.hashCode;
+      payload = 'notification';
+    }
+
+    // Show notification regardless of type
     await LocalNotificationService.showNotification(
-      id: message.hashCode,
-      title: message.notification?.title ?? 'Spending Alert',
-      body:
-          message.notification?.body ?? 'You have exceeded your spending limit',
-      payload: 'spending_alert',
+      id: notificationId,
+      title: notification.title ?? 'New Notification',
+      body: notification.body ?? 'You have a new notification',
+      payload: payload,
     );
   }
 }
@@ -55,6 +82,15 @@ Future<void> main() async {
 
   // Add HTTP override for connection issues (especially in emulators)
   HttpOverrides.global = MyHttpOverrides();
+
+  // Initialize plugins that need context-less initialization
+  try {
+    // Initialize connectivity plugin for network checks
+    await Connectivity().checkConnectivity();
+  } catch (e) {
+    debugPrint('Connectivity plugin initialization error: $e');
+    // Continue even if plugin fails
+  }
 
   try {
     await Firebase.initializeApp().timeout(

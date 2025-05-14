@@ -54,6 +54,7 @@ dependencies:
   syncfusion_flutter_charts: ^29.1.41 # For advanced charting capabilities
   url_launcher: ^6.2.6 # For launching URLs and file locations
   flutter_launcher_icons: ^0.14.3 # For generating app icons
+  connectivity_plus: ^4.0.1 # For network checks
 
   # Dependency Injection
   get_it: ^8.0.3 # For dependency injection and service locator pattern

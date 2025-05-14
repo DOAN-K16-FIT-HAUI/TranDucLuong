@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class LocalNotificationService {
   static final _notifications = FlutterLocalNotificationsPlugin();
   static final onNotificationClick = ValueNotifier<String?>(null);
+
+  // Define consistent notification IDs to avoid conflicts
+  static const int savingsReminderNotificationId = 0;
+  static const int spendingAlertNotificationId = 1;
+  static const int testNotificationId = 999;
+
+  // Channel IDs
+  static const String savingsReminderChannelId = 'savings_reminder_channel';
+  static const String generalChannelId = 'general_channel';
+  static const String alertChannelId = 'alert_channel';
 
   static Future<void> initialize() async {
     if (kIsWeb) {
@@ -55,7 +67,8 @@ class LocalNotificationService {
               >();
 
       if (androidImplementation != null) {
-        final bool? granted = await androidImplementation.areNotificationsEnabled();
+        final bool? granted =
+            await androidImplementation.areNotificationsEnabled();
         debugPrint('Android notification permission status: $granted');
       }
 
@@ -80,7 +93,7 @@ class LocalNotificationService {
     }
   }
 
-  // Schedule daily savings reminder
+  // Schedule daily savings reminder with permission check
   static Future<void> scheduleDailySavingsReminder({
     required int hour,
     required int minute,
@@ -89,8 +102,15 @@ class LocalNotificationService {
   }) async {
     if (kIsWeb) return;
 
-    // Xóa tất cả các thông báo hiện có để tránh trùng lặp
-    await cancelAllNotifications();
+    // Check notification permission before scheduling
+    final bool hasPermission = await checkPermissionStatus();
+    if (!hasPermission) {
+      debugPrint('No notification permission granted');
+      throw Exception('Notification permission not granted');
+    }
+
+    // Only cancel savings reminder notifications (not all notifications)
+    await _notifications.cancel(savingsReminderNotificationId);
 
     try {
       final tz.TZDateTime scheduledTime = _nextInstanceOfTime(hour, minute);
@@ -98,13 +118,13 @@ class LocalNotificationService {
       debugPrint('Scheduling reminder for: ${scheduledTime.toString()}');
 
       await _notifications.zonedSchedule(
-        0, // ID for savings reminder
+        savingsReminderNotificationId, // Use fixed ID for savings reminder
         title,
         body,
         scheduledTime,
         NotificationDetails(
           android: const AndroidNotificationDetails(
-            'savings_reminder_channel',
+            savingsReminderChannelId,
             'Savings Reminders',
             channelDescription: 'Daily reminders to save money',
             importance: Importance.max,
@@ -131,7 +151,7 @@ class LocalNotificationService {
 
       // Thử gửi một thông báo ngay lập tức để kiểm tra quyền
       await showNotification(
-        id: 999,
+        id: testNotificationId,
         title: 'Reminder Settings Saved',
         body:
             'Your daily reminder has been set for $hour:${minute.toString().padLeft(2, '0')}',
@@ -142,6 +162,18 @@ class LocalNotificationService {
     } catch (e) {
       debugPrint('Error scheduling reminder: $e');
       rethrow;
+    }
+  }
+
+  // Cancel specific notification by ID
+  static Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return;
+
+    try {
+      await _notifications.cancel(id);
+      debugPrint('Notification with ID $id cancelled');
+    } catch (e) {
+      debugPrint('Error cancelling notification: $e');
     }
   }
 
@@ -197,7 +229,7 @@ class LocalNotificationService {
         body,
         NotificationDetails(
           android: const AndroidNotificationDetails(
-            'general_channel',
+            generalChannelId,
             'General Notifications',
             channelDescription: 'For general app notifications',
             importance: Importance.max,
@@ -262,10 +294,58 @@ class LocalNotificationService {
         return granted ?? false;
       }
 
+      // For iOS, assume permission is granted if the plugin is initialized
+      final IOSFlutterLocalNotificationsPlugin? iOSImplementation =
+          _notifications
+              .resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin
+              >();
+
+      if (iOSImplementation != null) {
+        return true; // We can't check iOS permission status after initialization
+      }
+
       return false;
     } catch (e) {
       debugPrint('Error checking notification permission: $e');
       return false;
+    }
+  }
+
+  // Helper method to show a user-friendly error notification
+  static Future<void> showErrorNotification({
+    required String title,
+    required String body,
+  }) async {
+    if (kIsWeb) return;
+
+    try {
+      await showNotification(
+        id: DateTime.now().millisecond,
+        title: title,
+        body: body,
+        payload: 'error_notification',
+      );
+    } catch (e) {
+      // Just log if we can't even show error notifications
+      debugPrint('Failed to show error notification: $e');
+    }
+  }
+
+  // Check network connectivity with fallback
+  static Future<bool> checkConnectivity() async {
+    try {
+      try {
+        final connectivityResult = await Connectivity().checkConnectivity();
+        return connectivityResult != ConnectivityResult.none;
+      } on MissingPluginException catch (e) {
+        // Plugin not initialized properly, log and assume connectivity exists
+        debugPrint('Connectivity plugin not available: $e');
+        return true; // Assume connectivity to allow operations to continue
+      }
+    } catch (e) {
+      debugPrint('Error checking connectivity: $e');
+      return true; // Default to assuming connectivity in case of errors
     }
   }
 }

@@ -62,9 +62,43 @@ class TransactionForm {
     DateTime? repaymentDate = transaction.repaymentDate;
     String selectedCategoryKey = transaction.categoryKey;
     String selectedType = _getLocalizedType(context, transaction.typeKey);
-    String selectedWallet = transaction.wallet ?? '';
-    String selectedFromWallet = transaction.fromWallet ?? '';
-    String selectedToWallet = transaction.toWallet ?? '';
+
+    // Store original wallet paths to preserve them when saving
+    final originalWalletPath = transaction.wallet;
+    final originalFromWalletPath = transaction.fromWallet;
+    final originalToWalletPath = transaction.toWallet;
+
+    // Extract wallet names for UI display
+    String selectedWallet =
+        _extractWalletNameFromPath(transaction.wallet) ?? '';
+    String selectedFromWallet =
+        _extractWalletNameFromPath(transaction.fromWallet) ?? '';
+    String selectedToWallet =
+        _extractWalletNameFromPath(transaction.toWallet) ?? '';
+
+    // For tracking if wallet selection has changed
+    String initialSelectedWallet = selectedWallet;
+    String initialFromWallet = selectedFromWallet;
+    String initialToWallet = selectedToWallet;
+
+    // Check if the extracted names exist in the available wallets list
+    // If not, default to the first wallet
+    if (selectedWallet.isNotEmpty && !walletNames.contains(selectedWallet)) {
+      selectedWallet = walletNames.isNotEmpty ? walletNames.first : '';
+    }
+
+    if (selectedFromWallet.isNotEmpty &&
+        !walletNames.contains(selectedFromWallet)) {
+      selectedFromWallet = walletNames.isNotEmpty ? walletNames.first : '';
+    }
+
+    if (selectedToWallet.isNotEmpty &&
+        !walletNames.contains(selectedToWallet)) {
+      selectedToWallet =
+          walletNames.length > 1
+              ? walletNames[1]
+              : (walletNames.isNotEmpty ? walletNames.first : '');
+    }
 
     String? dateError;
     String? repaymentDateError;
@@ -318,6 +352,41 @@ class TransactionForm {
             return;
           }
 
+          // Create a map to store wallet mappings from name to path
+          final Map<String, String?> walletPathMap = {};
+
+          // Determine which wallet paths to use - preserve original paths if wallet wasn't changed
+          String? walletPath = null;
+          String? fromWalletPath = null;
+          String? toWalletPath = null;
+
+          if (selectedType != l10n.transactionTypeTransfer) {
+            // For non-transfer transactions, handle the main wallet
+            if (selectedWallet == initialSelectedWallet &&
+                originalWalletPath != null) {
+              // If wallet hasn't changed, preserve original path
+              walletPath = originalWalletPath;
+            } else {
+              // If wallet has changed, use the wallet name (repository will resolve to path)
+              walletPath = selectedWallet;
+            }
+          } else {
+            // For transfer transactions, handle fromWallet and toWallet
+            if (selectedFromWallet == initialFromWallet &&
+                originalFromWalletPath != null) {
+              fromWalletPath = originalFromWalletPath;
+            } else {
+              fromWalletPath = selectedFromWallet;
+            }
+
+            if (selectedToWallet == initialToWallet &&
+                originalToWalletPath != null) {
+              toWalletPath = originalToWalletPath;
+            } else {
+              toWalletPath = selectedToWallet;
+            }
+          }
+
           // Save transaction changes
           onSave(
             TransactionModel(
@@ -333,15 +402,15 @@ class TransactionForm {
                       : '',
               wallet:
                   selectedType != l10n.transactionTypeTransfer
-                      ? selectedWallet
+                      ? walletPath
                       : null,
               fromWallet:
                   selectedType == l10n.transactionTypeTransfer
-                      ? selectedFromWallet
+                      ? fromWalletPath
                       : null,
               toWallet:
                   selectedType == l10n.transactionTypeTransfer
-                      ? selectedToWallet
+                      ? toWalletPath
                       : null,
               lender:
                   selectedType == l10n.transactionTypeBorrow
@@ -768,5 +837,21 @@ class TransactionForm {
     if (localizedType == l10n.transactionTypeLend) return "lend";
     if (localizedType == l10n.transactionTypeAdjustment) return "adjustment";
     return localizedType; // Fallback
+  }
+
+  // New helper method to extract wallet name from a Firestore path
+  static String? _extractWalletNameFromPath(String? path) {
+    if (path == null || path.isEmpty) {
+      return null;
+    }
+
+    // Extract the last part of the path (document ID)
+    final parts = path.split('/');
+    if (parts.length >= 2) {
+      return parts.last; // Return the document ID
+    }
+
+    // If the path doesn't look like a Firestore path, return it as is
+    return path;
   }
 }

@@ -86,6 +86,8 @@ class TransactionRepository {
     required String userId,
     required String walletName,
   }) async {
+    debugPrint("Looking up wallet reference for name: '$walletName'");
+
     final querySnapshot =
         await firestore
             .collection(_userWalletCollectionPath(userId))
@@ -94,8 +96,12 @@ class TransactionRepository {
             .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first.reference;
+      final ref = querySnapshot.docs.first.reference;
+      debugPrint("Found wallet reference: ${ref.path}");
+      return ref;
     }
+
+    debugPrint("Warning: No wallet found with name '$walletName'");
     return null;
   }
 
@@ -189,9 +195,10 @@ class TransactionRepository {
     final batch = firestore.batch();
 
     try {
-      // Chuyển đổi wallet name thành wallet path (document reference) nếu cần
+      // Convert wallet names to wallet paths (document references)
       TransactionModel transactionToSave = transactionWithUser;
 
+      // Handle standard wallet field (used for income, expense, borrow, lend, adjustment)
       if (transactionWithUser.wallet != null &&
           !transactionWithUser.wallet!.contains('/')) {
         final walletRef = await _getWalletRefByName(
@@ -206,6 +213,7 @@ class TransactionRepository {
         }
       }
 
+      // Handle fromWallet (used by transfer)
       if (transactionWithUser.fromWallet != null &&
           !transactionWithUser.fromWallet!.contains('/')) {
         final fromWalletRef = await _getWalletRefByName(
@@ -220,6 +228,7 @@ class TransactionRepository {
         }
       }
 
+      // Handle toWallet (used by transfer)
       if (transactionWithUser.toWallet != null &&
           !transactionWithUser.toWallet!.contains('/')) {
         final toWalletRef = await _getWalletRefByName(
@@ -670,9 +679,58 @@ class TransactionRepository {
             : newTransaction;
 
     final firestore = firestoreService.firestore;
+
+    // Convert wallet names to paths if needed (similar to addTransaction)
+    TransactionModel transactionToUpdate = transactionWithUser;
+
+    // Handle standard wallet field
+    if (transactionToUpdate.wallet != null &&
+        !transactionToUpdate.wallet!.contains('/')) {
+      final walletRef = await _getWalletRefByName(
+        firestore: firestore,
+        userId: userId,
+        walletName: transactionToUpdate.wallet!,
+      );
+      if (walletRef != null) {
+        transactionToUpdate = transactionToUpdate.copyWith(
+          wallet: walletRef.path,
+        );
+      }
+    }
+
+    // Handle fromWallet
+    if (transactionToUpdate.fromWallet != null &&
+        !transactionToUpdate.fromWallet!.contains('/')) {
+      final fromWalletRef = await _getWalletRefByName(
+        firestore: firestore,
+        userId: userId,
+        walletName: transactionToUpdate.fromWallet!,
+      );
+      if (fromWalletRef != null) {
+        transactionToUpdate = transactionToUpdate.copyWith(
+          fromWallet: fromWalletRef.path,
+        );
+      }
+    }
+
+    // Handle toWallet
+    if (transactionToUpdate.toWallet != null &&
+        !transactionToUpdate.toWallet!.contains('/')) {
+      final toWalletRef = await _getWalletRefByName(
+        firestore: firestore,
+        userId: userId,
+        walletName: transactionToUpdate.toWallet!,
+      );
+      if (toWalletRef != null) {
+        transactionToUpdate = transactionToUpdate.copyWith(
+          toWallet: toWalletRef.path,
+        );
+      }
+    }
+
     final transactionRef = firestore
         .collection(_userTransactionsPath(userId))
-        .doc(transactionWithUser.id);
+        .doc(transactionToUpdate.id);
 
     try {
       await firestore.runTransaction((transaction) async {
@@ -711,14 +769,14 @@ class TransactionRepository {
           firestore,
           transaction,
           userId,
-          transactionWithUser,
-        ); // Sử dụng transaction đã có userId
+          transactionToUpdate, // Use the updated transaction with proper paths
+        );
 
         // 4. Cập nhật document giao dịch với dữ liệu mới
-        transaction.update(transactionRef, transactionWithUser.toJson());
+        transaction.update(transactionRef, transactionToUpdate.toJson());
       });
       debugPrint(
-        "Transaction updated and wallet balance(s) adjusted successfully (ID: ${transactionWithUser.id}).",
+        "Transaction updated and wallet balance(s) adjusted successfully (ID: ${transactionToUpdate.id}).",
       );
     } catch (e) {
       debugPrint("Error during updateTransaction Firestore transaction: $e");
